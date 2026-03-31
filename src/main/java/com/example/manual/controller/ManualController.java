@@ -1,32 +1,34 @@
 package com.example.manual.controller;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.manual.entity.Manual;
-import com.example.manual.repository.ManualRepository;
+import com.example.manual.entity.ManualStatus;
 import com.example.manual.service.ManualService;
+
 
 @RestController
 @RequestMapping("/manuals")
 public class ManualController {
 
-    @Autowired
-    private ManualRepository manualRepository;
+    private final ManualService manualService;
 
-    @Autowired
-    private ManualService manualService;
+    public ManualController(ManualService manualService) {
+        this.manualService = manualService;
+    }
 
     @GetMapping("/{id}")
     public Manual getManual(@PathVariable Long id) {
@@ -37,16 +39,37 @@ public class ManualController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したマニュアルが存在しません");
     }
 
-    //HTTPからIDとボディからupdateManualを受け取ってサービスに渡す
     @PutMapping("/{id}")
-    public Manual updateManual(@PathVariable Long id,@RequestBody Manual updatedManual) {
+    public Manual updateManual(@PathVariable Long id, @RequestBody Manual updatedManual) {
         return manualService.updateManual(id, updatedManual);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteManual(@PathVariable Long id){
+        manualService.deleteManual(id);
     }
 
     @PostMapping
     public Manual createManual(@RequestBody Manual manual) {
-        manual.setCreatedAt(LocalDateTime.now());
-        manual.setUpdatedAt(LocalDateTime.now());
-        return manualRepository.save(manual);
+        Manual savedManual = manualService.createManual(manual);
+        return savedManual;
+    }
+
+    //全件取得
+    @GetMapping
+    public List<Manual> getAllManuals(){
+        return manualService.getAllManuals();
+    }
+
+    //タイトル検索
+    @GetMapping("/search")
+    public List<Manual> searchByTitle(@RequestParam String keyword) {
+        return manualService.searchByTitle(keyword);
+    }
+
+    //status絞り込み検索
+    @GetMapping("/status")
+    public List<Manual> searchByStatus(@RequestParam ManualStatus status) {
+        return manualService.searchByStatus(status);
     }
 }
