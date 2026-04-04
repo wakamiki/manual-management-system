@@ -1,4 +1,4 @@
-package com.example.manual.entity;
+package com.example.manual.enums;
 
 public enum ManualStatus {
     DRAFT,

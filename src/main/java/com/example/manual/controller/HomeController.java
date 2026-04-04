@@ -1,13 +1,16 @@
 package com.example.manual.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+import ch.qos.logback.core.model.Model;
+
 public class HomeController {
 
     @GetMapping("/")
-    public String home() {
-        return "Manual Management System is running.";
+    public String home(Model model) {
+        //カテゴリ取得
+        //マニュアル取得
+        return "index";
     }
+
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.manual.entity.Manual;
-import com.example.manual.entity.ManualStatus;
+import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
 
 
@@ -44,14 +43,45 @@ public class ManualController {
         return manualService.updateManual(id, updatedManual);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteManual(@PathVariable Long id){
-        manualService.deleteManual(id);
+    @PutMapping("/{id}")
+    public String approveManual(Long id) {
+    manualService.approveManual(id);
+    return "申請を受け付けました";
     }
+
+    @PutMapping("/{id}")
+    public String submitManual(Long id) {
+        manualService.submitManual(id);
+        return "申請を受け付けました";
+    }
+
+    @PutMapping("/{id}")
+    public String rollbackManual(Long id) {
+        manualService.rollbackManual(id);
+        return "申請を受け付けました";
+    }
+
+    @PutMapping("/{id}")
+    public String archiveManual(Long id) {
+        manualService.archiveManual(id);
+        return "申請を受け付けました";
+        }
+    
+    @PutMapping("/{id}")
+    public String restoreManual(Long id) {
+        manualService.restoreManual(id);
+        return "申請を受け付けました";
+        }
 
     @PostMapping
     public Manual createManual(@RequestBody Manual manual) {
         Manual savedManual = manualService.createManual(manual);
+        return savedManual;
+    }
+
+    @PostMapping("/copy")
+    public Manual copyManual(@RequestBody Manual manual) {
+        Manual savedManual = manualService.copyManual(manual);
         return savedManual;
     }
 
