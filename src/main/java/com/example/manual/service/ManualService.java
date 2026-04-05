@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.manual.controller.ManualController;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;

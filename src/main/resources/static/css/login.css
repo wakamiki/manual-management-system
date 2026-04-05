@@ -1,0 +1,19 @@
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.login-page .card {
+  border: none;
+  box-shadow: 0 0.75rem 2rem rgba(13, 110, 253, 0.12);
+}
+
+.login-page .form-label {
+  font-weight: 600;
+}
+
+.login-page .btn-primary {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}

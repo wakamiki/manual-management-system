@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ホーム画面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+  <main class="container index-page">
+    <header class="page-header">
+      <div>
+        <h1 class="h3 mb-0">業務マニュアル管理システム</h1>
+      </div>
+      <div class="page-actions">
+        <form class="search-form">
+          <input type="search" class="form-control" placeholder="キーワード検索">
+          <button type="submit" class="btn btn-outline-primary">検索</button>
+        </form>
+        <a href="./manual-create.html" class="btn btn-primary create-button">新規作成</a>
+      </div>
+    </header>
+
+    <div class="row g-4 align-items-start">
+
+      <aside class="col-3 sidebar">
+        <div class="card">
+          <div class="card-body">
+            <div>
+            <h2 class="h5">カテゴリ</h2>
+            </div>
+            <div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item active">営業部</li>
+              <li class="list-group-item">総務部</li>
+              <li class="list-group-item">経理部</li>
+              </ul>
+              </div>
+              <div class="stopedCategory">
+              <button class="stopped-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
+                <span>使用停止</span>
+                <span class="stopped-toggle-icon">▼</span>
+              </button>
+              <div class="collapse" id="stoppedCategoryList">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">旧営業部</li>
+                </ul>
+                </div>
+              </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="col-9">
+        <div class="accordion w-100" id="accordionExample">
+          <div class="accordion-item">
+            <div class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <div class="w-100">
+              <div class="d-flex justify-content-between align-items-center gap-2">
+              <strong class="fw-semibold">マニュアル１件目</strong>
+              <span class="text-muted"><small class="pe-5">更新日</small></span>
+              </div>
+              <div class="align-items-center gap-2">
+              <span class="category">カテゴリ</span>
+              <span class="badge bg-primary">承認状態</span>
+              </div>
+              </div>
+            </button>
+                 <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                   <p>内容</p>
+                   <div class="table-responsive mt-3">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col">更新日</th>
+                          <th scope="col">更新内容</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>2026-04-05</td>
+                          <td>本文修正</td>
+                        </tr>
+                        <tr>
+                          <td>2026-04-04</td>
+                          <td>初版作成</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                   </div>
+                   <div class="d-flex gap-2 mt-3">
+                    <a href="./manual-edit.html" class="btn btn-outline-primary btn-sm">編集</a>
+                    <a href="./manual-create.html" class="btn btn-outline-secondary btn-sm">複製</a>
+                   </div>
+                </div>
+              </div> 
+              </div>
+        </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
+              <div class="w-100">
+              <div class="d-flex justify-content-between align-items-center gap-2">
+              <strong class="fw-semibold">マニュアル１件目</strong>
+              <span class="text-muted"><small class="pe-5">更新日</small></span>
+              </div>
+              <div class="align-items-center gap-2">
+              <span class="category">カテゴリ</span>
+              <span class="badge bg-primary">承認状態</span>
+              </div>
+              </div>
+            </button>
+                 <div id="collapseTwo" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                   <p>内容</p>
+                   <div class="table-responsive mt-3">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col">更新日</th>
+                          <th scope="col">更新内容</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>2026-04-05</td>
+                          <td>本文修正</td>
+                        </tr>
+                        <tr>
+                          <td>2026-04-04</td>
+                          <td>初版作成</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                   </div>
+                   <div class="d-flex gap-2 mt-3">
+                    <a href="./manual-edit.html" class="btn btn-outline-primary btn-sm">編集</a>
+                    <a href="./manual-create.html" class="btn btn-outline-secondary btn-sm">複製</a>
+                   </div>
+                </div>
+              </div> 
+              </div>
+        </div>          <div class="accordion-item">
+            <div class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
+              <div class="w-100">
+              <div class="d-flex justify-content-between align-items-center gap-2">
+              <strong class="fw-semibold">マニュアル１件目</strong>
+              <span class="text-muted"><small class="pe-5">更新日</small></span>
+              </div>
+              <div class="align-items-center gap-2">
+              <span class="category">カテゴリ</span>
+              <span class="badge bg-primary">承認状態</span>
+              </div>
+              </div>
+            </button>
+                 <div id="collapseThree" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                   <p>内容</p>
+                   <div class="table-responsive mt-3">
+                    <table class="table table-sm table-bordered align-middle mb-0">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col">更新日</th>
+                          <th scope="col">更新内容</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>2026-04-05</td>
+                          <td>本文修正</td>
+                        </tr>
+                        <tr>
+                          <td>2026-04-04</td>
+                          <td>初版作成</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                   </div>
+                   <div class="d-flex gap-2 mt-3">
+                    <a href="./manual-edit.html" class="btn btn-outline-primary btn-sm">編集</a>
+                    <a href="./manual-create.html" class="btn btn-outline-secondary btn-sm">複製</a>
+                   </div>
+                </div>
+              </div> 
+              </div>
+        </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

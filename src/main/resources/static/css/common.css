@@ -1,0 +1,23 @@
+body {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+main.container {
+  max-width: 1200px;
+}
+
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.form-control,
+.form-select,
+.btn {
+  border-radius: 0.5rem;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
