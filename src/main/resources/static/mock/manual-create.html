@@ -9,9 +9,13 @@
 </head>
 <body>
   <main class="container mock-page">
-    <div class="page-title-bar">
+    <div class="page-title-bar tight-gap">
       <h1 class="h3 mb-0">マニュアル新規作成</h1>
-      <a href="./index.html" class="btn btn-outline-secondary">一覧へ戻る</a>
+      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
+    </div>
+
+    <div class="alert mock-alert mt-0 mb-2" role="alert">
+      入力内容を保存しました。
     </div>
 
     <form class="card">
@@ -40,7 +44,7 @@
       <div class="card-footer d-flex gap-2">
         <button type="submit" class="btn btn-primary">下書き保存</button>
         <button type="button" class="btn btn-outline-primary">確認して申請</button>
-        <a href="./index.html" class="btn btn-outline-secondary">戻る</a>
+        <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
       </div>
     </form>
   </main>

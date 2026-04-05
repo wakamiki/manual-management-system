@@ -1,5 +1,4 @@
 package com.example.manual.dto;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,13 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ManualRequestDto {
+public class CategoryRequestDto {
+    
+private String categoryName;
 
-private String title;
+private Integer displayOrder;
 
-private String content;
-
-private Long categoryId;
-
-private String changeNote;
 }

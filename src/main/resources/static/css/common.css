@@ -26,6 +26,10 @@ main.container {
   color: #f7fbfc;
 }
 
+.page-title-bar.tight-gap {
+  margin-bottom: 4px;
+}
+
 .page-title-bar .h3,
 .page-title-bar .h4,
 .page-title-bar .h5,
@@ -62,6 +66,18 @@ main.container {
 .card-footer {
   background-color: #ffffff;
 }
+
+.mock-alert {
+  border-radius: 10px;
+  border: 1px solid #c7ddd7;
+  background-color: #f3faf5;
+  color: #476b57;
+  font-size: 13px;
+  line-height: 1.2;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
 
 .badge {
   font-weight: 600;

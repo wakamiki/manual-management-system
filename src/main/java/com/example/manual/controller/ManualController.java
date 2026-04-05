@@ -1,5 +1,7 @@
 package com.example.manual.controller;
 
+import com.example.manual.repository.ManualRepository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.manual.dto.ManualRequestDto;
+import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
@@ -23,83 +27,93 @@ import com.example.manual.service.ManualService;
 @RequestMapping("/manuals")
 public class ManualController {
 
+    private final ManualRepository manualRepository;
     private final ManualService manualService;
 
-    public ManualController(ManualService manualService) {
+    public ManualController(ManualService manualService, ManualRepository manualRepository) {
         this.manualService = manualService;
+        this.manualRepository = manualRepository;
     }
 
+      //Dto未対応　編集予定
     @GetMapping("/{id}")
-    public Manual getManual(@PathVariable Long id) {
-        Optional<Manual> manualOpt = manualService.getManualById(id);
-        if (manualOpt.isPresent()) {
-            return manualOpt.get();
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したマニュアルが存在しません");
+    public ManualResponseDto getManual(@PathVariable Long id) {
+    return manualService.getManual(id);
     }
 
+      //Dto未対応　編集予定
     @PutMapping("/{id}")
-    public Manual updateManual(@PathVariable Long id, @RequestBody Manual updatedManual) {
-        return manualService.updateManual(id, updatedManual);
-    }
+    public ManualResponseDto updateManual(@PathVariable Long id, @RequestBody ManualRequestDto requestDto) {
+        return manualService.updateManual(id, requestDto);
+    }//マニュアルを更新しました。
 
-    @PutMapping("/{id}")
-    public String approveManual(Long id) {
+      //Dto未対応　編集予定
+    @PutMapping("/{id}/approve")
+    public String approveManual(@PathVariable Long id) {
     manualService.approveManual(id);
-    return "申請を受け付けました";
+    return "マニュアルを承認しました。";
     }
 
-    @PutMapping("/{id}")
-    public String submitManual(Long id) {
+      //Dto未対応　編集予定
+    @PutMapping("/{id}/submit")
+    public String submitManual(@PathVariable Long id) {
         manualService.submitManual(id);
-        return "申請を受け付けました";
+        return "申請を完了しました。";
     }
 
-    @PutMapping("/{id}")
-    public String rollbackManual(Long id) {
+      //Dto未対応　編集予定
+    @PutMapping("/{id}rollback")
+    public String rollbackManual(@PathVariable Long id) {
         manualService.rollbackManual(id);
-        return "申請を受け付けました";
+        return "マニュアルを差し戻しました。";
     }
 
-    @PutMapping("/{id}")
-    public String archiveManual(Long id) {
+      //Dto未対応　編集予定
+    @PutMapping("/{id}archive")
+    public String archiveManual(@PathVariable Long id) {
         manualService.archiveManual(id);
-        return "申請を受け付けました";
+        return "マニュアルをアーカイブしました。";
         }
-    
-    @PutMapping("/{id}")
-    public String restoreManual(Long id) {
+      //Dto未対応　編集予定
+    @PutMapping("/{id}/restore")
+    public String restoreManual(@PathVariable Long id) {
         manualService.restoreManual(id);
-        return "申請を受け付けました";
+        return "マニュアルを復帰しました。";
         }
 
+      //Dto未対応　編集予定
     @PostMapping
-    public Manual createManual(@RequestBody Manual manual) {
-        Manual savedManual = manualService.createManual(manual);
-        return savedManual;
-    }
+    public ManualResponseDto createManual(@RequestBody ManualRequestDto requestDto) {
+     manualResponseDto savedManual = manualService.createManual(requestDto);
+    
+     return savedManual;
+    }//マニュアルを作成しました。
 
-    @PostMapping("/copy")
-    public Manual copyManual(@RequestBody Manual manual) {
-        Manual savedManual = manualService.copyManual(manual);
+      //Dto未対応　編集予定
+    @PostMapping("/{id}/copy")
+    public ManualResponseDto copyManual(@RequestBody ManualRequestDto manual) {
+        ManualResponseDto savedManual = manualService.copyManual(manual);
         return savedManual;
-    }
-
+    }//マニュアルを複製しました。
+    
+      //Dto未対応　編集予定
     //全件取得
     @GetMapping
-    public List<Manual> getAllManuals(){
+    public List<ManualResponseDto> getAllManuals(){
         return manualService.getAllManuals();
     }
 
+        //Dto未対応　編集予定
     //タイトル検索
     @GetMapping("/search")
-    public List<Manual> searchByTitle(@RequestParam String keyword) {
+    public List<ManualResponseDto> searchByTitle(@RequestParam String keyword) {
         return manualService.searchByTitle(keyword);
     }
 
+        //Dto未対応　編集予定
     //status絞り込み検索
     @GetMapping("/status")
-    public List<Manual> searchByStatus(@RequestParam ManualStatus status) {
+    public List<ManualResponseDto> searchByStatus(@RequestParam ManualStatus status) {
         return manualService.searchByStatus(status);
     }
 }

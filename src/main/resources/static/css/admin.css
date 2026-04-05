@@ -3,6 +3,10 @@
   padding-bottom: 40px;
 }
 
+.admin-page .page-title-bar {
+  margin-bottom: 8px;
+}
+
 .admin-layout {
   display: grid;
   grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
@@ -86,6 +90,10 @@
   border: 1px solid #c7ddd7;
   background-color: #f3faf5;
   color: #476b57;
+  font-size: 13px;
+  line-height: 1.2;
+  padding: 8px 12px;
+  margin-bottom: 8px !important;
 }
 
 @media (max-width: 991.98px) {

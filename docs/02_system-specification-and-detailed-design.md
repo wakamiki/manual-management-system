@@ -1,8 +1,9 @@
 # 業務マニュアル管理システム 仕様書
 
-Version: 01.05.00
+Version: 01.06.00
 更新日: 2026-04-05
-更新内容: Manual複製仕様の詳細化
+更新内容: 別タブ運用ルールと終了導線仕様を追加
+
 ---
 
 ## 1. システム仕様概要
@@ -21,7 +22,7 @@ Version: 01.05.00
 
 ---
 
-### 1-1. 対象機能
+## 2. 対象機能
 
 * マニュアル CRUD
 * 状態遷移管理
@@ -33,37 +34,55 @@ Version: 01.05.00
 * 履歴管理
 * 検索機能
 
-### 1-2. 利用者
+---
+
+## 3. 利用者・前提条件
+
+### 3-1. 利用者
 
 * USER
 * APPROVER
 * ADMIN
 
-### 1-3. 前提条件
+### 3-2. 前提条件
 
 * 全機能ログイン必須
 * 権限に応じて操作制御
 * 物理削除は行わない
-* ARCHIVED により論理管理
+* ARCHIVED により論理管理する
 
-### 1-4. 権限制御概要
+### 3-3. 権限制御概要
 
 * USER：作成 / 編集 / 申請
 * APPROVER：承認 / 旧版化 / 復帰
 * ADMIN：カテゴリ / ユーザー管理
 
+### 3-4. 画面利用方針
+
+* トップ画面は検索 / 絞り込み / 画面遷移の起点とする
+* マニュアル詳細画面は、検索しながら複数マニュアルを突き合わせて参照できるよう別タブで開く
+* 新規作成 / 複製 / 編集は入力専用の独立タブとして扱う
+* 管理画面もトップ画面を閉じずに参照・更新できるよう別タブで開く
+
+### 3-5. 終了導線方針
+
+* 別タブ画面の終了導線は `戻る` ではなく `閉じる` を基本とする
+* `閉じる` はモック段階では「現在の別タブ画面を終了する」操作意図を表す
+* 詳細画面の `閉じる` は、一覧へ戻る意味ではなく比較参照用タブを終了する意味で扱う
+* 新規作成 / 複製 / 編集 / 管理画面の `閉じる` も、入力・管理用タブを終了する導線として扱う
+
 ---
 
-## 2. 状態遷移仕様
+## 4. 状態遷移仕様
 
-### 2-1. マニュアル状態一覧
+### 4-1. マニュアル状態一覧
 
 * DRAFT
 * PENDING
 * APPROVED
 * ARCHIVED
 
-### 2-2. 状態遷移ルール
+### 4-2. 状態遷移ルール
 
 * DRAFT → PENDING
 * PENDING → APPROVED
@@ -72,7 +91,7 @@ Version: 01.05.00
 * APPROVED → ARCHIVED
 * ARCHIVED → APPROVED
 
-### 2-3. 状態遷移条件
+### 4-3. 状態遷移条件
 
 * title / content 必須
 * 作成者本人承認禁止
@@ -80,7 +99,7 @@ Version: 01.05.00
 * 使用停止カテゴリでは承認不可
 * 復帰は同一アクティブカテゴリのみ
 
-### 2-4. 承認日時制御
+### 4-4. 承認日時制御
 
 * DRAFT：null
 * PENDING：null
@@ -89,54 +108,65 @@ Version: 01.05.00
 
 ---
 
-## 3. 業務ルール仕様
+## 5. 業務ルール仕様
 
-### 3-1. 編集ルール
+### 5-1. 編集ルール
 
 * DRAFT：編集可
 * PENDING：作成者のみ編集可
 * APPROVED：直接編集不可
 * ARCHIVED：編集不可
 
-### 3-2. 複製ルール
+### 5-2. 複製ルール
 
 * 複製元から title / content を引き継ぐ
 * id は新規採番
 * changeNote 必須
 * 複製先は DRAFT
 * approvedAt = null
-* createdAt / updatedAt 再採番
+* createdAt / updatedAt は新規値を設定
 * createdByUser は複製実行ユーザー
 * category 指定必須
-* 複製時は履歴を必ず1件登録
+* 複製時は履歴を必ず 1 件登録
 
-### 3-3. 複製画面遷移ルール
+### 5-3. 複製画面遷移ルール
 
 * 複製開始元は詳細画面 / 編集画面
-* 複製開始時は新規作成画面を複製モードで表示
-* title / content は初期表示
-* category は複製先カテゴリを再選択可能
-* changeNote は未入力で初期表示し、保存前に必須チェック
-* 保存完了後は複製先マニュアル詳細画面へ遷移
+* 複製開始時は新規作成画面を複製モードで別タブ表示する
+* title / content は初期表示する
+* category は複製先カテゴリを再選択可能とする
+* changeNote は未入力で初期表示し、保存前に必須チェックする
+* 保存完了後は複製先マニュアル詳細画面へ遷移する
 
-### 3-4. 検索ルール
+### 5-4. 検索ルール
 
 * title 部分一致
 * 大文字小文字無視
 * includeArchived 対応
 
-### 3-5. disabledボタン理由表示
+### 5-5. disabled ボタン理由表示
 
-* 非活性理由を画面表示
+* 非活性理由を画面表示する
 * 権限不足
 * 状態不一致
 * 使用停止カテゴリ
 
+### 5-6. 別タブ画面の保存後方針
+
+* 詳細画面は参照タブとして扱うため、保存処理は持たない
+* 新規作成 / 複製 / 編集は独立タブで操作する
+* モック段階では `閉じる` により作業タブ終了を表現する
+* 実装時の保存完了後遷移は各機能ルールに従う
+* 例：
+  * 複製保存完了後は複製先マニュアル詳細画面へ遷移
+  * 新規作成保存完了後の遷移先は Controller / UI 実装時に確定
+  * 編集保存完了後の遷移先は詳細再表示または完了メッセージ表示を前提に実装時に確定
+
 ---
 
-## 4. Entity設計
+## 6. Entity設計
 
-### 4-1. Category
+### 6-1. Category
 
 * id
 * categoryName
@@ -144,7 +174,7 @@ Version: 01.05.00
 * createdAt
 * updatedAt
 
-### 4-2. User
+### 6-2. User
 
 * id
 * userId
@@ -156,7 +186,7 @@ Version: 01.05.00
 * createdAt
 * updatedAt
 
-### 4-3. Manual
+### 6-3. Manual
 
 * id
 * categoryId
@@ -168,14 +198,14 @@ Version: 01.05.00
 * updatedAt
 * approvedAt
 
-### 4-4. ManualHistory
+### 6-4. ManualHistory
 
 * id
 * manualId
 * changeNote
 * changedAt
 
-### 4-5. UserOperationHistory
+### 6-5. UserOperationHistory
 
 * id
 * targetUserId
@@ -186,9 +216,9 @@ Version: 01.05.00
 
 ---
 
-## 5. Service設計
+## 7. Service設計
 
-### 5-1. ManualService
+### 7-1. ManualService
 
 主要メソッド
 
@@ -207,7 +237,7 @@ Version: 01.05.00
 * 権限制御
 * changeNote 履歴保存
 
-### 5-2. UserService
+### 7-2. UserService
 
 * createUser()
 * updateUser()
@@ -216,7 +246,7 @@ Version: 01.05.00
 * activateUser()
 * resetPassword()
 
-### 5-3. CategoryService
+### 7-3. CategoryService
 
 * createCategory()
 * updateCategory()
@@ -224,7 +254,7 @@ Version: 01.05.00
 * activateCategory()
 * findAllActive()
 
-### 5-4. AuthService
+### 7-4. AuthService
 
 * login()
 * logout()
@@ -232,9 +262,9 @@ Version: 01.05.00
 
 ---
 
-## 6. Controller設計
+## 8. Controller設計
 
-### 6-1. ManualController
+### 8-1. ManualController
 
 | メソッド | エンドポイント               | 機能   |
 | ---- | --------------------- | ---- |
@@ -247,7 +277,7 @@ Version: 01.05.00
 | PUT  | /manuals/{id}/archive | 旧版化  |
 | POST | /manuals/{id}/copy    | 複製   |
 
-### 6-2. UserController
+### 8-2. UserController
 
 | メソッド | エンドポイント                | 機能     |
 | ---- | ---------------------- | ------ |
@@ -257,7 +287,7 @@ Version: 01.05.00
 | PUT  | /users/{id}/deactivate | 停止     |
 | PUT  | /users/{id}/activate   | 再有効化   |
 
-### 6-3. CategoryController
+### 8-3. CategoryController
 
 | メソッド | エンドポイント                     | 機能   |
 | ---- | --------------------------- | ---- |
@@ -266,7 +296,7 @@ Version: 01.05.00
 | PUT  | /categories/{id}            | 更新   |
 | PUT  | /categories/{id}/deactivate | 停止   |
 
-### 6-4. AuthController
+### 8-4. AuthController
 
 | メソッド | エンドポイント      | 機能    |
 | ---- | ------------ | ----- |
@@ -275,56 +305,56 @@ Version: 01.05.00
 
 ---
 
-## 7. DTO設計
+## 9. DTO設計
 
-### RequestDto
+### 9-1. RequestDto
 
 * ManualRequestDto
 * UserRequestDto
 * CategoryRequestDto
 
-### ResponseDto
+### 9-2. ResponseDto
 
 * ManualResponseDto
 * UserResponseDto
 * CategoryResponseDto
 
-### 一覧用Dto
+### 9-3. 一覧用Dto
 
 * ManualListDto
 * UserListDto
 
-### 詳細用Dto
+### 9-4. 詳細用Dto
 
 * ManualDetailDto
 * UserDetailDto
 
 ---
 
-## 8. バリデーション仕様
+## 10. バリデーション仕様
 
-### title
+### 10-1. title
 
 * 必須
 * 最大 100 文字
 
-### content
+### 10-2. content
 
 * 必須
 * 最大 10000 文字
 
-### changeNote
+### 10-3. changeNote
 
 * 必須
 * 最大 100 文字
 * trim
 
-### userId
+### 10-4. userId
 
 * 必須
 * 重複不可
 
-### categoryName
+### 10-5. categoryName
 
 * 必須
 * 最大 50 文字
@@ -332,7 +362,7 @@ Version: 01.05.00
 
 ---
 
-## 9. 例外設計
+## 11. 例外設計
 
 例外クラス
 
@@ -348,7 +378,7 @@ Version: 01.05.00
 
 ---
 
-## 10. ログ設計
+## 12. ログ設計
 
 ログレベル
 
@@ -371,7 +401,7 @@ Version: 01.05.00
 
 ---
 
-## 11. 実装順
+## 13. 実装順
 
 1. Entity
 2. Repository
@@ -385,7 +415,7 @@ Version: 01.05.00
 
 ---
 
-## 12. 将来拡張設計
+## 14. 将来拡張設計
 
 * 関連マニュアル
 * 確認チェック
@@ -397,10 +427,11 @@ Version: 01.05.00
 
 ## 改版履歴
 
-| Version  | 日付         | 更新内容        |
-| -------- | ---------- | ----------- |
+| Version  | 日付         | 更新内容 |
+| -------- | ---------- | -------- |
 | 01.01.00 | 2026-03-29 | 初版作成、基本構成定義 |
 | 01.02.00 | 2026-03-30 | status仕様・状態遷移・承認履歴仕様追加 |
 | 01.03.00 | 2026-03-31 | CRUD仕様確定、検索API追加、approvedAt制御ルール確定 |
 | 01.04.00 | 2026-04-04 | 詳細設計資料統合版作成 |
 | 01.05.00 | 2026-04-05 | Manual複製仕様の詳細化 |
+| 01.06.00 | 2026-04-05 | 別タブ運用方針、`閉じる` 終了導線、保存後方針の整理を追加 |

@@ -24,7 +24,7 @@ public class ManualHistory {
   @Setter
   @ManyToOne
   @JoinColumn(name = "manual_id")
-  private Manual manual;
+  private ManualRequestDto manual;
 
   @Setter
   @Column(nullable = false, length = 100)

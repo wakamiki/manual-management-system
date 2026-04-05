@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
+import com.example.manual.entity.ManualRequestDto;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.repository.CategoryRepository;
 import com.example.manual.repository.ManualRepository;
@@ -23,34 +25,47 @@ public class ManualService {
     this.categoryRepository = categoryRepository;
   }
 
-  public Manual createManual(Manual manual) {
+  public ManualResponseDto createManual(ManualRequestDto requestDto) {
+    Manual manual = new Manual();
     manual.markCreatedNow();
     manual.markUpdatedNow();
-    //ユーザー入力は分離予定
+    manual.setTitle(requestDto.getTitle());
+    manual.setContent(requestDto.getContent());
+    manual.setTargetUser(requestDto.getTargetUser());
     //ステータス初期状態はDRAFT(下書き)状態 Approvedは作成時はNULL
     manual.markStatusDRAFT();
-    manual.setTargetUser(manual.getTargetUser());
-      if (manual.getCategory() == null||
-          manual.getCategory().getId() == null) {
+    //承認日時は作成時はNULL
+      if (Manual.getCategory() == null||
+          Manual.getCategory().getId() == null) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
       }
-        Long id = manual.getCategory().getId();
+        Long id = Manual.getCategory().getId();
         Optional<Category> categoryOpt = categoryRepository.findById(id);
       if(categoryOpt.isPresent()){
-        manual.setCategory(categoryOpt.get());
+        Manual.setCategory(categoryOpt.get());
       } else {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
-    Manual savedManual= manualRepository.save(manual);
-    return savedManual;
+    Manual savedManual = manualRepository.save(manual);
+
+    ManualResponseDto responseDto = new ManualResponseDto();
+    responseDto.setTitle(savedManual.getTitle());
+    responseDto.setContent(savedManual.getContent());
+     responseDto.setStatus(savedManual.getStatus());
+     responseDto.setCategoryName(savedManual.getCategory().getName());
+     responseDto.setDisplayName(savedManual.getTargetUser().getDisplayName());
+     responseDto.setCreatedAt(savedManual.getCreatedAt());
+     responseDto.setUpdatedAt(savedManual.getUpdatedAt());
+    return responseDto;
   }
 
-  public Manual copyManual(Manual manual) {
+  //Dto未対応　編集予定
+  public ManualResponseDto copyManual(ManualRequestDto manual) {
     Optional<Manual> manualOpt = manualRepository.findById(manual.getId());
 
     if (manualOpt.isPresent()) {
-      Manual originalManual = manualOpt.get();
-      Manual copiedManual = new Manual();
+      ManualRequestDto originalManual = manualOpt.get();
+      ManualRequestDto copiedManual = new ManualRequestDto();
       copiedManual.setTitle(originalManual.getTitle());
       copiedManual.setContent(originalManual.getContent());
       copiedManual.setCategory(originalManual.getCategory());
@@ -64,7 +79,8 @@ public class ManualService {
     //セーブ処理考え中
   }
 
-  public Manual updateManual(Long id, Manual updatedManual) {
+    //Dto未対応　編集予定
+  public ManualResponseDto updateManual(Long id, ManualRequestDto requestDto) {
     Optional<Manual> manualOpt = manualRepository.findById(id);
     Manual existingManual;
 
@@ -73,22 +89,26 @@ public class ManualService {
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-    existingManual.setTitle(updatedManual.getTitle());
-    existingManual.setContent(updatedManual.getContent());  
+    existingManual.setTitle(requestDto.getTitle());
+    existingManual.setContent(requestDto.getContent());  
     //ステータス変更処理
     existingManual.markUpdatedNow();
 
     Manual savedManual = manualRepository.save(existingManual);
-
-    return savedManual;
+    ManualResponseDto responseDto = new ManualResponseDto();
+    responseDto.setId(savedManual.getId());
+    responseDto.setTitle(savedManual.getTitle());
+    responseDto.setContent(savedManual.getContent());
+    return responseDto;
   }
   
-  public Manual approveManual(Long id) {
+    //Dto未対応　編集予定
+  public ManualResponseDto approveManual(Long id) {
     Optional<Manual> manualOpt = getManualById(id);
     if (!manualOpt.isPresent()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-    Manual targetManual = manualOpt.get();
+    ManualRequestDto targetManual = manualOpt.get();
 
     // APPROVED のときのみ承認日時を自動設定する
     if (targetManual.getStatus() == ManualStatus.APPROVED
@@ -96,64 +116,68 @@ public class ManualService {
        && targetManual.getApprovedAt() == null) {
       targetManual.approve();
     } // DRAFT / PENDING は未承認状態のため approvedAt は保持しない
-        Manual savedManual= manualRepository.save(targetManual);
+        ManualRequestDto savedManual= manualRepository.save(targetManual);
     return savedManual;
   }
 
-  public Manual submitManual(Long id) {
-    Optional<Manual> manualOpt = getManualById(id);
+    //Dto未対応　編集予定
+  public ManualRequestDto submitManual(Long id) {
+    Optional<ManualRequestDto> manualOpt = getManualById(id);
     if (!manualOpt.isPresent()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-    Manual targetManual = manualOpt.get();
+    ManualRequestDto targetManual = manualOpt.get();
     if (targetManual.getStatus() == ManualStatus.DRAFT) {
       targetManual.submitForApproval();
     } else {
       throw new IllegalStateException("下書き状態のマニュアルのみ申請できます");
     }
-    Manual savedManual= manualRepository.save(targetManual);
+    ManualRequestDto savedManual= manualRepository.save(targetManual);
     return savedManual;
   }
 
-  public Manual rollbackManual(Long id) {
-    Optional<Manual> manualOpt = getManualById(id);
+    //Dto未対応　編集予定
+  public ManualRequestDto rollbackManual(Long id) {
+    Optional<ManualRequestDto> manualOpt = getManualById(id);
     if (!manualOpt.isPresent()) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-    Manual targetManual = manualOpt.get();
+    ManualRequestDto targetManual = manualOpt.get();
     if (targetManual.getStatus() == ManualStatus.PENDING) { 
       targetManual.rollbackToDraft();
     } else {
       throw new IllegalStateException("申請状態のマニュアルのみ差し戻しができます");
     }
-    Manual savedManual= manualRepository.save(targetManual);
+    ManualRequestDto savedManual= manualRepository.save(targetManual);
     return savedManual;
   }
   
-  public Manual archiveManual(Long id) {
-      Optional<Manual> manualOpt = getManualById(id);
+    //Dto未対応　編集予定
+  public ManualRequestDto archiveManual(Long id) {
+      Optional<ManualRequestDto> manualOpt = getManualById(id);
       if (!manualOpt.isPresent()) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
-      Manual targetManual = manualOpt.get();
+      ManualRequestDto targetManual = manualOpt.get();
       if (targetManual.getStatus() == ManualStatus.APPROVED
       ||targetManual.getStatus() == ManualStatus.PENDING) {
         targetManual.archive();
       } else {
         throw new IllegalStateException("公開されているマニュアルのみアーカイブできます");
       } 
-    Manual savedManual= manualRepository.save(targetManual);
+    ManualRequestDto savedManual= manualRepository.save(targetManual);
     return savedManual;
     }
   
 
+    //Dto未対応　編集予定
 //カテゴリーが同カテゴリーでアクティブ状態のときのみ復元可能の機能未実装
-  public Manual restoreManual(Long id) {
+  public ManualResponseDto restoreManual(Long id) {
       Optional<Manual> manualOpt = getManualById(id);
       if (!manualOpt.isPresent()) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
       }
-      Manual targetManual = manualOpt.get();
+      ManualRequestDto targetManual = manualOpt.get();
       if (targetManual.getStatus() == ManualStatus.ARCHIVED
         && targetManual.getCategory().isActive() == true)
        {
@@ -161,24 +185,38 @@ public class ManualService {
       } else {
         throw new IllegalStateException("アーカイブ状態のマニュアルのみ復元できます");
       }
-    Manual savedManual= manualRepository.save(targetManual);
+    ManualRequestDto savedManual= manualRepository.save(targetManual);
     return savedManual;
     }
 
-  
-  public Optional<Manual> getManualById(Long id) {
-    return manualRepository.findById(id);
-  }
+      //Dto未対応　編集予定
+  public ManualResponseDto getManual(Long id) {
+    Optional<Manual> manualOpt = manualRepository.findById(id);
+        if (manualOpt.isPresent()==false) {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したマニュアルが存在しません");    
+        }
+        Manual getManual = manualOpt.get();
+        ManualResponseDto responseDto = new ManualResponseDto();
+        responseDto.setId(getManual.getId());
+        responseDto.setTitle(getManual.getTitle());
+        responseDto.setContent(getManual.getContent());
 
-  public List<Manual> getAllManuals() {
+        return responseDto;
+        
+    }
+
+      //Dto未対応　編集予定
+  public List<ManualRequestDto> getAllManuals() {
    return manualRepository.findAllByOrderByUpdatedAtDesc();
   }
 
-  public List<Manual> searchByTitle(String keyword) {
+    //Dto未対応　編集予定
+  public List<ManualRequestDto> searchByTitle(String keyword) {
     return manualRepository.findByTitleContainingOrderByUpdatedAtDesc(keyword);
   }
 
-  public List<Manual> searchByStatus(ManualStatus status) {
+    //Dto未対応　編集予定
+  public List<ManualRequestDto> searchByStatus(ManualStatus status) {
     return manualRepository.findByStatusOrderByUpdatedAtDesc(status);
   }
 }

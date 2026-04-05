@@ -7,13 +7,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ManualRequestDto {
+public class ManualCopyRequestDto {
 
-private String title;
+    private String title;
 
-private String content;
+    private String content;
 
-private Long categoryId;
+    private Long categoryId;
 
-private String changeNote;
+    private String changeNote;
+
 }

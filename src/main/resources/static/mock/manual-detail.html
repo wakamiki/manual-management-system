@@ -9,13 +9,20 @@
 </head>
 <body>
   <main class="container mock-page">
-    <header class="page-title-bar">
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <h1 class="h3 mb-0">発注業務の流れ</h1>
-        <span class="badge bg-success">APPROVED</span>
+    <header class="page-title-bar tight-gap">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <h1 class="h3 mb-0">発注業務の流れ</h1>
+          <span class="badge bg-success">APPROVED</span>
+        </div>
+        <p class="text-muted mb-0">営業部 / 作成日時: 2026-04-04 09:00 / 更新日: 2026-04-05 / 作成者: 山田 花子</p>
       </div>
-      <p class="text-muted mb-0">営業部 / 更新日: 2026-04-05</p>
+      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
+
+    <div class="alert mock-alert mt-0 mb-2" role="alert">
+      マニュアルを承認しました。
+    </div>
 
     <section class="card mb-4">
       <div class="card-body">
@@ -35,12 +42,12 @@
     </section>
 
     <div class="d-flex flex-wrap gap-2">
-      <a href="./manual-edit.html" class="btn btn-primary">編集</a>
+      <a href="./manual-edit.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary">編集</a>
       <button type="button" class="btn btn-outline-primary">申請</button>
       <button type="button" class="btn btn-outline-success">承認</button>
       <button type="button" class="btn btn-outline-warning">差し戻し</button>
       <button type="button" class="btn btn-outline-danger">アーカイブ</button>
-      <a href="./manual-create.html" class="btn btn-outline-secondary">複製</a>
+      <a href="./manual-create.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">複製</a>
       <button type="button" class="btn btn-outline-info">復帰</button>
     </div>
   </main>
