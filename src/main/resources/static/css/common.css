@@ -1,5 +1,5 @@
 body {
-  background-color: #f8f9fa;
+  background-color: #f4f8f8;
   color: #212529;
 }
 
@@ -7,15 +7,110 @@ main.container {
   max-width: 1200px;
 }
 
+.mock-page {
+  padding-top: 32px;
+  padding-bottom: 40px;
+}
+
+.page-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  background-color: #56969d;
+  border: 1px solid #487f85;
+  border-radius: 12px;
+  color: #f7fbfc;
+}
+
+.page-title-bar .h3,
+.page-title-bar .h4,
+.page-title-bar .h5,
+.page-title-bar p,
+.page-title-bar span {
+  color: #f7fbfc;
+}
+
+.page-title-bar .text-muted {
+  color: rgba(247, 251, 252, 0.88) !important;
+}
+
+.page-title-bar .btn-outline-secondary {
+  color: #f7fbfc;
+  border-color: rgba(247, 251, 252, 0.7);
+  background-color: rgba(247, 251, 252, 0.08);
+}
+
+.page-title-bar .btn-outline-secondary:hover,
+.page-title-bar .btn-outline-secondary:focus {
+  color: #3f7177;
+  background-color: #f7fbfc;
+  border-color: #f7fbfc;
+}
+
+.card {
+  border: 1px solid #bfd4d7;
+  border-radius: 12px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.card-body,
+.card-footer {
+  background-color: #ffffff;
+}
+
 .badge {
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.badge.bg-primary {
+  background-color: #56969d !important;
+  color: #f7fbfc;
+}
+
+.badge.bg-success {
+  background-color: #74a886 !important;
+  color: #f7fbfc;
+}
+
+.btn-primary {
+  background-color: #56969d;
+  border-color: #56969d;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #487f85;
+  border-color: #487f85;
+}
+
+.btn-outline-primary {
+  color: #56969d;
+  border-color: #56969d;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: #56969d;
+  border-color: #56969d;
+  color: #f7fbfc;
 }
 
 .form-control,
 .form-select,
 .btn {
   border-radius: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #89b7bc;
+  box-shadow: 0 0 0 0.2rem rgba(86, 150, 157, 0.2);
 }
 
 .text-muted {

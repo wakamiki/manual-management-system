@@ -2,18 +2,32 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
+  background-color: #f4f8f8;
 }
 
 .login-page .card {
-  border: none;
-  box-shadow: 0 0.75rem 2rem rgba(13, 110, 253, 0.12);
+  border: 1px solid #bfd4d7;
+  box-shadow: none;
 }
 
 .login-page .form-label {
   font-weight: 600;
 }
 
+.login-page .card-body .h5 {
+  text-align: center;
+  color: #3f6f75;
+}
+
 .login-page .btn-primary {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+}
+
+.login-page .text-center .h3 {
+  color: #2f5f66;
+}
+
+.login-page .text-center .text-muted {
+  color: #5e7f84 !important;
 }

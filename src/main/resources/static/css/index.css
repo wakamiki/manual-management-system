@@ -137,7 +137,12 @@
 }
 
 .sidebar .card-body {
+  background-color: #56969d;
   padding: 12px 0;
+}
+
+.sidebar .list-group {
+  background-color: #56969d;
 }
 
 .sidebar .h5 {
@@ -150,7 +155,7 @@
   border-left: 0;
   border-right: 0;
   padding: 12px 16px;
-  background-color: transparent;
+  background-color: #56969d;
   color: #f7fbfc;
   transition: background-color 0.2s ease;
   cursor: pointer;
@@ -207,4 +212,28 @@
 
 .stopedCategory .collapse {
   margin-top: 0;
+}
+
+.pagination .page-link {
+  color: #56969d;
+  border-color: #a8c8cc;
+  background-color: #f8fbfb;
+}
+
+.pagination .page-link:hover {
+  color: #3f7177;
+  background-color: #dcebee;
+  border-color: #8fb7bc;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #56969d;
+  border-color: #56969d;
+  color: #f7fbfc;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #8ea8ab;
+  background-color: #eef4f5;
+  border-color: #d5e2e4;
 }
