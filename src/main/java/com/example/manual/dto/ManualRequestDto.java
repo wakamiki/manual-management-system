@@ -4,8 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+
 @Setter
+@Getter
 @NoArgsConstructor
 public class ManualRequestDto {
 
@@ -16,4 +17,5 @@ private String content;
 private Long categoryId;
 
 private String changeNote;
+
 }

@@ -12,7 +12,7 @@ public class UserRequestDto {
 
 private String id;
 
-private Long userId;
+private String loginId;
 
 private String displayName;
 

@@ -22,6 +22,10 @@ private ManualStatus status;
 
 private String categoryName;
 
+private String changeNote;
+
+private LocalDateTime changedAt;
+
 private String displayName;
 
 private LocalDateTime createdAt;

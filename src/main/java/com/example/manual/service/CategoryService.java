@@ -30,8 +30,10 @@ public class CategoryService {
     category.markUpdatedNow();
     //作成時はアクティブ状態
     category.markActive();
+    category.setCategoryName(category.getCategoryName());
 
     Category savedCategory = categoryRepository.save(category);
     return savedCategory;
   }
+
 }

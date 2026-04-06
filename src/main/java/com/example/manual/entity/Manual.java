@@ -46,16 +46,18 @@ public class Manual {
     // 業務上の公開状態を表す
     @Enumerated(EnumType.STRING)
     private ManualStatus status;
+
     public void markStatusDRAFT() {
         this.status = ManualStatus.DRAFT;
         markUpdatedNow();
     }
-    public void submitForApproval() {
-        if (this.status == ManualStatus.DRAFT) {
+
+    public void submitPENDING() {
+        if (this.status!= ManualStatus.APPROVED
+            &&this.status!=ManualStatus.ARCHIVED) {
             this.status = ManualStatus.PENDING;
-            markUpdatedNow();
         } else {
-            throw new IllegalStateException("下書き状態のマニュアルのみ申請できます");
+            throw new IllegalStateException("申請として保存するには必須項目をすべて入力してください。");
         }
     }
     public void approve() {
@@ -76,7 +78,7 @@ public class Manual {
         }
     }
     public void archive() {
-        if (this.status == ManualStatus.APPROVED 
+        if (this.status == ManualStatus.APPROVED
             || this.status == ManualStatus.PENDING) {
             this.status = ManualStatus.ARCHIVED;
             markUpdatedNow();

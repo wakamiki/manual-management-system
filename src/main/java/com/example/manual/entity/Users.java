@@ -21,7 +21,7 @@ public class Users {
   private Long id;
 
   @Column(nullable = false, length = 50)
-  private String userId;
+  private String loginId;
 
   @Setter
   @Column(nullable = false, length = 255)

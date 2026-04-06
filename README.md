@@ -152,6 +152,11 @@ Version: 01.06.00
 * バックエンド複製機能の設計準備
   * `ManualCopyRequestDto` 着手
   * DTO と Entity の役割整理
+* バックエンド設計整理
+  * `createDraftManual()` / `createAndSubmitManual()` の責務分離方針整理
+  * DTO / Model / Mapper の役割整理
+  * `Manual` / `ManualHistory` の責務分離確認
+  * `@Valid` による入力検証方針整理
 * ログイン画面UIモック作成
 * Bootstrapレイアウト学習
   * row / col
@@ -193,6 +198,10 @@ Version: 01.06.00
 * 更新日時表示
 * 版管理
 * DTO対応
+* 命名修正
+* `@Valid` バリデーション実装
+* create 系メソッド分割
+* Mapper 導入検討
 * 認証機能
 * Web公開
 
@@ -225,3 +234,4 @@ Version: 01.06.00
 | 01.04.00 | 2026-04-04 | 資料整備、資料統合・分離、Entity整備、履歴検索Repository設計、トップ画面UIモック・ログイン画面モック作成、Bootstrapレイアウト学習 |
 | 01.05.00 | 2026-04-05 | フロントエンド実装方針整理、モック配置を `static/mock` に統一、PC業務向けUI方針を追記 |
 | 01.06.00 | 2026-04-05 | 別タブ運用方針、詳細画面の比較参照方針、`閉じる` 導線、管理画面モック追加を反映 |
+| 01.07.00 | 2026-04-06 | DTO対応再開、create系責務分離方針、Validation / Mapper / History分離の設計整理を追記 |

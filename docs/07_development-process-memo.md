@@ -646,3 +646,208 @@ DTO は Entity をそのまま受け渡ししないための箱であり、外�
 - Controller エンドポイント追加
 - Postman 動作確認
 - 認証 / 権限制御着手
+
+# 作業記録（2026/04/06）
+
+## 作業概要
+本日はバックエンド設計整理と学習理解の深化を中心に進めた。  
+Codex 側では DTO 対応の再開、命名整理、状態遷移・権限・入力検証方針の整理を行い、実装前の設計判断を固めた。  
+また、自身の理解面では MVC / DTO / Model / オブジェクト指向 / Mapper の概念整理が大きく進んだ。
+
+---
+
+## 実施内容
+
+### 1. DTO対応作業の再開
+前日中断していた DTO 対応を再開した。
+
+- id の扱い（採番元・DTOとの関係）を整理
+- Entity 主キーは DB の IDENTITY 採番であることを確認
+- Request DTO / Response DTO / Model の役割を整理
+- Controller → Service → Entity → Response DTO の流れを再確認
+
+---
+
+### 2. 命名整理の検討（id と userId）
+id（主キー）と userId（業務識別子）が紛らわしいため、命名整理の必要性を確認した。
+
+- userId は loginId 等へ改名する方針を推奨
+- `findByUserId(Long id)` のような命名と実装のズレを確認
+- Repository / Service / Controller を含めた検索メソッド名の整合性見直しを判断
+
+---
+
+### 3. createManual の責務分離方針整理
+「ボタン分岐で状態を決める」よりも、ユースケース別に責務を分ける方針を整理した。
+
+方針案
+- `createDraftManual()`
+- `createAndSubmitManual()`
+
+処理内容が明確に分かる命名へ分割する方向で整理した。
+
+---
+
+### 4. ステータス定義・遷移ルール再確認
+承認状態を再確認した。
+
+- DRAFT
+- PENDING
+- APPROVED
+- ARCHIVED
+
+あわせて、既存の遷移メソッドと例外メッセージ方針をそろえる方向を確認した。
+
+---
+
+### 5. 例外メッセージ方針整理
+例外文言は
+
+「許可状態」+「現在状態」
+
+を含める形式が運用しやすいと整理した。
+
+例
+- 下書き状態のマニュアルのみ申請できます。現在の状態: {status}
+
+---
+
+### 6. 権限・入力検証整理
+以下の観点を整理した。
+
+権限
+- isActive
+- ロール（USER / APPROVER / ADMIN）
+- 自己承認禁止
+- 状態 × 権限整合
+
+入力検証
+- DTO + `@Valid`（Bean Validation）で簡潔に実装する方針を確認
+
+対象
+- title
+- content
+- categoryId
+- changeNote
+
+---
+
+### 7. Manual と ManualHistory の責務整理
+Manual と ManualHistory は分離維持が望ましいと整理した。
+
+- 本体 = 最新状態
+- 履歴 = append-only
+
+また、ManualHistoryService は単独利用ではなく
+
+`ManualService → ManualHistoryService`
+
+の呼び出し関係で利用する理解を整理した。
+
+---
+
+### 8. フロントエンド / Thymeleaf 学習
+以下を学習した。
+
+- Bootstrap レイアウト基礎
+- div
+- row / col
+- CodePen でモック作成
+- HTML / Bootstrap / CSS の役割整理
+- Thymeleaf 化の概念理解
+
+---
+
+### 9. MVC / DTO / Model 理解整理
+理解したこと
+
+`Controller → Model → Thymeleaf → 画面表示`
+
+- Model = 画面表示用の箱
+- Request DTO = 入力値受け取り
+- Response DTO = API返却
+- Model は Thymeleaf へ渡す箱
+
+---
+
+### 10. オブジェクト指向理解の深化
+処理を部品単位ではなく、画面操作単位で流れとして考えられるようになった。
+
+例
+- 承認ボタン押下後の流れ
+- 作成ボタン押下後の流れ
+
+`画面 → Controller → Service → Entity → 結果返却 → 画面表示`
+
+---
+
+### 11. 設計思考の変化
+これまでは
+
+- 日時を更新する
+- 新規インスタンスを作る
+- ステータスを変更する
+
+といった小さい粒度で考えていた。
+
+本日は
+
+- 画面の承認ボタン押下時の挙動
+- 作成ボタン押下時の挙動
+
+という大きい粒度（ユースケース単位）で考えられるようになった。
+
+---
+
+### 12. Mapper 概念学習
+Mapper は
+
+DTO ⇄ Entity の変換を行う橋渡し役
+
+として理解を進めた。
+
+役割整理
+- Service = 業務ルール
+- Mapper = データ変換
+
+---
+
+### 13. コードレビュー・問題整理
+バックエンド実装に着手する前提で、ManualController / ManualService / ManualHistoryService の責務と整合性を確認した。
+
+- Controller に残す処理と Service に寄せる処理を整理
+- DTO と Entity が混在している箇所を洗い出した
+- `Optional<Manual>` と `Manual` の使い分け不整合を確認
+- 履歴作成メソッドの戻り値と責務のズレを確認
+- `ManualHistoryService` は `void createHistory(...)` を基本にする方針を整理
+
+---
+
+## 本日の成果
+本日は実装よりも、設計・理解・責務整理が大きく進んだ日となった。
+
+特に以下の理解が深まった。
+
+- DTO
+- Model
+- Service責務
+- History分離
+- オブジェクト指向
+- Mapper
+- ユースケース思考
+
+---
+
+## 更新した主なファイル
+- `docs/07_development-process-memo.md`
+- `README.md`
+
+---
+
+## 次回着手予定
+- DTO対応
+- 命名修正
+- `@Valid` バリデーション実装
+- create 系メソッド分割
+- Mapper 導入検討
+- `Manual` 複製機能の本実装再開
