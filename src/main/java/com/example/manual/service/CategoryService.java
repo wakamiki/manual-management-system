@@ -11,21 +11,13 @@ import com.example.manual.repository.CategoryRepository;
 @Service
 public class CategoryService {
 
-  public final CategoryRepository categoryRepository;
+public final CategoryRepository categoryRepository;
 
-  public CategoryService(CategoryRepository categoryRepository){
+public CategoryService(CategoryRepository categoryRepository){
     this.categoryRepository = categoryRepository;
   }
 
-  public List<Category> getAllCategories() {
-    return categoryRepository.findAllByOrderByCategoryNameAsc();
-  }
-
-  public Optional<Category> getCategoryById() {
-    return categoryRepository.findById();
-  }
-
-  public Category createCategory(Category category) {
+public Category createCategory(Category category) {
     category.markCreatedNow();
     category.markUpdatedNow();
     //作成時はアクティブ状態
@@ -34,6 +26,30 @@ public class CategoryService {
 
     Category savedCategory = categoryRepository.save(category);
     return savedCategory;
+  }
+
+public void updateCategory() {
+    
+  }
+
+public void DeactivateCategory(){
+
+  }
+
+public void activateCategory(){
+
+}
+
+public void findAllActive(){
+  
+}
+
+public List<Category> getAllCategories() {
+    return categoryRepository.findAllByOrderByCategoryNameAsc();
+  }
+
+public Optional<Category> getCategoryById() {
+    return categoryRepository.findById();
   }
 
 }

@@ -33,7 +33,7 @@ public class Manual {
     @Setter
     @ManyToOne
     @JoinColumn(name = "operated_by_user_id")
-    private Users TargetUser;
+    private User TargetUser;
 
     @Setter
     @Column(nullable = false, length = 100)

@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.manual.entity.Users;
+import com.example.manual.entity.User;
 
-public interface UserRepository extends JpaRepository<Users, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<Users>findByUserId(Long id);
+    Optional<User>findByUserId(Long id);
 }

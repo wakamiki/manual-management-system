@@ -2,7 +2,6 @@ package com.example.manual.dto;
 
 import com.example.manual.enums.ManualStatus;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -12,26 +11,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ManualCopyRequestDto {
-
+public class ManualDraftRequestDto {
+    
     @Size(max=100)
-    @NotBlank
     private String title;
 
-    @NotBlank
     @Size(max=10000)
     private String content;
 
     @NotNull
-    private Long sourceManualId;
-
-    @NotNull
-    private Long categoryId;
+    private Long categoruId;
 
     @Size(max=100)
-    @NotBlank
     private String changeNote;
 
-    @NotNull
     private ManualStatus status;
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.manual.entity.Users;
+import com.example.manual.entity.User;
 import com.example.manual.service.UserService;
 
 
@@ -24,10 +24,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Long findByUserId(@PathVariable Long id) {
-        Optional<Users> userOpt = UserService.findByUserId(id);
+    public void findByUserId(@PathVariable Long id) {
+        Optional<User> userOpt = UserService.findByUserId(id);
         if (userOpt.isPresent()) {
-            return userOpt.get().getId();
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
     }

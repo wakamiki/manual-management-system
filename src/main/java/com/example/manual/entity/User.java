@@ -1,7 +1,9 @@
 package com.example.manual.entity;
 
 import java.time.LocalDateTime;
+
 import com.example.manual.enums.UserRole;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,7 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
-public class Users {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,16 +6,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.manual.dto.ManualCopyRequestDto;
 import com.example.manual.dto.ManualRequestDto;
-import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -29,58 +30,60 @@ public class ManualController {
         this.manualService = manualService;
     }
 
-    @GetMapping("/{id}")
-    public ManualResponseDto getManual(@PathVariable Long id) {
-    return manualService.getManual(id);
+    @GetMapping("/{manualId}")
+    public void getManual(@PathVariable Long id) {
+    manualService.getManual(id);
     }
 
-    @PutMapping("/update")
-    public ManualResponseDto updateManual(@RequestBody ManualRequestDto requestDto) {
-        return manualService.updateManual(requestDto);
+    @PutMapping("/{manualId}")
+    public void updateManual(@PathVariable Long id) {
+        manualService.updateManual(id);
     }//マニュアルを更新しました。
 
-    @PutMapping("/{id}/approve")
+    @PostMapping("/{manualId}/actions/submit")
+    public String submitManual(@PathVariable Long id) {
+        manualService.submitManual(id);
+        return "マニュアルを公開しました。";
+    }
+
+    @PostMapping("/{manualId}/actions/approve")
     public String approveManual(@PathVariable Long id) {
     manualService.approveManual(id);
     return "マニュアルを承認しました。";
     }
 
-    @PutMapping("/rollback")
-    public String rollbackManual(@RequestBody ManualRequestDto requestDto) {
-        manualService.rollbackManual(requestDto);
+    @PostMapping("/{manualId}/actions/rollback")
+    public String rollbackManual(@PathVariable Long id,@Valid ManualRequestDto requestDto) {
         return "マニュアルを差し戻しました。";
     }
 
-    @PutMapping("/archive")
-    public String archiveManual(@RequestBody ManualRequestDto requestDto) {
-        manualService.archiveManual(requestDto);
+    @PostMapping("/{manualId}/actions/archive")
+    public String archiveManual(@PathVariable Long id) {
+        manualService.archiveManual(id);
         return "マニュアルをアーカイブしました。";
-        }
-    @PutMapping("/{id}/restore")
+    }
+
+    @PostMapping("/{manualId}/actions/restore")
     public String restoreManual(@PathVariable Long id) {
         manualService.restoreManual(id);
         return "マニュアルを復帰しました。";
         }
 
     @PostMapping("/draft")
-    public ManualResponseDto createDraftManual(@RequestBody ManualRequestDto requestDto) {
-     return manualService.createDraftManual(requestDto);
+    public void createDraftManual(@Valid ManualRequestDto requestDto) {
     }//マニュアルを下書きに保存しました。
 
-    @PostMapping("/submit")
-    public ManualResponseDto createAndSubmitManual(@RequestBody ManualRequestDto requestDto) {
-    return manualService.createAndSubmitManual(requestDto);
+    @PostMapping("/pending")
+    public void createPendingManual(@Valid ManualRequestDto requestDto) {
     }//マニュアルを承認申請しました。
 
       //Dto未対応　編集予定
-    @PostMapping("/copy")
-    public ManualResponseDto copyManualDRAFT(@RequestBody ManualRequestDto requestDto) {
-        return manualService.copyManualDRAFT(requestDto);
+      @PostMapping("/{manualId}/actions/copyDraft")
+    public void copyDraftManual(@PathVariable Long id,@Valid ManualCopyRequestDto requestDto) {
     }//マニュアルを複製し下書きに保存しました。
 
-        @PostMapping("/copy/submit")
-    public ManualResponseDto copyManualPENDING(@RequestBody ManualRequestDto requestDto) {
-        return manualService.copyManualPENDING(requestDto);
+    @PostMapping("/{manualId}/action/copyPending")
+    public void copyPendingManual(@PathVariable Long id,@Valid ManualCopyRequestDto requestDto) {
     }//マニュアルを複製し申請しました。
 
       //マニュアルを直接返す形になっている編集予定

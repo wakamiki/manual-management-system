@@ -1,13 +1,14 @@
 package com.example.manual.entity;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,10 +24,10 @@ private Long id;
 @ManyToOne    
 @Column(nullable = false)
 @JoinColumn(name = "target_user_id")
-private Users targetUser;
+private User targetUser;
 
 @Column(nullable = false)
-private Users operatedByUser;
+private User operatedByUser;
 
 @Column(nullable = false,length = 30)
 private String operationType;

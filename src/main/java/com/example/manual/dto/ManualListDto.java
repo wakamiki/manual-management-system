@@ -1,9 +1,8 @@
 package com.example.manual.dto;
 
-
 import java.time.LocalDateTime;
 
-import com.example.manual.enums.UserRole;
+import com.example.manual.enums.ManualStatus;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,19 +14,18 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRequestDto {
+public class ManualListDto {
 
-@NotNull
-private String loginId;
+  private Long manualId;
 
-@NotBlank
-@Size(max=50)
-private String displayName;
+  private String title;
 
-@NotNull
-private UserRole role;
+  private ManualStatus status;
 
-@NotNull
-private Boolean isActive;
+  private String categoryName;
+
+  private LocalDateTime updatedAt;
+
+  private String createdByName;
 
 }

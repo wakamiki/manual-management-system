@@ -13,6 +13,8 @@ public class UserResponseDto {
 
 private String loginId;
 
+private String password;
+
 private String displayName;
 
 private  UserRole role;

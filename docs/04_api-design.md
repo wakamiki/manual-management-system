@@ -1,7 +1,7 @@
 # 04_api-design.md
 
-Version: 01.01.00
-最終更新日: 2026-04-04
+Version: 01.02.00
+最終更新日: 2026-04-07
 
 ---
 
@@ -9,41 +9,41 @@ Version: 01.01.00
 
 ### 1-1. Manual API
 
-* POST /manuals
-* GET /manuals
-* GET /manuals/{id}
-* PUT /manuals/{id}
-* PUT /manuals/{id}/submit
-* PUT /manuals/{id}/approve
-* PUT /manuals/{id}/rollback
-* PUT /manuals/{id}/archive
-* PUT /manuals/{id}/restore
-* POST /manuals/{id}/copy
-* GET /manuals/{id}/histories
+* GET /api/manuals
+* GET /api/manuals/{manualId}
+* GET /api/manuals/{manualId}/histories
+* POST /api/manuals
+* PUT /api/manuals/{manualId}
+* POST /api/manuals/{manualId}/actions/copy
+* POST /api/manuals/{manualId}/actions/submit
+* POST /api/manuals/{manualId}/actions/approve
+* POST /api/manuals/{manualId}/actions/rollback
+* POST /api/manuals/{manualId}/actions/archive
+* POST /api/manuals/{manualId}/actions/restore
 
 ### 1-2. Category API
 
-* GET /categories
-* POST /categories
-* PUT /categories/{id}
-* PUT /categories/{id}/deactivate
-* PUT /categories/{id}/activate
+* GET /api/categories
+* POST /api/categories
+* PUT /api/categories/{id}
+* PUT /api/categories/{id}/deactivate
+* PUT /api/categories/{id}/activate
 
 ### 1-3. User API
 
-* GET /users
-* GET /users/{id}
-* POST /users
-* PUT /users/{id}
-* PUT /users/{id}/deactivate
-* PUT /users/{id}/activate
-* PUT /users/{id}/reset-password
-* GET /users/{id}/operation-histories
+* GET /api/users
+* GET /api/users/{id}
+* POST /api/users
+* PUT /api/users/{id}
+* PUT /api/users/{id}/deactivate
+* PUT /api/users/{id}/activate
+* PUT /api/users/{id}/reset-password
+* GET /api/users/{id}/operation-histories
 
 ### 1-4. Auth API
 
-* POST /auth/login
-* POST /auth/logout
+* POST /api/auth/login
+* POST /api/auth/logout
 
 ---
 
@@ -87,13 +87,35 @@ Version: 01.01.00
 * 409 Conflict
 * 500 Internal Server Error
 
+### 2-4. API設計方針
+
+* Controller は thin controller とし、入力受付とレスポンス返却に責務を限定する
+* 入力は Request DTO、返却は Response DTO または List / Detail DTO を基本とする
+* 状態変更系 API は対象 ID を URL で受け、業務操作は action で表現する
+* 一覧 / 詳細 / 履歴取得は参照系 API、作成 / 更新 / 状態変更は操作系 API として整理する
+
+### 2-5. 例外ハンドリング方針
+
+* DTO の形式不正は `@Valid` による入力バリデーションで処理する
+* 業務ルール違反は Service で例外を送出する
+* ControllerAdvice で共通エラーレスポンスへ変換する
+
+主な例外分類
+
+* `ResourceNotFoundException` : 404
+* `ValidationException` : 400
+* `UnauthorizedException` : 403
+* `InvalidStatusTransitionException` : 409
+* `MethodArgumentNotValidException` : 400
+* `Exception` : 500
+
 ---
 
 ## 3. Manual API 詳細
 
 ### 3-1. マニュアル新規作成
 
-**POST /manuals**
+**POST /api/manuals**
 
 #### Request
 
@@ -137,7 +159,7 @@ Version: 01.01.00
 
 ### 3-2. マニュアル一覧取得
 
-**GET /manuals**
+**GET /api/manuals**
 
 #### Query Parameter
 
@@ -168,7 +190,7 @@ Version: 01.01.00
 
 ### 3-3. マニュアル詳細取得
 
-**GET /manuals/{id}**
+**GET /api/manuals/{manualId}**
 
 #### Response
 
@@ -192,7 +214,7 @@ Version: 01.01.00
 
 ### 3-4. マニュアル更新
 
-**PUT /manuals/{id}**
+**PUT /api/manuals/{manualId}**
 
 #### Request
 
@@ -212,7 +234,7 @@ Version: 01.01.00
 
 ### 3-5. マニュアル申請
 
-**PUT /manuals/{id}/submit**
+**POST /api/manuals/{manualId}/actions/submit**
 
 #### 成功メッセージ
 
@@ -226,7 +248,7 @@ Version: 01.01.00
 
 ### 3-6. マニュアル承認
 
-**PUT /manuals/{id}/approve**
+**POST /api/manuals/{manualId}/actions/approve**
 
 #### 成功メッセージ
 
@@ -247,7 +269,7 @@ Version: 01.01.00
 
 ### 3-7. マニュアル差し戻し
 
-**PUT /manuals/{id}/rollback**
+**POST /api/manuals/{manualId}/actions/rollback**
 
 #### Request
 
@@ -265,7 +287,7 @@ Version: 01.01.00
 
 ### 3-8. マニュアル旧版化
 
-**PUT /manuals/{id}/archive**
+**POST /api/manuals/{manualId}/actions/archive**
 
 #### 成功メッセージ
 
@@ -275,7 +297,7 @@ Version: 01.01.00
 
 ### 3-9. マニュアル復帰
 
-**PUT /manuals/{id}/restore**
+**POST /api/manuals/{manualId}/actions/restore**
 
 #### 成功メッセージ
 
@@ -285,7 +307,7 @@ Version: 01.01.00
 
 ### 3-10. マニュアル複製
 
-**POST /manuals/{id}/copy**
+**POST /api/manuals/{manualId}/actions/copy**
 
 #### Request
 
@@ -313,7 +335,7 @@ Version: 01.01.00
 
 ### 3-11. マニュアル履歴取得
 
-**GET /manuals/{id}/histories**
+**GET /api/manuals/{manualId}/histories**
 
 #### Response
 
@@ -334,11 +356,11 @@ Version: 01.01.00
 
 ### 4-1. カテゴリ一覧取得
 
-**GET /categories**
+**GET /api/categories**
 
 ### 4-2. カテゴリ作成
 
-**POST /categories**
+**POST /api/categories**
 
 #### 成功メッセージ
 
@@ -346,11 +368,11 @@ Version: 01.01.00
 
 ### 4-3. カテゴリ更新
 
-**PUT /categories/{id}**
+**PUT /api/categories/{id}**
 
 ### 4-4. カテゴリ停止
 
-**PUT /categories/{id}/deactivate**
+**PUT /api/categories/{id}/deactivate**
 
 #### 成功メッセージ
 
@@ -358,7 +380,7 @@ Version: 01.01.00
 
 ### 4-5. カテゴリ再有効化
 
-**PUT /categories/{id}/activate**
+**PUT /api/categories/{id}/activate**
 
 #### 成功メッセージ
 
@@ -370,23 +392,23 @@ Version: 01.01.00
 
 ### 5-1. ユーザー一覧取得
 
-**GET /users**
+**GET /api/users**
 
 ### 5-2. ユーザー詳細取得
 
-**GET /users/{id}**
+**GET /api/users/{id}**
 
 ### 5-3. ユーザー作成
 
-**POST /users**
+**POST /api/users**
 
 ### 5-4. ユーザー更新
 
-**PUT /users/{id}**
+**PUT /api/users/{id}**
 
 ### 5-5. ユーザー停止
 
-**PUT /users/{id}/deactivate**
+**PUT /api/users/{id}/deactivate**
 
 #### 成功メッセージ
 
@@ -394,7 +416,7 @@ Version: 01.01.00
 
 ### 5-6. ユーザー再有効化
 
-**PUT /users/{id}/activate**
+**PUT /api/users/{id}/activate**
 
 #### 成功メッセージ
 
@@ -402,11 +424,11 @@ Version: 01.01.00
 
 ### 5-7. パスワードリセット
 
-**PUT /users/{id}/reset-password**
+**PUT /api/users/{id}/reset-password**
 
 ### 5-8. 操作履歴取得
 
-**GET /users/{id}/operation-histories**
+**GET /api/users/{id}/operation-histories**
 
 ---
 
@@ -414,7 +436,7 @@ Version: 01.01.00
 
 ### 6-1. ログイン
 
-**POST /auth/login**
+**POST /api/auth/login**
 
 #### Request
 
@@ -434,7 +456,7 @@ Version: 01.01.00
 
 ### 6-2. ログアウト
 
-**POST /auth/logout**
+**POST /api/auth/logout**
 
 ---
 
@@ -448,7 +470,37 @@ Version: 01.01.00
 
 ---
 
-## 8. 今後追加予定API
+## 8. DTO設計方針
+
+### 8-1. Request DTO
+
+* `ManualDraftRequestDto` : 下書き保存用
+* `ManualRequestDto` : 新規作成 / 更新
+* `ManualCopyRequestDto` : 複製
+* `ManualActionRequestDto` : 差し戻し等の changeNote 入力
+* `CategoryRequestDto` : カテゴリ作成 / 更新
+* `UserRequestDto` : ユーザー作成 / 更新
+* `LoginRequestDto` : ログイン
+
+### 8-2. Response DTO
+
+* `ManualResponseDto` : 作成 / 更新 / 状態変更結果
+* `ManualListDto` : 一覧表示
+* `ManualDetailDto` : 詳細表示
+* `ManualHistoryDto` : 履歴表示
+* `CategoryResponseDto` : カテゴリ表示
+* `UserResponseDto` : ユーザー表示
+
+### 8-3. 設計ルール
+
+* Request DTO には入力値のみを持たせる
+* Entity をそのままレスポンスへ返さない
+* displayName や categoryName など表示用データは Response DTO に詰める
+* 業務上重要な値（status, approvedAt, createdAt, updatedAt など）は Service / Entity 側で制御する
+
+---
+
+## 9. 今後追加予定API
 
 * 関連マニュアルAPI
 * お気に入りAPI
@@ -464,3 +516,4 @@ Version: 01.01.00
 | -------- | ---------- | ------------ |
 | 01.00.00 | 2026-04-04 | 初版作成         |
 | 01.01.00 | 2026-04-04 | API設計資料統合版作成 |
+| 01.02.00 | 2026-04-07 | DTO方針、ControllerAdvice前提の例外方針、API設計ルールを追記 |

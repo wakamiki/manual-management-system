@@ -12,13 +12,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ManualCopyRequestDto {
+public class ManualCopyDraftRequest {
 
     @Size(max=100)
-    @NotBlank
     private String title;
 
-    @NotBlank
     @Size(max=10000)
     private String content;
 

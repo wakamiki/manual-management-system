@@ -1,8 +1,8 @@
 # 業務マニュアル管理システム 仕様書
 
-Version: 01.06.00
-更新日: 2026-04-05
-更新内容: 別タブ運用ルールと終了導線仕様を追加
+Version: 01.07.00
+更新日: 2026-04-07
+更新内容: DTO / Service / API 設計方針を現行案へ更新
 
 ---
 
@@ -222,13 +222,19 @@ Version: 01.06.00
 
 主要メソッド
 
-* createManual()
+* createDraftManual()
+* createAndSubmitManual()
 * updateManual()
+* getManualDetail()
+* getManualHistories()
 * submitManual()
 * approveManual()
+* rollbackManual()
 * archiveManual()
-* copyManual()
-* searchManuals()
+* restoreManual()
+* copyDraftManual()
+* copyPendingManual()
+* getManualList()
 
 責務
 
@@ -268,40 +274,47 @@ Version: 01.06.00
 
 | メソッド | エンドポイント               | 機能   |
 | ---- | --------------------- | ---- |
-| POST | /manuals              | 新規作成 |
-| GET  | /manuals              | 一覧取得 |
-| GET  | /manuals/{id}         | 詳細取得 |
-| PUT  | /manuals/{id}         | 更新   |
-| PUT  | /manuals/{id}/submit  | 申請   |
-| PUT  | /manuals/{id}/approve | 承認   |
-| PUT  | /manuals/{id}/archive | 旧版化  |
-| POST | /manuals/{id}/copy    | 複製   |
+| GET  | /api/manuals | 一覧取得 |
+| GET  | /api/manuals/{manualId} | 詳細取得 |
+| GET  | /api/manuals/{manualId}/histories | 履歴取得 |
+| POST | /api/manuals | 下書き保存 |
+| POST | /api/manuals/submit | 申請付き新規作成 |
+| PUT  | /api/manuals/{manualId} | 更新 |
+| POST | /api/manuals/{manualId}/actions/copy | 複製 |
+| POST | /api/manuals/{manualId}/actions/submit | 申請 |
+| POST | /api/manuals/{manualId}/actions/approve | 承認 |
+| POST | /api/manuals/{manualId}/actions/rollback | 差し戻し |
+| POST | /api/manuals/{manualId}/actions/archive | 旧版化 |
+| POST | /api/manuals/{manualId}/actions/restore | 復帰 |
 
 ### 8-2. UserController
 
 | メソッド | エンドポイント                | 機能     |
 | ---- | ---------------------- | ------ |
-| GET  | /users                 | 一覧取得   |
-| POST | /users                 | ユーザー作成 |
-| PUT  | /users/{id}            | 更新     |
-| PUT  | /users/{id}/deactivate | 停止     |
-| PUT  | /users/{id}/activate   | 再有効化   |
+| GET  | /api/users | 一覧取得 |
+| GET  | /api/users/{id} | 詳細取得 |
+| POST | /api/users | ユーザー作成 |
+| PUT  | /api/users/{id} | 更新 |
+| PUT  | /api/users/{id}/deactivate | 停止 |
+| PUT  | /api/users/{id}/activate | 再有効化 |
+| PUT  | /api/users/{id}/reset-password | パスワード再設定 |
 
 ### 8-3. CategoryController
 
 | メソッド | エンドポイント                     | 機能   |
 | ---- | --------------------------- | ---- |
-| GET  | /categories                 | 一覧取得 |
-| POST | /categories                 | 新規作成 |
-| PUT  | /categories/{id}            | 更新   |
-| PUT  | /categories/{id}/deactivate | 停止   |
+| GET  | /api/categories | 一覧取得 |
+| POST | /api/categories | 新規作成 |
+| PUT  | /api/categories/{id} | 更新 |
+| PUT  | /api/categories/{id}/deactivate | 停止 |
+| PUT  | /api/categories/{id}/activate | 再有効化 |
 
 ### 8-4. AuthController
 
 | メソッド | エンドポイント      | 機能    |
 | ---- | ------------ | ----- |
-| POST | /auth/login  | ログイン  |
-| POST | /auth/logout | ログアウト |
+| POST | /api/auth/login | ログイン |
+| POST | /api/auth/logout | ログアウト |
 
 ---
 
@@ -309,25 +322,28 @@ Version: 01.06.00
 
 ### 9-1. RequestDto
 
+* ManualDraftRequestDto
 * ManualRequestDto
+* ManualCopyRequestDto
+* ManualActionRequestDto
 * UserRequestDto
 * CategoryRequestDto
+* LoginRequestDto
 
 ### 9-2. ResponseDto
 
 * ManualResponseDto
 * UserResponseDto
 * CategoryResponseDto
+* ManualHistoryDto
 
 ### 9-3. 一覧用Dto
 
 * ManualListDto
-* UserListDto
 
 ### 9-4. 詳細用Dto
 
 * ManualDetailDto
-* UserDetailDto
 
 ---
 
