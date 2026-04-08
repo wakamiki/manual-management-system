@@ -3,7 +3,7 @@ package com.example.manual.dto;
 import java.time.LocalDateTime;
 
 import com.example.manual.enums.ManualStatus;
-
+import com.example.manual.entity.ManualHistory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +31,6 @@ public class ManualDetailDto {
   
   private String content;
 
-  private String historyList;
+  private ManualHistory history;
 
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.manual.dto.ManualCopyRequestDto;
+import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.entity.Manual;
@@ -32,8 +33,9 @@ public class ManualController {
     }
 
     @GetMapping("/{manualId}")
-    public ManualDtailDto getManualDetail(@PathVariable Long manualId) {
-    manualService.getManualDetail(manualId);
+    public ManualDetailDto getManualDetail(@PathVariable Long manualId) {
+    ManualDetailDto detailDto = manualService.getManualDetail(manualId);
+    return detailDto;
     }
 
     @PutMapping("/{manualId}")
@@ -86,6 +88,14 @@ public class ManualController {
     @PostMapping("/{manualId}/action/copyPending")
     public void copyPendingManual(@PathVariable Long id,@Valid ManualCopyRequestDto requestDto) {
     }//マニュアルを複製し申請しました。
+
+    @GetMapping("{manualId}")
+    public ManualResponseDto getManualForEdit(@PathVariable Long manualId) {
+    ManualResponseDto responseDto = getManualForEdit(manualId);
+        return responseDto;
+    }
+    
+    
 
       //マニュアルを直接返す形になっている編集予定
     //全件取得

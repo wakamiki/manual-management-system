@@ -42,8 +42,8 @@ public class ManualService {
    
   }
   //下書きから公開へ変更するだけの処理 対応ボタン不明　要確認
-  public ManualResponseDto submitManual(Long id) {
-    Manual manual = findManualOrThrow(id);
+  public ManualResponseDto submitManual(Long manualId) {
+    Manual manual = findManualOrThrow(manualId);
     manualRepository.save(manual);
 
     ManualResponseDto responseDto = new ManualResponseDto();
@@ -60,47 +60,67 @@ public class ManualService {
   }
 
     //編集予定 ユーザー関係未実装
-  public void updateManual(Long id) {
-    Manual manual = findManualOrThrow(id);
+  public void updateManual(Long manualId) {
+    Manual manual = findManualOrThrow(manualId);
    
   }
 
     //編集予定 ユーザー関係未実装
-  public void approveManual(Long id) {
-    Manual manual = findManualOrThrow(id);
+  public void approveManual(Long manualId) {
+    Manual manual = findManualOrThrow(manualId);
 
   }
 
     //編集予定 更新履歴必須 ユーザー関係未実装
-  public void rollbackManual(Long id,ManualRequestDto requestDto) {
-    Manual manual = findManualOrThrow(id);
+  public void rollbackManual(Long manualId,ManualRequestDto requestDto) {
+    Manual manual = findManualOrThrow(manualId);
     manual.rollbackToDraft();
     manualRepository.save(manual);
   }
 
     //編集予定　ユーザー関係未実装　更新履歴必須
-  public void archiveManual(Long id) {
-      Manual manual = findManualOrThrow(id);
+  public void archiveManual(Long manualId) {
+      Manual manual = findManualOrThrow(manualId);
     manualRepository.save(manual);
     }
 
     //編集予定 ユーザー関係未実装
 //カテゴリーが同カテゴリーでアクティブ状態のときのみ復元可能の機能未実装
-  public void restoreManual(Long id) {
-      Manual manual = findManualOrThrow(id);
+  public void restoreManual(Long manualId) {
+      Manual manual = findManualOrThrow(manualId);
       manualRepository.save(manual);
     }
 
-  public ManualResponseDto getManualDetail(Long manualId){
+  public ManualDetailDto getManualDetail(Long manualId){
     Manual manual = findManualOrThrow(manualId);
     ManualDetailDto detailDto = new ManualDetailDto();
-    detailDto.set
+    detailDto.setManualId(manual.getId());
+    detailDto.setCategoryName(manual.getCategory().getCategoryName());
+    detailDto.setTitle(manual.getTitle());
+    detailDto.setContent(manual.getContent());
+    detailDto.setStatus(manual.getStatus());
+    detailDto.setCreatedAt(manual.getCreatedAt());
+    detailDto.setUpdatedAt(manual.getUpdatedAt());
+    //ManualHistoryからマニュアルヒストリーをマニュアルIDで呼ぶ
+    return detailDto;
   }
 
 //履歴取得の窓口　manualIdを起点に履歴を返す
   public void getManualHistories(Long id){
     List<ManualHistory> getHistory = manualHistoryService.getManualIdHistory(id);
 
+  }
+
+  public ManualResponseDto getManualForEdit(Long manualId){
+    Manual manual = findManualOrThrow(manualId);
+    ManualResponseDto responseDto = new ManualResponseDto();
+    responseDto.setManualId(manual.getId());
+    responseDto.setTitle(manual.getTitle());
+    responseDto.setContent(manual.getContent());
+    responseDto.setCategoryName(manual.getCategory().getCategoryName());
+    responseDto.setUpdatedAt(manual.getUpdatedAt());
+    //displayNameとマニュアルヒストリー必要
+    return responseDto;
   }
 
     //マニュアルを直接返す形になっている編集予定

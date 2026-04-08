@@ -89,6 +89,7 @@ Version: 01.03.01
 - 下書き保存時と申請時の必須差分
 - changeNote のケース別必須判定
 - 複製時の status 初期化確認
+- rollback / archive / restore での changeNote 必須確認
 
 ---
 
@@ -107,23 +108,25 @@ Version: 01.03.01
 | --- | --- | --- | --- |
 | MAN-005 | 正常 | DRAFT 更新 | 更新成功 |
 | MAN-006 | 正常 | changeNote 入力 | 履歴保存 |
-| MAN-007 | 異常 | APPROVED 編集 | 業務ルールに従い制御 |
+| MAN-007 | 正常 | PENDING の下書きに保存 | DRAFT に戻せる |
+| MAN-008 | 異常 | APPROVED 編集 | 業務ルールに従い制御 |
 
 ### 5-3. 一覧 / 詳細
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-008 | 正常 | 一覧取得 | 全件表示 |
-| MAN-009 | 正常 | keyword 検索 | 条件一致のみ表示 |
-| MAN-010 | 正常 | category 複数選択 + status 複数選択で絞り込み | 条件一致のみ表示 |
-| MAN-011 | 正常 | 0件 | 結果0件表示 |
+| MAN-009 | 正常 | 一覧取得 | 全件表示 |
+| MAN-010 | 正常 | keyword 検索 | 条件一致のみ表示 |
+| MAN-011 | 正常 | category 複数選択 + status 複数選択で絞り込み | 条件一致のみ表示 |
+| MAN-012 | 正常 | 0件 | 結果0件表示 |
+| MAN-013 | 正常 | 詳細の更新日時表示 | 時間まで表示される |
 
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-012 | 正常 | 複製実行 | DRAFT で新規作成 |
-| MAN-013 | 正常 | approvedAt | null になる |
-| MAN-014 | 正常 | changeNote | 履歴保存される |
-| MAN-015 | 異常 | 使用停止カテゴリ | エラー |
+| MAN-014 | 正常 | 複製実行 | DRAFT で新規作成 |
+| MAN-015 | 正常 | approvedAt | null になる |
+| MAN-016 | 正常 | changeNote | 履歴保存される |
+| MAN-017 | 異常 | 使用停止カテゴリ | エラー |
 
 ---
 
@@ -131,12 +134,13 @@ Version: 01.03.01
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
 | ST-001 | 正常 | DRAFT → PENDING | 遷移成功 |
-| ST-002 | 正常 | PENDING → APPROVED | 遷移成功 |
-| ST-003 | 正常 | PENDING → DRAFT | 差し戻し成功 |
-| ST-004 | 正常 | PENDING → ARCHIVED | 遷移成功 |
-| ST-005 | 正常 | APPROVED → ARCHIVED | 遷移成功 |
-| ST-006 | 正常 | ARCHIVED → APPROVED | 復帰成功 |
-| ST-007 | 異常 | 不正な遷移 | エラー |
+| ST-002 | 正常 | DRAFT → ARCHIVED | 遷移成功 |
+| ST-003 | 正常 | PENDING → APPROVED | 遷移成功 |
+| ST-004 | 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
+| ST-005 | 正常 | PENDING → ARCHIVED | 遷移成功 |
+| ST-006 | 正常 | APPROVED → ARCHIVED | 遷移成功 |
+| ST-007 | 正常 | ARCHIVED → APPROVED | 復帰成功 |
+| ST-008 | 異常 | 不正な遷移 | エラー |
 
 ---
 
@@ -160,6 +164,18 @@ Version: 01.03.01
 | NT-004 | 正常 | ホームバッヂ | 上段=差し戻し、下段=未承認 |
 | NT-005 | 正常 | マイページ初期表示 | 通知タブが開く |
 | NT-006 | 正常 | APPROVER のマイページ | 未承認タブ表示 |
+
+---
+
+## 8-2. manual-form 経由の確定操作
+| No | 種別 | テスト観点 | 期待結果 |
+| --- | --- | --- | --- |
+| FORM-001 | 正常 | rollback を入力画面で確定 | changeNote 入力後に DRAFT へ更新される |
+| FORM-002 | 正常 | archive を入力画面で確定 | changeNote 入力後に ARCHIVED へ更新される |
+| FORM-003 | 正常 | restore を入力画面で確定 | approvedAt を保持した ARCHIVED が APPROVED へ戻る |
+| FORM-004 | 異常 | rollback で changeNote 未入力 | エラー表示 |
+| FORM-005 | 異常 | archive で changeNote 未入力 | エラー表示 |
+| FORM-006 | 異常 | restore で changeNote 未入力 | エラー表示 |
 
 ---
 

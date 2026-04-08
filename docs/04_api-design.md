@@ -82,9 +82,30 @@ Version: 01.03.01
   - keyword
   - categoryId
   - statuses
+- 一覧返却項目は画面要件に合わせて以下を含めてよい
+  - manualId
+  - categoryName
+  - title
+  - content
+  - status
+  - historyDate
+  - updatedAt
+  - updatedByUser
+  - changeNote
+  - createdByUser
 
 ### 3-2. 詳細取得
 - GET `/api/manuals/{manualId}`
+- 詳細返却項目は以下を含めてよい
+  - manualId
+  - categoryName
+  - title
+  - content
+  - status
+  - createdAt
+  - updatedAt
+  - createdByUser
+  - histories
 
 ### 3-3. 履歴取得
 - GET `/api/manuals/{manualId}/histories`
@@ -102,6 +123,8 @@ Version: 01.03.01
 - rollback
 - archive
 - restore
+- UI 上は rollback / archive / restore を `manual-form` で `changeNote` 入力後に確定してよい
+- restore 対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする
 
 ### 3-7. 複製
 - POST `/api/manuals/{manualId}/actions/copy`

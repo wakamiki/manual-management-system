@@ -119,6 +119,7 @@ Examples:
 Allowed transitions:
 
 - DRAFT → PENDING
+- DRAFT → ARCHIVED
 - PENDING → APPROVED
 - PENDING → DRAFT
 - PENDING → ARCHIVED
@@ -168,6 +169,96 @@ New values:
 Always save history record when copied.
 
 ---
+
+# Screen Rules
+
+## Top Page List Display
+
+Top page accordion list should always display:
+
+- manualId
+- categoryName
+- title
+- content
+- status
+- history date
+- updatedAt
+- updatedByUser
+- changeNote
+- createdByUser
+
+Because the list is shown inside an accordion, keeping more information visible is allowed.
+
+## Manual Detail Screen
+
+Display:
+
+- manualId
+- categoryName
+- title
+- content
+- status
+- createdAt
+- updatedAt
+- createdByUser
+- history list
+- history changedAt
+- history changeNote
+- history changedByUser
+
+Important datetime rule:
+
+- `createdAt` may be displayed without time
+- `updatedAt` should display time because ordering within the same day must be understandable
+
+## Manual Form Screen
+
+The input screen is unified as:
+
+- `manual-form`
+
+Modes:
+
+- create
+- edit
+- copy
+- rollback
+- archive
+- restore
+
+Display rules:
+
+- In create mode, helper information may be hidden
+- In edit / copy mode, show:
+  - manualId
+  - createdAt
+  - updatedAt
+  - createdByUser
+  - history changedAt
+  - history changedByUser
+  - status
+
+Button rules:
+
+- `下書きに保存`
+- `マニュアル公開`
+- `承認`
+- `差し戻し`
+- `アーカイブ`
+- `復帰`
+
+Do not place a copy button inside `manual-form`.
+
+Rollback / archive / restore should be finalized from the input screen after entering `changeNote`.
+
+Special note:
+
+- `下書きに保存` may move `PENDING → DRAFT`
+- This is allowed when the creator needs to reopen and revise unpublished content
+
+Restore rule:
+
+- Restore target is an archived manual that still has `approvedAt`
 
 # Coding Style Rules
 
@@ -234,16 +325,3 @@ If specifications conflict,
 
 Current phase:
 **Entity maintenance and business logic design**
-
-bash -lc 'powershell -NoLogo -Command "
-$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false);
-Set-Location -LiteralPath (Convert-Path .);
-function Get-Lines { param([string]$Path)
-$enc=[Text.UTF8Encoding]::new($false)
-$text=[IO.File]::ReadAllText($Path,$enc)
-if($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF){ $text=$text.Substring(1) }
-$ls=$text -split \"`r?`n\"
-foreach($line in $ls){ $line }
-}
-Get-Lines -Path \"path/to/file.ext\"
-"'
