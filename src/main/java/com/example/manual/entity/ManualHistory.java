@@ -19,7 +19,7 @@ public class ManualHistory {
   @Id
   @Column(nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long changedId;
+  private Long id;
 
   @Setter
   @ManyToOne
@@ -34,6 +34,6 @@ public class ManualHistory {
   private LocalDateTime changedAt;
   public void markChangedNow(){
     this.changedAt = LocalDateTime.now();
-  
+
   }
 }

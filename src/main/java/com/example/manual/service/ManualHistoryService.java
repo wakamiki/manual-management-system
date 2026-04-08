@@ -18,7 +18,7 @@ public class ManualHistoryService {
     this.manualHistoryRepository = manualHistoryRepository;
   }
 
-//null可
+//null可　ユーザー追加予定
 public ManualResponseDto createHistory(Manual manual,String changeNote){
   ManualHistory history = new ManualHistory();
   history.setChangeNote(changeNote);
@@ -30,6 +30,8 @@ public ManualResponseDto createHistory(Manual manual,String changeNote){
   responseDto.setChangedAt(history.getChangedAt());
   return responseDto;
 }
+
+//チェンジノート必須作成予定
 
 //manualIDで履歴取得(更新履歴昇順)
 public List<ManualHistory>getManualIdHistory(Long manualId){

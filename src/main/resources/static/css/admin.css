@@ -81,7 +81,7 @@
 }
 
 .admin-note {
-  font-size: 13px;
+  font-size: 11px;
   color: #64757a;
 }
 
@@ -94,6 +94,22 @@
   line-height: 1.2;
   padding: 8px 12px;
   margin-bottom: 8px !important;
+}
+
+.admin-pagination {
+  margin-top: 16px;
+}
+
+.admin-page .pagination .page-link {
+  color: #4a7f85;
+  border-color: #cfe0e3;
+  font-size: 12px;
+}
+
+.admin-page .pagination .page-item.active .page-link {
+  background-color: #56969d;
+  border-color: #56969d;
+  color: #ffffff;
 }
 
 @media (max-width: 991.98px) {

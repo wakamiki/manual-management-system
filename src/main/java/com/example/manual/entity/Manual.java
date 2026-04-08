@@ -23,7 +23,7 @@ public class Manual {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long Id;
 
     @Setter
     @ManyToOne

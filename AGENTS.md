@@ -234,3 +234,16 @@ If specifications conflict,
 
 Current phase:
 **Entity maintenance and business logic design**
+
+bash -lc 'powershell -NoLogo -Command "
+$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false);
+Set-Location -LiteralPath (Convert-Path .);
+function Get-Lines { param([string]$Path)
+$enc=[Text.UTF8Encoding]::new($false)
+$text=[IO.File]::ReadAllText($Path,$enc)
+if($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF){ $text=$text.Substring(1) }
+$ls=$text -split \"`r?`n\"
+foreach($line in $ls){ $line }
+}
+Get-Lines -Path \"path/to/file.ext\"
+"'

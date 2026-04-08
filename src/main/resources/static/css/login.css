@@ -24,7 +24,8 @@
   padding-bottom: 0.75rem;
 }
 
-.login-page .text-center .h3 {
+.login-page .text-center .h3,
+.login-page .text-center .h4 {
   color: #2f5f66;
 }
 

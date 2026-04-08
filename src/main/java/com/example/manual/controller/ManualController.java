@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.manual.dto.ManualCopyRequestDto;
 import com.example.manual.dto.ManualRequestDto;
+import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
@@ -31,8 +32,8 @@ public class ManualController {
     }
 
     @GetMapping("/{manualId}")
-    public void getManual(@PathVariable Long id) {
-    manualService.getManual(id);
+    public ManualDtailDto getManualDetail(@PathVariable Long manualId) {
+    manualService.getManualDetail(manualId);
     }
 
     @PutMapping("/{manualId}")

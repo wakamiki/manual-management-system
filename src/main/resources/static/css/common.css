@@ -1,6 +1,8 @@
 body {
   background-color: #f4f8f8;
   color: #212529;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 main.container {
@@ -76,6 +78,11 @@ main.container {
   line-height: 1.2;
   padding: 8px 12px;
   margin-bottom: 8px;
+}
+
+.text-muted small,
+small {
+  font-size: 12px;
 }
 
 

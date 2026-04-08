@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -12,7 +12,7 @@
   <main class="container admin-page">
     <header class="page-title-bar">
       <div>
-        <h1 class="h3 mb-1">ユーザー管理</h1>
+        <h1 class="h4 mb-1">ユーザー管理</h1>
         <p class="mb-0 text-muted">ユーザー情報、権限、利用状態を管理します。</p>
       </div>
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
@@ -24,7 +24,7 @@
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="card-header">ユーザー登録 / 編集</div>
+        <div class="card-header">ユーザー登録 / 更新</div>
         <div class="card-body">
           <form>
             <div class="mb-3">
@@ -44,10 +44,10 @@
               </select>
             </div>
             <div class="admin-form-actions">
-              <button type="button" class="btn btn-primary">作成</button>
-              <button type="button" class="btn btn-outline-primary">保存</button>
+              <button type="button" class="btn btn-primary">保存</button>
+              <button type="button" class="btn btn-outline-primary">更新</button>
               <button type="button" class="btn btn-outline-danger">停止</button>
-              <button type="button" class="btn btn-outline-secondary">再有効化</button>
+              <button type="button" class="btn btn-outline-secondary">復帰</button>
               <button type="button" class="btn btn-outline-warning">パスワードリセット</button>
             </div>
           </form>
@@ -81,7 +81,7 @@
                   <td>2026-04-05 09:15</td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">保存</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
                       <button type="button" class="btn btn-outline-warning btn-sm">PW再設定</button>
                     </div>
                   </td>
@@ -94,39 +94,48 @@
                   <td>2026-04-05 08:42</td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">保存</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
                       <button type="button" class="btn btn-outline-danger btn-sm">停止</button>
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td>user01</td>
-                  <td>一般 三郎</td>
+                  <td>一般 一郎</td>
                   <td><span class="admin-status is-user">USER</span></td>
                   <td><span class="admin-status is-active">利用中</span></td>
                   <td>2026-04-04 19:20</td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">保存</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
                       <button type="button" class="btn btn-outline-danger btn-sm">停止</button>
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td>user99</td>
-                  <td>停止 四郎</td>
+                  <td>停止 対象</td>
                   <td><span class="admin-status is-user">USER</span></td>
                   <td><span class="admin-status is-inactive">停止中</span></td>
                   <td>2026-03-21 14:05</td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-secondary btn-sm">再有効化</button>
+                      <button type="button" class="btn btn-outline-secondary btn-sm">復帰</button>
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <nav class="admin-pagination" aria-label="ユーザー一覧ページ切り替え">
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item disabled"><span class="page-link">前へ</span></li>
+              <li class="page-item active"><span class="page-link">1</span></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">次へ</a></li>
+            </ul>
+          </nav>
         </div>
       </div>
     </section>

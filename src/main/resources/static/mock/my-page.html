@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイページ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../css/common.css">
+  <link rel="stylesheet" href="../css/my-page.css">
+</head>
+<body>
+  <main class="container mock-page my-page">
+    <header class="page-title-bar">
+      <div>
+        <h1 class="h4 mb-1">マイページ</h1>
+        <p class="mb-0 text-muted">通知と自分が関わるマニュアルをまとめて確認します。</p>
+      </div>
+      <div class="mypage-user-summary">
+        <span class="badge bg-primary">APPROVER</span>
+        <span class="mypage-user-name">山田 花子</span>
+      </div>
+    </header>
+
+    <div class="alert mock-alert" role="alert">
+      差し戻し通知が 2 件、未承認通知が 4 件あります。
+    </div>
+
+    <section class="notification-overview card mb-4">
+      <div class="card-body">
+        <div class="overview-header">
+          <div>
+            <h2 class="h5 mb-1">通知サマリー</h2>
+            <p class="text-muted mb-0">ホームアイコン横に表示される通知バッヂの確認用です。</p>
+          </div>
+          <div class="home-icon-preview">
+            <button type="button" class="home-icon-button" aria-label="ホーム">
+              <i class="bi bi-house-fill home-icon-shape" aria-hidden="true"></i>
+            </button>
+            <span class="home-badge home-badge-rollback">2</span>
+            <span class="home-badge home-badge-pending">4</span>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-6">
+            <div class="overview-tile overview-tile-rollback">
+              <div class="overview-label">差し戻し通知</div>
+              <div class="overview-count">2件</div>
+              <div class="overview-note">上段バッヂ / オレンジ表示</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="overview-tile overview-tile-pending">
+              <div class="overview-label">未承認通知</div>
+              <div class="overview-count">4件</div>
+              <div class="overview-note">下段バッヂ / 緑表示</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-body p-0">
+        <ul class="nav nav-tabs mypage-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-pane" type="button" role="tab" aria-controls="notifications-pane" aria-selected="true">通知</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="created-manuals-tab" data-bs-toggle="tab" data-bs-target="#created-manuals-pane" type="button" role="tab" aria-controls="created-manuals-pane" aria-selected="false">作成マニュアル</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pending-manuals-tab" data-bs-toggle="tab" data-bs-target="#pending-manuals-pane" type="button" role="tab" aria-controls="pending-manuals-pane" aria-selected="false">未承認マニュアル</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane fade show active tab-pane-body" id="notifications-pane" role="tabpanel" aria-labelledby="notifications-tab">
+            <div class="tab-pane-header">
+              <div>
+                <h2 class="h5 mb-1">通知一覧</h2>
+                <p class="text-muted mb-0">差し戻し通知と未承認通知を優先して確認します。</p>
+              </div>
+            </div>
+
+            <div class="notification-list">
+              <article class="notification-card notification-card-rollback">
+                <div class="notification-accent"></div>
+                <div class="notification-content">
+                  <div class="notification-meta">
+                    <span class="notification-chip notification-chip-rollback">差し戻し</span>
+                    <small class="text-muted">2026-04-08 09:30</small>
+                  </div>
+                  <p class="text-muted mb-2">マニュアルID: 1001</p>
+                  <h3 class="notification-title">配送手順の流れが差し戻されました</h3>
+                  <p class="notification-text mb-3">変更理由を見直して、再申請してください。</p>
+                  <div class="notification-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                  </div>
+                </div>
+              </article>
+
+              <article class="notification-card notification-card-pending">
+                <div class="notification-accent"></div>
+                <div class="notification-content">
+                  <div class="notification-meta">
+                    <span class="notification-chip notification-chip-pending">未承認</span>
+                    <small class="text-muted">2026-04-08 08:45</small>
+                  </div>
+                  <p class="text-muted mb-2">マニュアルID: 1002</p>
+                  <h3 class="notification-title">発注処理フローの承認待ちがあります</h3>
+                  <p class="notification-text mb-3">承認者として内容を確認し、承認または差し戻しを行ってください。</p>
+                  <div class="notification-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="tab-pane fade tab-pane-body" id="created-manuals-pane" role="tabpanel" aria-labelledby="created-manuals-tab">
+            <div class="tab-pane-header">
+              <div>
+                <h2 class="h5 mb-1">作成マニュアル</h2>
+                <p class="text-muted mb-0">自分が作成したマニュアルを一覧で確認できます。</p>
+              </div>
+            </div>
+
+            <div class="dashboard-list">
+              <article class="dashboard-card">
+                <div class="dashboard-card-main">
+                  <div>
+                    <div class="dashboard-meta">
+                      <span class="badge bg-success">承認済</span>
+                      <small class="text-muted">マニュアルID: 1001</small>
+                      <small class="text-muted">更新日: 2026-04-05</small>
+                    </div>
+                    <h3 class="dashboard-title">配送手順の流れ</h3>
+                    <p class="dashboard-text mb-0">配送依頼から完了報告までの業務手順をまとめたマニュアルです。</p>
+                  </div>
+                  <div class="dashboard-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                  </div>
+                </div>
+              </article>
+
+              <article class="dashboard-card">
+                <div class="dashboard-card-main">
+                  <div>
+                    <div class="dashboard-meta">
+                      <span class="badge bg-primary">申請中</span>
+                      <small class="text-muted">マニュアルID: 1002</small>
+                      <small class="text-muted">更新日: 2026-04-08</small>
+                    </div>
+                    <h3 class="dashboard-title">発注処理フロー</h3>
+                    <p class="dashboard-text mb-0">発注依頼の確認事項と承認フローを整理したマニュアルです。</p>
+                  </div>
+                  <div class="dashboard-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="tab-pane fade tab-pane-body" id="pending-manuals-pane" role="tabpanel" aria-labelledby="pending-manuals-tab">
+            <div class="tab-pane-header">
+              <div>
+                <h2 class="h5 mb-1">未承認マニュアル</h2>
+                <p class="text-muted mb-0">承認者向けに、承認待ちマニュアルだけをまとめています。</p>
+              </div>
+            </div>
+
+            <div class="dashboard-list">
+              <article class="dashboard-card dashboard-card-pending">
+                <div class="dashboard-card-main">
+                  <div>
+                    <div class="dashboard-meta">
+                      <span class="badge bg-primary">申請中</span>
+                      <small class="text-muted">マニュアルID: 1003</small>
+                      <small class="text-muted">申請者: 佐藤 次郎</small>
+                    </div>
+                    <h3 class="dashboard-title">見積作成ルール</h3>
+                    <p class="dashboard-text mb-0">見積作成時の確認ポイントと提出ルールを整理したマニュアルです。</p>
+                  </div>
+                  <div class="dashboard-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
+                  </div>
+                </div>
+              </article>
+
+              <article class="dashboard-card dashboard-card-pending">
+                <div class="dashboard-card-main">
+                  <div>
+                    <div class="dashboard-meta">
+                      <span class="badge bg-primary">申請中</span>
+                      <small class="text-muted">マニュアルID: 1004</small>
+                      <small class="text-muted">申請者: 鈴木 一郎</small>
+                    </div>
+                    <h3 class="dashboard-title">月次締め処理</h3>
+                    <p class="dashboard-text mb-0">月末締めから承認依頼までの処理フローをまとめたマニュアルです。</p>
+                  </div>
+                  <div class="dashboard-actions">
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -6,20 +6,39 @@
   <title>ホーム画面</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="../css/common.css">
-    <link rel="stylesheet" href="../css/index.css">
+  <link rel="stylesheet" href="../css/index.css">
 </head>
 <body>
   <main class="container index-page">
     <header class="page-header">
       <div>
-        <h1 class="h3 mb-0">業務マニュアル管理システム</h1>
+        <h1 class="h4 mb-0">業務マニュアル管理システム</h1>
       </div>
       <div class="page-actions">
         <form class="search-form">
+          <details class="search-filter">
+            <summary>カテゴリ</summary>
+            <div class="search-filter-panel">
+              <label class="search-check"><input type="checkbox" checked> すべて</label>
+              <label class="search-check"><input type="checkbox"> 営業部</label>
+              <label class="search-check"><input type="checkbox"> 経理部</label>
+              <label class="search-check"><input type="checkbox"> 総務部</label>
+            </div>
+          </details>
+          <details class="search-filter">
+            <summary>ステータス</summary>
+            <div class="search-filter-panel">
+              <label class="search-check"><input type="checkbox" checked> すべて</label>
+              <label class="search-check"><input type="checkbox"> 下書き</label>
+              <label class="search-check"><input type="checkbox"> 申請中</label>
+              <label class="search-check"><input type="checkbox"> 承認済</label>
+              <label class="search-check"><input type="checkbox"> アーカイブ</label>
+            </div>
+          </details>
           <input type="search" class="form-control" placeholder="キーワード検索">
           <button type="submit" class="btn btn-outline-primary">検索</button>
         </form>
-        <a href="./manual-create.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary create-button">新規作成</a>
+        <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary create-button">新規作成</a>
       </div>
     </header>
 
@@ -28,31 +47,39 @@
     </div>
 
     <div class="row g-4 align-items-start">
-
       <aside class="col-3 sidebar">
         <div class="card">
           <div class="card-body">
             <div>
-            <h2 class="h5">カテゴリ</h2>
+              <h2 class="h5">カテゴリ</h2>
             </div>
             <div>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item active">営業部</li>
-              <li class="list-group-item">総務部</li>
-              <li class="list-group-item">経理部</li>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item active">営業部</li>
+                <li class="list-group-item">経理部</li>
+                <li class="list-group-item">総務部</li>
               </ul>
-              </div>
-              <div class="stopedCategory">
+            </div>
+            <div class="stopedCategory">
               <button class="stopped-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
-                <span>使用停止</span>
-                <span class="stopped-toggle-icon">▼</span>
+                <span>使用停止中</span>
+                <span class="stopped-toggle-icon">＋</span>
               </button>
               <div class="collapse" id="stoppedCategoryList">
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item">旧営業部</li>
                 </ul>
-                </div>
               </div>
+            </div>
+            <div class="sidebar-home">
+              <a href="./my-page.html" class="sidebar-home-link" target="_blank" rel="noopener noreferrer" aria-label="マイページ">
+                <span class="sidebar-home-icon-wrap">
+                  <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
+                  <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
+                  <span class="sidebar-home-badge sidebar-home-badge-pending">4</span>
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </aside>
@@ -61,146 +88,75 @@
         <div class="accordion w-100" id="accordionExample">
           <div class="accordion-item">
             <div class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-              <div class="w-100">
-              <div class="d-flex justify-content-between align-items-center gap-2">
-              <strong class="fw-semibold">マニュアル１件目</strong>
-              <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
-              </div>
-              <div class="align-items-center gap-2">
-              <span class="category">カテゴリ</span>
-              <span class="badge bg-primary">承認状態</span>
-              </div>
-              </div>
-            </button>
-                 <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                   <p>内容</p>
-                   <div class="table-responsive mt-3">
-                    <table class="table table-sm table-bordered align-middle mb-0">
-                      <thead class="table-light">
-                        <tr>
-                          <th scope="col">更新日</th>
-                          <th scope="col">更新内容</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2026-04-05</td>
-                          <td>本文修正</td>
-                        </tr>
-                        <tr>
-                          <td>2026-04-04</td>
-                          <td>初版作成</td>
-                        </tr>
-                      </tbody>
-                   </table>
-                   </div>
-                   <div class="d-flex gap-2 mt-3">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">詳細を見る</a>
-                    <a href="./manual-edit.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">編集</a>
-                    <a href="./manual-create.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
-                   </div>
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <strong class="fw-semibold">マニュアルの作成手順</strong>
+                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
+                  </div>
+                  <div class="align-items-center gap-2">
+                    <span class="text-muted"><small>マニュアルID: 1001</small></span>
+                    <span class="category">カテゴリ</span>
+                    <span class="badge bg-primary">申請待ち</span>
+                  </div>
                 </div>
-              </div> 
+              </button>
+            </div>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <p>見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
+                </div>
+                <h2 class="h5 mb-2">更新履歴</h2>
+                <ul class="history-list mb-0">
+                  <li>2026-04-05: 本文の修正</li>
+                  <li>2026-04-04: 新規作成</li>
+                </ul>
               </div>
-        </div>
+            </div>
+          </div>
+
           <div class="accordion-item">
             <div class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseOne">
-              <div class="w-100">
-              <div class="d-flex justify-content-between align-items-center gap-2">
-              <strong class="fw-semibold">マニュアル１件目</strong>
-              <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
-              </div>
-              <div class="align-items-center gap-2">
-              <span class="category">カテゴリ</span>
-              <span class="badge bg-primary">承認状態</span>
-              </div>
-              </div>
-            </button>
-                 <div id="collapseTwo" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                   <p>内容</p>
-                   <div class="table-responsive mt-3">
-                    <table class="table table-sm table-bordered align-middle mb-0">
-                      <thead class="table-light">
-                        <tr>
-                          <th scope="col">更新日</th>
-                          <th scope="col">更新内容</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2026-04-05</td>
-                          <td>本文修正</td>
-                        </tr>
-                        <tr>
-                          <td>2026-04-04</td>
-                          <td>初版作成</td>
-                        </tr>
-                      </tbody>
-                   </table>
-                   </div>
-                   <div class="d-flex gap-2 mt-3">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">詳細を見る</a>
-                    <a href="./manual-edit.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">編集</a>
-                    <a href="./manual-create.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
-                   </div>
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <strong class="fw-semibold">発注処理フロー</strong>
+                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 佐藤 次郎</small></span>
+                  </div>
+                  <div class="align-items-center gap-2">
+                    <span class="text-muted"><small>マニュアルID: 1002</small></span>
+                    <span class="category">カテゴリ</span>
+                    <span class="badge bg-success">承認済</span>
+                  </div>
                 </div>
-              </div> 
-              </div>
-        </div>          <div class="accordion-item">
-            <div class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseOne">
-              <div class="w-100">
-              <div class="d-flex justify-content-between align-items-center gap-2">
-              <strong class="fw-semibold">マニュアル１件目</strong>
-              <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
-              </div>
-              <div class="align-items-center gap-2">
-              <span class="category">カテゴリ</span>
-              <span class="badge bg-primary">承認状態</span>
-              </div>
-              </div>
-            </button>
-                 <div id="collapseThree" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                <div class="accordion-body">
-                   <p>内容</p>
-                   <div class="table-responsive mt-3">
-                    <table class="table table-sm table-bordered align-middle mb-0">
-                      <thead class="table-light">
-                        <tr>
-                          <th scope="col">更新日</th>
-                          <th scope="col">更新内容</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>2026-04-05</td>
-                          <td>本文修正</td>
-                        </tr>
-                        <tr>
-                          <td>2026-04-04</td>
-                          <td>初版作成</td>
-                        </tr>
-                      </tbody>
-                   </table>
-                   </div>
-                   <div class="d-flex gap-2 mt-3">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-sm">詳細を見る</a>
-                    <a href="./manual-edit.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">編集</a>
-                    <a href="./manual-create.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
-                   </div>
+              </button>
+            </div>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <p>発注依頼から納品確認までの確認事項をまとめています。</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
-              </div> 
+                <h2 class="h5 mb-2">更新履歴</h2>
+                <ul class="history-list mb-0">
+                  <li>2026-04-03: 承認済へ変更</li>
+                  <li>2026-04-01: 初回公開</li>
+                </ul>
               </div>
+            </div>
+          </div>
         </div>
-        </div>
-        <nav aria-label="マニュアル一覧ページ切り替え" class="mt-4 d-flex justify-content-center">
-          <ul class="pagination pagination-sm mb-0">
+
+        <nav class="mt-4" aria-label="ページネーション">
+          <ul class="pagination justify-content-center mb-0">
             <li class="page-item disabled"><span class="page-link">前へ</span></li>
-            <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
+            <li class="page-item active"><span class="page-link">1</span></li>
             <li class="page-item"><a class="page-link" href="#">2</a></li>
             <li class="page-item"><a class="page-link" href="#">3</a></li>
             <li class="page-item"><a class="page-link" href="#">次へ</a></li>

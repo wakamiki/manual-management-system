@@ -14,6 +14,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ManualResponseDto {
 
+  private Long manualId;
+
 private String title;
 
 private String content;

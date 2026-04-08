@@ -91,13 +91,10 @@ public class ManualService {
       manualRepository.save(manual);
     }
 
-      //編集予定　ユーザー関係未実装
-  public void getManual(Long id) {
-    }
-
-  public void getManualDetail(Long id){
-    Manual manual = findManualOrThrow(id);
+  public ManualResponseDto getManualDetail(Long manualId){
+    Manual manual = findManualOrThrow(manualId);
     ManualDetailDto detailDto = new ManualDetailDto();
+    detailDto.set
   }
 
 //履歴取得の窓口　manualIdを起点に履歴を返す
