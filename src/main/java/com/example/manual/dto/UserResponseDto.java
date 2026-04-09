@@ -19,4 +19,20 @@ private String displayName;
 
 private  UserRole role;
 
+public String getLoginId() {
+return this.loginId;
+}
+
+public String getPassword() {
+return this.password;
+}
+
+public String getDisplayName() {
+return this.displayName;
+}
+
+public UserRole getRole() {
+return this.role;
+}
+
 }

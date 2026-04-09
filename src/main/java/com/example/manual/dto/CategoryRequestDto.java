@@ -18,4 +18,12 @@ private String categoryName;
 @NotNull
 private Integer displayOrder;
 
+public String getCategoryName() {
+return this.categoryName;
+}
+
+public Integer getDisplayOrder() {
+return this.displayOrder;
+}
+
 }

@@ -81,7 +81,7 @@ public class ManualController {
     }//マニュアルを承認申請しました。
 
       //Dto未対応　編集予定
-      @PostMapping("/{manualId}/actions/copyDraft")
+    @PostMapping("/{manualId}/actions/copyDraft")
     public void copyDraftManual(@PathVariable Long id,@Valid ManualCopyRequestDto requestDto) {
     }//マニュアルを複製し下書きに保存しました。
 
@@ -89,7 +89,7 @@ public class ManualController {
     public void copyPendingManual(@PathVariable Long id,@Valid ManualCopyRequestDto requestDto) {
     }//マニュアルを複製し申請しました。
 
-    @GetMapping("{manualId}")
+    @GetMapping("{manualId}/edit")
     public ManualResponseDto getManualForEdit(@PathVariable Long manualId) {
     ManualResponseDto responseDto = getManualForEdit(manualId);
         return responseDto;

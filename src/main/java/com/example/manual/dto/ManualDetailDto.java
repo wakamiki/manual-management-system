@@ -33,4 +33,44 @@ public class ManualDetailDto {
 
   private ManualHistory history;
 
+  public Long getManualId() {
+    return this.manualId;
+  }
+
+  public String getTitle() {
+    return this.title;
+  }
+
+  public ManualStatus getStatus() {
+    return this.status;
+  }
+
+  public String getCategoryName() {
+    return this.categoryName;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return this.createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return this.updatedAt;
+  }
+
+  public LocalDateTime getApprovedAt() {
+    return this.approvedAt;
+  }
+
+  public String getCreatedByName() {
+    return this.createdByName;
+  }
+
+  public String getContent() {
+    return this.content;
+  }
+
+  public ManualHistory getHistory() {
+    return this.history;
+  }
+
 }

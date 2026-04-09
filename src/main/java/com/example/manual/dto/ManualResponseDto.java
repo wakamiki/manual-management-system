@@ -38,4 +38,52 @@ private LocalDateTime updatedAt;
 
 private LocalDateTime approvedAt;
 
+public Long getManualId() {
+  return this.manualId;
+}
+
+public String getTitle() {
+  return this.title;
+}
+
+public String getContent() {
+  return this.content;
+}
+
+public ManualStatus getStatus() {
+  return this.status;
+}
+
+public String getCategoryName() {
+  return this.categoryName;
+}
+
+public String getChangeNote() {
+  return this.changeNote;
+}
+
+public LocalDateTime getChangedAt() {
+  return this.changedAt;
+}
+
+public String getDisplayName() {
+  return this.displayName;
+}
+
+public User getChangedByName() {
+  return this.changedByName;
+}
+
+public LocalDateTime getCreatedAt() {
+  return this.createdAt;
+}
+
+public LocalDateTime getUpdatedAt() {
+  return this.updatedAt;
+}
+
+public LocalDateTime getApprovedAt() {
+  return this.approvedAt;
+}
+
 }

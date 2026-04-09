@@ -30,4 +30,20 @@ private UserRole role;
 @NotNull
 private Boolean isActive;
 
+public String getLoginId() {
+return this.loginId;
+}
+
+public String getDisplayName() {
+return this.displayName;
+}
+
+public UserRole getRole() {
+return this.role;
+}
+
+public Boolean getIsActive() {
+return this.isActive;
+}
+
 }

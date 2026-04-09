@@ -250,12 +250,83 @@ Entity 設計、Repository 整理、画面モック作成に着手した。
 ### 学び
 - 通知は機能単体ではなく、通知を見る入口と一緒に設計するとまとまりやすい
 - 入力画面は画面統合しても、API はユースケースごとに分けてよい
-- 文字化けは本文破損と文字コードの両面で見直す必要がある
 - ボタンの役割、保存内容、画面遷移を先に言語化すると、後から実装を組み立てやすい
 - IDE 設定の不調はコード側の赤エラーだけでなく、言語サーバー設定も確認すると復旧が早い
 
 ### 次回着手予定
+- ManualControllerとManualServiceの復旧
 - Notification Entity / Service の中身実装
 - MyPage DTO の項目確定
 - コンパイルエラー整理
 - DTO と Service シグネチャの整合
+
+---
+
+## 2026-04-09
+
+### 作業概要
+Spring Security の学習と起動確認を進め、認証基盤の理解を深めた。あわせて、起動失敗の原因になっていた JPA 関連定義や Controller の重複マッピングを整理し、Lombok の getter 不安定対策として明示 getter を追加した。
+
+### 実施内容
+
+#### Spring Security の理解整理
+- `Principal` と `Authentication` の役割を整理
+  - `Principal`: ログインユーザー識別向け
+  - `Authentication`: 認証状態や権限確認向け
+- 認証と認可の違いを整理
+  - 認証 = ログイン済みか
+  - 認可 = 何ができるか
+- セッション / クッキー / セッションID の流れを学習
+- ログインユーザー情報は画面からではなく Security から取得する方針を確認
+
+#### Spring Security 導入と起動確認
+- `spring-boot-starter-security` を追加
+- `.\mvnw spring-boot:run` で起動確認を実施
+- 標準ログイン画面が localhost に表示されることを確認
+- 認証基盤が動作しているところまで到達
+
+#### 起動失敗の原因調査
+- `UserOperationHistory` の関連定義を見直し
+  - Entity 関連に `@Column` を使っていた箇所を確認
+- `CategoryRepository` / `UserRepository` のメソッド名と Entity 項目名のズレを調査
+- `ManualController` の重複 GET マッピングを確認
+  - 詳細取得と編集用取得が同じ URL になっていた
+- `UserController` の `mypage` 重複マッピングを確認
+  - `Principal` 版と `Authentication` 版が同じ URL を持っていた
+
+#### ログインユーザー情報取得の整理
+- `Principal` は Controller 引数で受けることを確認
+- `principal.getName()` でログイン中の `loginId` を取る流れを整理
+- `UserService` では `loginId` から `displayName` を返す役割に整理
+- ログイン中ユーザーの表示名取得と、作成者 / 更新者表示の取得経路を分けて理解した
+
+#### Lombok / getter 問題への対応
+- Maven compile は通るが VS Code では getter が見つからない状況を確認
+- `Java Language Server` 側の認識ズレと判断
+- `User` に `getDisplayName()` を明示追加
+- その後、Lombok 依存で不安定になりやすいクラスへ明示 getter を追加
+  - Entity
+  - DTO
+  - `ErrorResponse`
+- `ManualService` などで getter が赤くなりにくい状態へ調整
+
+#### 命名・設計整理
+- `UserService` のメソッドは `loginId` 基準で考える方向に整理
+- 画面遷移系メソッド名の整理を継続
+  - `goToUserManagementPage()`
+  - `goToCategoryManagementPage()`
+  - `submitManual()`
+
+### 学び
+- Spring Security は、まず「起動してログイン画面が出る」ところまで確認すると理解が進みやすい
+- `Principal` は Controller で受けるもの、と割り切ると整理しやすい
+- Repository のメソッド名は Entity の実フィールド名と一致していないと起動時に落ちる
+- Lombok は Maven 上で通っていても IDE 側で不安定になることがある
+- 学習段階では、まず最小動作を確認してから権限や画面連携へ進む方が理解しやすい
+
+### 次回着手予定
+- `Principal` を使ったログイン中ユーザーID取得の確認
+- `UserRepository` / `UserService` を `loginId` 基準で整理
+- `createdByUser` 自動設定の検討
+- Security 導入後の Controller / Service の役割整理
+- 起動時エラーになりやすい Repository / Mapping の最終確認

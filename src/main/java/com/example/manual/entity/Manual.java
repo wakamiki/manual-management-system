@@ -23,7 +23,7 @@ public class Manual {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Setter
     @ManyToOne
@@ -33,7 +33,7 @@ public class Manual {
     @Setter
     @ManyToOne
     @JoinColumn(name = "operated_by_user_id")
-    private User TargetUser;
+    private User targetUser;
 
     @Setter
     @Column(nullable = false, length = 100)
@@ -111,5 +111,41 @@ public class Manual {
     private LocalDateTime approvedAt;
          public void markApprovedNow() {
         this.approvedAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public User getTargetUser() {
+        return this.targetUser;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getContent() {
+        return this.content;
+    }
+
+    public ManualStatus getStatus() {
+        return this.status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public LocalDateTime getApprovedAt() {
+        return this.approvedAt;
     }
 }

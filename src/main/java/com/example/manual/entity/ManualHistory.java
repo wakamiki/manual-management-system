@@ -36,4 +36,20 @@ public class ManualHistory {
     this.changedAt = LocalDateTime.now();
 
   }
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public Manual getManual() {
+    return this.manual;
+  }
+
+  public String getChangeNote() {
+    return this.changeNote;
+  }
+
+  public LocalDateTime getChangedAt() {
+    return this.changedAt;
+  }
 }

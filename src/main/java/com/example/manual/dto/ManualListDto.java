@@ -28,4 +28,28 @@ public class ManualListDto {
 
   private String createdByName;
 
+  public Long getManualId() {
+    return this.manualId;
+  }
+
+  public String getTitle() {
+    return this.title;
+  }
+
+  public ManualStatus getStatus() {
+    return this.status;
+  }
+
+  public String getCategoryName() {
+    return this.categoryName;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return this.updatedAt;
+  }
+
+  public String getCreatedByName() {
+    return this.createdByName;
+  }
+
 }

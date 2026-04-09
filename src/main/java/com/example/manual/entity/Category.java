@@ -47,4 +47,28 @@ public class Category {
     this.isActive = false;
   }
 
+  public Long getId() {
+    return this.id;
+  }
+
+  public Integer getDisplayOrder() {
+    return this.displayOrder;
+  }
+
+  public String getCategoryName() {
+    return this.categoryName;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return this.createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return this.updatedAt;
+  }
+
+  public boolean isActive() {
+    return this.isActive;
+  }
+
 }

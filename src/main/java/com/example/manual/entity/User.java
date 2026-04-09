@@ -20,7 +20,7 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long id;
 
   @Column(nullable = false, length = 50)
   private String loginId;
@@ -32,6 +32,9 @@ public class User {
   @Setter
   @Column(nullable = false, length = 50)
   private String displayName;
+  public String getDisplayName() {
+    return this.displayName;
+  }
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
@@ -68,6 +71,38 @@ public class User {
   private LocalDateTime updatedAt;
   public void markUpdatedNow() {
     this.updatedAt = LocalDateTime.now();
+  }
+
+  public Long getId() {
+    return this.id;
+  }
+
+  public String getLoginId() {
+    return this.loginId;
+  }
+
+  public String getPassword() {
+    return this.password;
+  }
+
+  public UserRole getRole() {
+    return this.role;
+  }
+
+  public boolean isActive() {
+    return this.isActive;
+  }
+
+  public LocalDateTime getLastLoginAt() {
+    return this.lastLoginAt;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return this.createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return this.updatedAt;
   }
 
 }

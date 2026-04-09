@@ -14,4 +14,16 @@ public class ErrorResponse {
     private String message;
     private String errorCode;
     private LocalDateTime timestamp;
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public String getErrorCode() {
+        return this.errorCode;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return this.timestamp;
+    }
 }

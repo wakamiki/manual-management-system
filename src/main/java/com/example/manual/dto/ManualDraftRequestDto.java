@@ -26,4 +26,24 @@ public class ManualDraftRequestDto {
     private String changeNote;
 
     private ManualStatus status;
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getContent() {
+        return this.content;
+    }
+
+    public Long getCategoruId() {
+        return this.categoruId;
+    }
+
+    public String getChangeNote() {
+        return this.changeNote;
+    }
+
+    public ManualStatus getStatus() {
+        return this.status;
+    }
 }

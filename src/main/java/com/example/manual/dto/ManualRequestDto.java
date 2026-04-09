@@ -27,4 +27,20 @@ private Long categoryId;
 @Size(max=100)
 private String changeNote;
 
+public String getTitle() {
+return this.title;
+}
+
+public String getContent() {
+return this.content;
+}
+
+public Long getCategoryId() {
+return this.categoryId;
+}
+
+public String getChangeNote() {
+return this.changeNote;
+}
+
 }

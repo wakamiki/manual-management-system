@@ -32,4 +32,28 @@ public class ManualCopyDraftRequest {
 
     @NotNull
     private ManualStatus status;
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getContent() {
+        return this.content;
+    }
+
+    public Long getSourceManualId() {
+        return this.sourceManualId;
+    }
+
+    public Long getCategoryId() {
+        return this.categoryId;
+    }
+
+    public String getChangeNote() {
+        return this.changeNote;
+    }
+
+    public ManualStatus getStatus() {
+        return this.status;
+    }
 }

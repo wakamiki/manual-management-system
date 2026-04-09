@@ -22,12 +22,11 @@ private Long id;
 
 @Setter
 @ManyToOne    
-@Column(nullable = false)
 @JoinColumn(name = "target_user_id")
 private User targetUser;
 
 @Column(nullable = false)
-private User operatedByUser;
+private String operatedByUser;
 
 @Column(nullable = false,length = 30)
 private String operationType;
@@ -39,5 +38,29 @@ private String operationDetail;
 private LocalDateTime createdAt;
 public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
+}
+
+public Long getId() {
+    return this.id;
+}
+
+public User getTargetUser() {
+    return this.targetUser;
+}
+
+public String getOperatedByUser() {
+    return this.operatedByUser;
+}
+
+public String getOperationType() {
+    return this.operationType;
+}
+
+public String getOperationDetail() {
+    return this.operationDetail;
+}
+
+public LocalDateTime getCreatedAt() {
+    return this.createdAt;
 }
 }

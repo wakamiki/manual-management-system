@@ -48,8 +48,8 @@ public List<Category> getAllCategories() {
     return categoryRepository.findAllByOrderByCategoryNameAsc();
   }
 
-public Optional<Category> getCategoryById() {
-    return categoryRepository.findById();
+public Optional<Category> getCategoryById(Long categoryId) {
+    return categoryRepository.findById(categoryId);
   }
 
 }

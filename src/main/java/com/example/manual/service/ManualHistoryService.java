@@ -4,31 +4,31 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.manual.dto.ManualResponseDto;
-import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
 import com.example.manual.repository.ManualHistoryRepository;
+import com.example.manual.repository.ManualRepository;
+import com.example.manual.repository.UserRepository;
 
 @Service
 public class ManualHistoryService {
 
-    public final ManualHistoryRepository manualHistoryRepository;
+  private final ManualRepository manualRepository;
+  public final ManualHistoryRepository manualHistoryRepository;
+  public final UserRepository userRepository;
 
-    public ManualHistoryService(ManualHistoryRepository manualHistoryRepository){
-    this.manualHistoryRepository = manualHistoryRepository;
+    public ManualHistoryService(ManualHistoryRepository manualHistoryRepository,UserRepository userRepository, ManualRepository manualRepository){
+      this.manualHistoryRepository = manualHistoryRepository;
+      this.userRepository = userRepository;
+      this.manualRepository = manualRepository;
   }
 
 //null可　ユーザー追加予定
-public ManualResponseDto createHistory(Manual manual,String changeNote){
+public ManualHistory createHistory(Long manualId,String changeNote){
   ManualHistory history = new ManualHistory();
   history.setChangeNote(changeNote);
-  history.setManual(manual);
   history.markChangedNow();
-  manualHistoryRepository.save(history);
-  ManualResponseDto responseDto = new ManualResponseDto();
-  responseDto.setChangeNote(history.getChangeNote());
-  responseDto.setChangedAt(history.getChangedAt());
-  return responseDto;
+  //ユーザーdisplayName
+  return manualHistoryRepository.save(history);
 }
 
 //チェンジノート必須作成予定
