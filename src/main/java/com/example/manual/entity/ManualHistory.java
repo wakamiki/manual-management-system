@@ -9,42 +9,32 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
 @Entity
 public class ManualHistory {
+
+  public ManualHistory() {
+  }
 
   @Id
   @Column(nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Setter
   @ManyToOne
   @JoinColumn(name = "manual_id")
   private Manual manual;
-
-  @Setter
   @Column(nullable = false, length = 100)
   private String changeNote;
-
   @Column(nullable = false)
   private LocalDateTime changedAt;
-  public void markChangedNow(){
-    this.changedAt = LocalDateTime.now();
 
-  }
-
+  //ゲッター
   public Long getId() {
     return this.id;
   }
-
   public Manual getManual() {
     return this.manual;
   }
-
   public String getChangeNote() {
     return this.changeNote;
   }
@@ -52,4 +42,19 @@ public class ManualHistory {
   public LocalDateTime getChangedAt() {
     return this.changedAt;
   }
+
+  //セッター
+  public void setManual(Manual manual) {
+    this.manual = manual;
+  }
+
+  public void setChangeNote(String changeNote) {
+    this.changeNote = changeNote;
+  }
+
+  //メソッド
+  public void markChangedNow() {
+    this.changedAt = LocalDateTime.now();
+  }
+
 }

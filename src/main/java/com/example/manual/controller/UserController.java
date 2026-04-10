@@ -31,10 +31,4 @@ public class UserController {
         return userOpt;
     }
 
-    @GetMapping("/mypage")
-    public String MyPageController(Principal principal) {
-    String loginId = principal.getName();
-    return loginId;
-    }
-
 }

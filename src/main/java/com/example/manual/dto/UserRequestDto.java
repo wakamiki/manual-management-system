@@ -1,21 +1,17 @@
 package com.example.manual.dto;
 
 
-import java.time.LocalDateTime;
-
 import com.example.manual.enums.UserRole;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class UserRequestDto {
+  public UserRequestDto() {
+
+  }
+  private String id;
 
 @NotNull
 private String loginId;
@@ -30,6 +26,12 @@ private UserRole role;
 @NotNull
 private Boolean isActive;
 
+
+//ゲッター
+public String getId() {
+  return id;
+}
+
 public String getLoginId() {
 return this.loginId;
 }
@@ -43,7 +45,20 @@ return this.role;
 }
 
 public Boolean getIsActive() {
-return this.isActive;
+  return this.isActive;
+}
+
+//セッター
+public void setId(String id) {
+  this.id = id;
+}
+
+public void setLoginId(String loginId) {
+  this.loginId = loginId;
+}
+
+public void setDisplayName(String displayName) {
+  this.displayName = displayName;
 }
 
 }

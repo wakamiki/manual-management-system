@@ -3,28 +3,23 @@ package com.example.manual.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-
-@Setter
-@Getter
-@NoArgsConstructor
 public class ManualRequestDto {
+
+  public ManualRequestDto() {
+  }
 
 @NotBlank
 @Size(max=100)
 private String title;
-
 @Size(max=10000)
 @NotBlank
 private String content;
-
 @NotNull
 private Long categoryId;
+@Size(max = 100)
 
-@Size(max=100)
+//ゲッター
 private String changeNote;
 
 public String getTitle() {
@@ -40,7 +35,24 @@ return this.categoryId;
 }
 
 public String getChangeNote() {
-return this.changeNote;
+  return this.changeNote;
+}
+
+//セッター
+public void setTitle(String title) {
+  this.title = title;
+}
+
+public void setContent(String content) {
+  this.content = content;
+}
+
+public void setCategoryId(Long categoryId) {
+  this.categoryId = categoryId;
+}
+
+public void setChangeNote(String cangeNote) {
+  this.changeNote = cangeNote;
 }
 
 }

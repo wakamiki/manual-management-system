@@ -1,21 +1,17 @@
 package com.example.manual.dto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class CategoryResponseDto {
-    
+
+  public CategoryResponseDto() {
+
+  }
+
 private Long id;
-
 private String categoryName;
-
 private Integer displayOrder;
-
 private boolean isActive;
 
+//ゲッター
 public Long getId() {
 return this.id;
 }
@@ -29,7 +25,24 @@ return this.displayOrder;
 }
 
 public boolean isActive() {
-return this.isActive;
+  return this.isActive;
+}
+
+// セッター
+public void setId(Long id) {
+  this.id = id;
+}
+
+public void setCategoryName(String categoryName) {
+  this.categoryName = categoryName;
+}
+
+public void setDisplayOrder(Integer displayOrder) {
+  this.displayOrder = displayOrder;
+}
+
+public void setActive(boolean active) {
+  this.isActive = active;
 }
 
 }

@@ -9,37 +9,30 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
-@Getter
 public class UserOperationHistory {
+
+    public UserOperationHistory() {
+
+}
 
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
 private Long id;
-
-@Setter
-@ManyToOne    
+@ManyToOne
 @JoinColumn(name = "target_user_id")
 private User targetUser;
-
 @Column(nullable = false)
 private String operatedByUser;
-
 @Column(nullable = false,length = 30)
 private String operationType;
-
 @Column(nullable = false,length = 100)
 private String operationDetail;
-
 @Column(nullable = false)
 private LocalDateTime createdAt;
-public void markCreatedNow() {
-    this.createdAt = LocalDateTime.now();
-}
 
+//ゲッター
 public Long getId() {
     return this.id;
 }
@@ -62,5 +55,15 @@ public String getOperationDetail() {
 
 public LocalDateTime getCreatedAt() {
     return this.createdAt;
+}
+
+//セッター
+public void setTargetUser(User targetUser) {
+    this.targetUser = targetUser;
+}
+
+//メソッド
+public void markCreatedNow() {
+    this.createdAt = LocalDateTime.now();
 }
 }

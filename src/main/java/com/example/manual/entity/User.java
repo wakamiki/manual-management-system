@@ -11,68 +11,34 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
-@Getter
 public class User {
+
+  public User() {
+  }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   @Column(nullable = false, length = 50)
   private String loginId;
-
-  @Setter
   @Column(nullable = false, length = 255)
   private String password;
-
-  @Setter
   @Column(nullable = false, length = 50)
   private String displayName;
-  public String getDisplayName() {
-    return this.displayName;
-  }
-
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private UserRole role;
-  public void markRoleAdmin() {
-    this.role = UserRole.ADMIN;
-  }
-    public void markRoleApprover() {
-    this.role = UserRole.APPROVER;
-  }
-  public void markRoleUser() {
-    this.role = UserRole.USER;
-  }
-
   @Column(nullable = false)
   private boolean isActive;
-  public void activate() {
-    this.isActive = true;
-  }
-  public void deactivate() {
-    this.isActive = false;
-  }
-
   private LocalDateTime lastLoginAt;
-  public void markLastLoginNow() {
-    this.lastLoginAt = LocalDateTime.now();
-  }
-
   private LocalDateTime createdAt;
-  public void markCreatedNow() {
-    this.createdAt = LocalDateTime.now();
-  }
-
   private LocalDateTime updatedAt;
-  public void markUpdatedNow() {
-    this.updatedAt = LocalDateTime.now();
-  }
 
+
+
+  //ゲッター
   public Long getId() {
     return this.id;
   }
@@ -83,6 +49,10 @@ public class User {
 
   public String getPassword() {
     return this.password;
+  }
+
+  public String getDisplayName() {
+    return this.displayName;
   }
 
   public UserRole getRole() {
@@ -105,4 +75,41 @@ public class User {
     return this.updatedAt;
   }
 
+  //セッター
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
+
+  //メソッド
+  public void markRoleAdmin() {
+    this.role = UserRole.ADMIN;
+  }
+
+  public void markRoleApprover() {
+    this.role = UserRole.APPROVER;
+  }
+
+  public void markRoleUser() {
+    this.role = UserRole.USER;
+  }
+  public void activate() {
+    this.isActive = true;
+  }
+
+  public void deactivate() {
+    this.isActive = false;
+  }
+  public void markLastLoginNow() {
+    this.lastLoginAt = LocalDateTime.now();
+  }
+  public void markCreatedNow() {
+    this.createdAt = LocalDateTime.now();
+  }
+  public void markUpdatedNow() {
+    this.updatedAt = LocalDateTime.now();
+  }
 }

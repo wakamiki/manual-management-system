@@ -4,30 +4,18 @@ import java.time.LocalDateTime;
 
 import com.example.manual.enums.ManualStatus;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-@Getter
-@Setter
-@NoArgsConstructor
 public class ManualListDto {
+  public ManualListDto() {
 
+  }
   private Long manualId;
-
   private String title;
-
   private ManualStatus status;
-
   private String categoryName;
-
   private LocalDateTime updatedAt;
-
   private String createdByName;
 
+  //ゲッター
   public Long getManualId() {
     return this.manualId;
   }
@@ -50,6 +38,31 @@ public class ManualListDto {
 
   public String getCreatedByName() {
     return this.createdByName;
+  }
+
+  //セッター
+  public void setManualId(Long manualId) {
+     this.manualId = manualId;
+  }
+
+  public void setTitle(String title) {
+     this.title = title;
+  }
+
+  public void setStatus(ManualStatus status) {
+     this.status = status;
+  }
+
+  public void setCategoryName(String categoryName) {
+     this.categoryName = categoryName;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+     this.updatedAt = updatedAt;
+  }
+
+  public void setCreatedByName(String createdByName) {
+     this.createdByName = createdByName;
   }
 
 }
