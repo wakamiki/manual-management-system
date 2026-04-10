@@ -1,6 +1,5 @@
 package com.example.manual.controller;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;

@@ -27,6 +27,9 @@ public class ManualHistory {
   private String changeNote;
   @Column(nullable = false)
   private LocalDateTime changedAt;
+  @ManyToOne
+  @JoinColumn(name = "change_user_id")
+  private User changedByUser;
 
   //ゲッター
   public Long getId() {
@@ -43,6 +46,10 @@ public class ManualHistory {
     return this.changedAt;
   }
 
+  public User getChangedByUser(){
+    return  this.changedByUser;
+  }
+
   //セッター
   public void setManual(Manual manual) {
     this.manual = manual;
@@ -50,6 +57,10 @@ public class ManualHistory {
 
   public void setChangeNote(String changeNote) {
     this.changeNote = changeNote;
+  }
+
+  public void setChangedByUser(User changedByUser){
+    this.changedByUser = changedByUser;
   }
 
   //メソッド

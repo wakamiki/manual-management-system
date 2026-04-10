@@ -7,12 +7,10 @@ import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.manual.dto.ManualCopyRequestDto;
 import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
@@ -28,45 +26,100 @@ import jakarta.validation.Valid;
 public class ManualController {
 
 
-    private final ManualService manualService;
+private final ManualService manualService;
 
-    public ManualController(ManualService manualService) {
-        this.manualService = manualService;
+public ManualController(ManualService manualService) {
+    this.manualService = manualService;
     }
 
 //#region 画面初期表示
 //#endregion
 
 //#region 登録・更新
-    @PostMapping("/{manualId}/actions/submit")//対応ボタン　マニュアル公開（編集なし）
+    //対応ボタン　マニュアル公開（編集なし）
+    @PostMapping("/{manualId}/actions/submit")
     public String submitManual(@PathVariable Long manualId, Principal principal) {
         manualService.submitManual(manualId);
         return "マニュアルを公開しました。";
     }
 
-    //ロール必須
-    @PostMapping("/{manualId}/actions/approve")//対応ボタン　承認（チェンジノートなし）
+    //対応ボタン　承認（チェンジノート無）
+    //TODO: ロール必須
+    @PostMapping("/{manualId}/actions/approve")
     public String approveManual(@PathVariable Long manualId, Authentication authentication) {
         manualService.approveManual(manualId, authentication);
         return "マニュアルを承認しました。";
     }
 
+    //対応ボタン　承認（チェンジノート有）
+    @PostMapping("/{manualId}/actions/approve")
+    public String approveEditManual(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Authentication authentication) {
+        manualService.approveEditManual(manualId,requestDto.getChangeNote(),authentication);
+        return "マニュアルを承認しました。";
+    }
+
+    //対応ボタン　下書き保存
+    @PostMapping("/{manualId}/draft")
+    public String saveDraftForCreate(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
+        manualService.saveDraftForCreate(manualId,requestDto, principal);
+        return "マニュアルを下書きに保存しました";
+    }
+    
+    //対応ボタン　下書き保存(複製ボタンから遷移)
+    @PostMapping("/{manualId}/draft")
+    public String saveDraftForCopy(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
+        manualService.saveDraftForCopy(manualId,requestDto, principal);
+        return "複製マニュアルを下書きに保存しました";
+    }
+
+    //対応ボタン　マニュアルを公開（新規作成から遷移）
+    @PostMapping("/{manualId}/pending")
+    public String submitToPending(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
+        manualService.submitToPending(manualId, requestDto, principal);
+        return "マニュアルを承認待ち公開しました。";
+    }
+
+    //対応ボタン　マニュアルを公開(編集画面から遷移)
+    @PostMapping("/{manualId}/pending")
+    public String editToPending(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
+        manualService.editToPending(manualId, requestDto, principal);
+        return "マニュアルを承認待ち公開しました。";
+    }
+
+    //対応ボタン　差し戻し（チェンジノート必須）
+    @PostMapping("/{manualId}/actions/rollback")
+    public String rollbackEditManual(@PathVariable Long manualId,@Valid ManualRequestDto requestDto,Authentication authentication) {
+        manualService.rollbackEditManual(manualId,requestDto.getChangeNote(), authentication);
+        return "マニュアルを差し戻しました。";
+    }
+
+    //対応ボタン　アーカイブ（チェンジノート必須）
+    @PostMapping("/{manualId}/actions/archive")
+    public String archiveManual(@PathVariable Long manualId,@Valid ManualRequestDto requestDto,Authentication authentication){
+        manualService.archiveManual(manualId, requestDto, authentication);
+        return "マニュアルをアーカイブしました。";
+    }
+
 //#endregion
 //#region 新規タブ画面遷移
-    @GetMapping("/{manualId}")//対応ボタン　詳細を見る（新規タブ）　
+
+    //対応ボタン　詳細を見る（新規タブ）
+    @GetMapping("/{manualId}")
     public ManualDetailDto goToDetailPage(@PathVariable Long manualId) {
         ManualDetailDto detailDto = manualService.goToDetailPage(manualId);
         return detailDto;
     }
 
-    @PostMapping("/{manualId}/actions/copy") //対応ボタン　複製（新規タブ）
+    //対応ボタン　複製（新規タブ）
+    @PostMapping("/{manualId}/actions/copy") 
     public ManualResponseDto goToCopyPage(@PathVariable Long manualId, Principal principal) {
-        ManualResponseDto responseDto = goToCopyPage(manualId, principal);
+        ManualResponseDto responseDto = manualService.goToCopyPage(manualId, principal);
         return responseDto;
-    }
-        //対応ボタン　 編集（新規タブ）
+     }
+    
+     //対応ボタン　 編集（新規タブ）
     public ManualResponseDto goToEditPage(@PathVariable Long manualId, Principal principal) {
-        ManualResponseDto responseDto = goToEditPage(manualId, principal);
+        ManualResponseDto responseDto = manualService.goToEditPage(manualId, principal);
         return responseDto;
     }
 
@@ -76,53 +129,22 @@ public class ManualController {
         ManualResponseDto responseDto = manualService.goToRollbackPage(manualId, authentication);
         return responseDto;
     }
-//#endregion
-    @PutMapping("/{manualId}")
-    public ManualResponseDto updateManual(@PathVariable Long manualId, Principal principal) {
-        String  loginId = getLoginId(principal);
-        ManualResponseDto responseDto = manualService.updateManual(manualId, loginId);
-        return responseDto;
-    }//マニュアルを更新しました。
-
+    
+    //対応ボタン　アーカイブ(新規タブ)
     @PostMapping("/{manualId}/actions/archive")
     public ManualResponseDto goToArchivePage(@PathVariable Long manualId, Authentication authentication) {
         ManualResponseDto responseDto = manualService.goToArchivePage(manualId, authentication);
         return responseDto;
     }
 
-    @PostMapping("/{manualId}/actions/rollback")
-    public String rollbackManual(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
-        return "マニュアルを差し戻しました。";
-    }
-
+    //対応ボタン　復帰（新規タブ）
     @PostMapping("/{manualId}/actions/restore")
-    public String restoreManual(@PathVariable Long manualId, Principal principal) {
-        manualService.restoreManual(manualId);
-        return "マニュアルを復帰しました。";
+    public ManualResponseDto goToRestorePage(@PathVariable Long manualId, Authentication authentication) {
+        ManualResponseDto responseDto = manualService.goToRestorePage(manualId,authentication);
+        return responseDto;
         }
 
-    @PostMapping("/draft")
-    public void createDraftManual(@Valid ManualRequestDto requestDto, Principal principal) {
-    }//マニュアルを下書きに保存しました。
-
-    @PostMapping("/pending")
-    public void createPendingManual(@Valid ManualRequestDto requestDto, Principal principal) {
-    }//マニュアルを承認申請しました。
-
-      //Dto未対応　編集予定
-    @PostMapping("/{manualId}/actions/copyDraft")
-    public void copyDraftManual(@PathVariable Long manualId,@Valid ManualCopyRequestDto requestDto, Principal principal) {
-    }//マニュアルを複製し下書きに保存しました。
-
-    @PostMapping("/{manualId}/actions/copyPending")
-    public void copyPendingManual(@PathVariable Long manualId,@Valid ManualCopyRequestDto requestDto, Principal principal) {
-    }//マニュアルを複製し申請しました。
-
-    @GetMapping("{manualId}/edit")
-    public ManualResponseDto getManualForEdit(@PathVariable Long manualId, Principal principal) {
-    ManualResponseDto responseDto = getManualForEdit(manualId, principal);
-        return responseDto;
-    }
+//#endregion
 
       //マニュアルを直接返す形になっている編集予定
     //全件取得

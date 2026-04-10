@@ -106,7 +106,7 @@ public class Manual {
                 && this.status != ManualStatus.ARCHIVED) {
             this.status = ManualStatus.PENDING;
         } else {
-            throw new IllegalStateException("申請として保存するには必須項目をすべて入力してください。");
+            throw new IllegalStateException("必須項目(タイトル・本文)をすべて入力してください。");
         }
     }
 

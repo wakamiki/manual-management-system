@@ -1,7 +1,7 @@
 ﻿# Manual Management System
 
-Version: 01.08.01  
-更新日: 2026-04-08
+Version: 01.09.00  
+更新日: 2026-04-10
 
 ## 概要
 日々更新される業務マニュアルを、現場で継続的に管理することを想定したポートフォリオ用システムです。  
@@ -27,6 +27,7 @@ Version: 01.08.01
 ## 利用技術
 - Java 17
 - Spring Boot
+- Spring Security
 - Spring Data JPA
 - Thymeleaf
 - Bootstrap
@@ -81,17 +82,22 @@ Version: 01.08.01
 - Validation / 例外 / Mapper の設計方針を整理中
 - 通知機能とマイページの設計・モック作成を実施済み
 - 文字サイズと UI トーンの統一を実施中
+- Spring Security 導入と標準ログイン画面の起動確認を実施済み
+- ログイン中ユーザー情報取得の流れを整理中
+- Lombok 依存を減らし、明示 getter / setter への移行を進行中
 
 ## 今後の予定
-- コンパイルエラーの整理
+- 検索系メソッドの完成
 - DTO と Service シグネチャの整合
 - Notification Entity / Service 実装
 - MyPage DTO 実装
 - Validation と例外ハンドリングの整備
+- `loginId` を起点にしたユーザー取得処理の整理
 
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.09.00 | 2026-04-10 | Spring Security 導入確認、Lombok 依存見直し、認証情報取得方針を追記 |
 | 01.08.01 | 2026-04-08 | README の文字化け解消、マイページ / 通知 / manual-form 方針を再整理 |
 | 01.08.00 | 2026-04-08 | 通知機能、マイページ、ホーム通知バッヂ、ID 命名方針を整理 |
 | 01.07.00 | 2026-04-06 | DTO 対応、Validation / Mapper / History 分離の設計整理 |

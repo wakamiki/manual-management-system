@@ -330,3 +330,87 @@ Spring Security の学習と起動確認を進め、認証基盤の理解を深�
 - `createdByUser` 自動設定の検討
 - Security 導入後の Controller / Service の役割整理
 - 起動時エラーになりやすい Repository / Mapping の最終確認
+
+---
+
+## 2026-04-10
+
+### 作業概要
+Lombok 依存を減らしながら getter / setter の不安定さを解消し、Spring Security の認証情報取得の理解を進めた。あわせて、入力画面 DTO の整理、更新履歴や Category 設定の責務整理、下書き保存処理の分岐設計を進めた。今日はこれまでの進みの遅さが嘘のように作業が進み、設計と実装のつながりがかなり見えてきた。
+
+### 実施内容
+
+#### Lombok 廃止対応と手動メソッド整理
+- `@Getter` `@Setter` `@NoArgsConstructor` など Lombok 依存を減らす方針を整理
+- Entity / DTO に getter / setter を手動追加する方向で作業
+- JPA 用空コンストラクタの必要性を再確認
+- `ManualService` などで getter が IDE 上で不安定だったため、明示 getter による安定化を進めた
+
+#### Spring Security 認証情報取得整理
+- `Authentication` から取得できる情報を整理
+  - `authentication.getName()` でログインID
+  - `authentication.getAuthorities()` でロール / 権限一覧
+- `Principal` と `Authentication` の使い分けを再確認
+  - ログインIDだけなら `Principal`
+  - ロールや認証状態も見るなら `Authentication`
+- ログインユーザー情報は画面入力ではなく Security から取得する前提を改めて整理
+
+#### Controller / Service / DTO 責務整理
+- `ManualController` / `UserController` では `Principal` を引数で受ける方針を整理
+- 取り出したログインIDは Service へ渡す形に整理
+- ロール判定は Service 中心で保持し、入口の粗い制御は Security 側に寄せる方針を確認
+- 一覧 DTO / 詳細 DTO / 状態更新用レスポンス DTO の責務分離を継続する方針を確認
+
+#### 入力画面 DTO と複製処理整理
+- 複製専用 DTO は増やさず、組み立てメソッド側で差分吸収する考え方を確認
+
+#### Category / Manual / History の責務整理
+- DTO では `categoryId`、Entity では `Category` を持つ流れを確認
+  - `categoryId`
+  - `CategoryService` で `Category` 取得
+  - `manual.setCategory(category)`
+- 更新履歴一覧は `List<ManualHistory>` で扱う方針を確認
+- `Optional<List<...>>` は使わず、0件時は空 List で返す方針を整理
+- 更新履歴更新者は `ManualHistory` 側へ持たせる前提が自然だと整理した
+
+#### 下書き保存処理の分岐設計
+- 用途別に入口メソッドを分ける案を整理
+  - `saveDraftForCreate()`
+  - `saveDraftForDraftEdit()`
+  - `saveDraftForPendingEdit()`
+  - `saveDraftForCopy()`
+- 共通処理は private メソッドへ寄せる方針を確認
+  - `applyManualInputValues()`
+  - `findCategoryOrThrow()`
+  - `saveManual()`
+- 複製時のみ `changeNote` 必須という業務ルールを再整理
+
+#### エラー切り分けと設計相談
+- `ManualResponseDto` と誤記された `ResponseDto` 参照の整理
+- setter / getter の使い分けミスの切り分け
+- DTO に対して Entity メソッドを呼んでいないか確認
+- `CategoryRepository#findById()` のシグネチャ不整合も再確認
+- `Optional` は 1件取得結果だけに使う方針を明確化
+
+#### VS Code 学習
+- 開発効率化として次の機能を重点的に確認
+  - `F12` 定義へ移動
+  - `Shift + F12` 参照検索
+  - `Alt + F12` Peek
+  - `Ctrl + .` クイック修正
+  - `Ctrl + Shift + M` Problems
+  - `TODO / FIXME / NOTE`
+  - `#region`
+
+### 学び
+- Lombok に依存しすぎると IDE の不安定さに引きずられやすい
+- `Principal` と `Authentication` は用途で分けると理解しやすい
+- `categoryId` と `Category` の責務を分けると Entity と DTO の役割が整理しやすい
+- 下書き保存は 1 本で考えるより、用途別に入口を分けたほうが設計しやすい
+- 今日は、いままでの進みの遅さが嘘のようにはかどった
+
+### 次回着手予定
+- 検索系メソッドの完成
+- `UserRepository` / `UserService` の `loginId` 基準整理
+- `ManualHistory` の更新者記録設計
+- 下書き保存分岐の実装着手

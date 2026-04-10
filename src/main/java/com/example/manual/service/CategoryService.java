@@ -48,8 +48,12 @@ public List<Category> getAllCategories() {
     return categoryRepository.findAllByOrderByCategoryNameAsc();
   }
 
-public Optional<Category> getCategoryById(Long categoryId) {
-    return categoryRepository.findById(categoryId);
+public Category getCategoryById(Long categoryId) {
+Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
+ if (categoryOpt.isEmpty()) {
+      throw new RuntimeException("指定されたカテゴリーは存在しません");
+    }
+    return categoryOpt.get();
   }
 
 }
