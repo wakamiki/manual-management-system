@@ -20,7 +20,7 @@ public CategoryService(CategoryRepository categoryRepository){
 public Category createCategory(Category category) {
     category.markCreatedNow();
     category.markUpdatedNow();
-    //ä½œæEæ™‚ãEã‚¢ã‚¯ãƒE‚£ãƒ–çŠ¶æ…E
+   //ä½œæˆæ™‚ã¯ã‚¢ã‚¯ãƒ†ã‚£ãƒ–çŠ¶æ…‹
     category.markActive();
     category.setCategoryName(category.getCategoryName());
 
@@ -51,11 +51,10 @@ public List<Category> getAllCategories() {
 public Category getCategoryById(Long categoryId) {
 Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
  if (categoryOpt.isEmpty()) {
-      throw new RuntimeException("æŒE®šã•ã‚ŒãŸã‚«ãƒE‚´ãƒªãƒ¼ã¯å­˜åœ¨ã—ã¾ã›ã‚“");
+      throw new RuntimeException("æŒEï¿½ï¿½ã•ã‚ŒãŸã‚«ãƒEï¿½ï¿½ãƒªãƒ¼ã¯å­˜åœ¨ã—ã¾ã›ã‚“");
     }
     return categoryOpt.get();
   }
 
 }
-  //#region ‚±‚Ì•ª‚¯•û‚ğ‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
-  //#endregion
+

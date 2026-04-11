@@ -24,7 +24,6 @@ public class ManualDetailDto {
   private List<ManualHistory> histories;
 
 
-  //#region „Ç≤„ÉÅEÇø„Éº
   //#region getter
   public Long getManualId() {
     return this.manualId;
@@ -71,7 +70,6 @@ public class ManualDetailDto {
     return this.histories;
   }
 
-  //#region „Çª„ÉÅEÇø„Éº
   //#region setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
@@ -114,7 +112,8 @@ public class ManualDetailDto {
   }
 
   public void setHistories(List<ManualHistory> histories) {
-  //#endregion
+
     this.histories = histories;
   }
+    //#endregion
 }

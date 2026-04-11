@@ -22,8 +22,6 @@ private LocalDateTime createdAt;
 private LocalDateTime updatedAt;
 private LocalDateTime approvedAt;
 private LocalDateTime changedAt;
-
-//„Ç≤„ÉÅEÇø„Éº
   //#region getter
 public Long getManualId() {
   return this.manualId;
@@ -70,11 +68,10 @@ public LocalDateTime getApprovedAt() {
 }
 
 public LocalDateTime getChangedAt() {
-  //#endregion
+
   return this.changedAt;
 }
-
-//„Çª„ÉÅEÇø„Éº
+  //#endregion
   //#region setter
 public void setManualId(long manualId) {
   this.manualId = manualId;
@@ -121,8 +118,8 @@ public void setApprovedAt(LocalDateTime approvedAt) {
 }
 
 public void setChangedAt(LocalDateTime changedAt) {
-  //#endregion
+
   this.changedAt = changedAt;
 }
-
+  //#endregion
 }

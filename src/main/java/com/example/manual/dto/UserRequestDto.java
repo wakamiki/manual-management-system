@@ -27,7 +27,6 @@ private UserRole role;
 private Boolean isActive;
 
 
-//„Ç≤„ÉÅEÇø„Éº
   //#region getter
 public String getId() {
   return id;
@@ -46,11 +45,10 @@ return this.role;
 }
 
 public Boolean getIsActive() {
-  //#endregion
+
   return this.isActive;
 }
-
-//„Çª„ÉÅEÇø„Éº
+  //#endregion
   //#region setter
 public void setId(String id) {
   this.id = id;
@@ -61,8 +59,8 @@ public void setLoginId(String loginId) {
 }
 
 public void setDisplayName(String displayName) {
-  //#endregion
+
   this.displayName = displayName;
 }
-
+  //#endregion
 }

@@ -32,7 +32,6 @@ private String operationDetail;
 @Column(nullable = false)
 private LocalDateTime createdAt;
 
-//ゲチE��ー
   //#region getter
 public Long getId() {
     return this.id;
@@ -55,18 +54,17 @@ public String getOperationDetail() {
 }
 
 public LocalDateTime getCreatedAt() {
-  //#endregion
+
     return this.createdAt;
 }
-
-//セチE��ー
+  //#endregion
   //#region setter
 public void setTargetUser(User targetUser) {
-  //#endregion
+
     this.targetUser = targetUser;
 }
-
-//メソチE��
+  //#endregion
+//メソッド
 public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
 }

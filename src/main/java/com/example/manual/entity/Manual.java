@@ -6,8 +6,6 @@ import com.example.manual.enums.ManualStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,13 +32,12 @@ public class Manual {
     private String title;
     @Column(nullable = false, length = 10000)
     private String content;
-    // 業務上�E公開状態を表ぁE    @Enumerated(EnumType.STRING)
+    // 業務上の公開状態を表す    @Enumerated(EnumType.STRING)
     private ManualStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime approvedAt;
 
-    //ゲチE��ー
   //#region getter
     public Long getId() {
         return this.id;
@@ -75,11 +72,10 @@ public class Manual {
     }
 
     public LocalDateTime getApprovedAt() {
-  //#endregion
+
         return this.approvedAt;
     }
-
-    //セチE��ー
+  //#endregion
   //#region setter
     public void setCategory(Category category) {
         this.category = category;
@@ -94,11 +90,10 @@ public class Manual {
     }
 
     public void setContent(String content) {
-  //#endregion
+
         this.content = content;
     }
-
-    //メソチE��
+  //#endregion
     public void markStatusDRAFT() {
         this.status = ManualStatus.DRAFT;
         markUpdatedNow();
@@ -109,7 +104,7 @@ public class Manual {
                 && this.status != ManualStatus.ARCHIVED) {
             this.status = ManualStatus.PENDING;
         } else {
-            throw new IllegalStateException("忁E��頁E��(タイトル・本斁Eをすべて入力してください、E);
+            throw new IllegalStateException("必須項目(タイトル・本文)をすべて入力してください。");
         }
     }
 
@@ -119,7 +114,7 @@ public class Manual {
             markApprovedNow();
             markUpdatedNow();
         } else {
-            throw new IllegalStateException("申請状態�Eマニュアルのみ承認できまぁE);
+            throw new IllegalStateException("申請状態のマニュアルのみ承認できます");
         }
     }
 
@@ -128,7 +123,7 @@ public class Manual {
             this.status = ManualStatus.DRAFT;
             markUpdatedNow();
         } else {
-            throw new IllegalStateException("申請状態�Eマニュアルのみ差し戻しができまぁE);
+            throw new IllegalStateException("申請状態のマニュアルのみ差し戻しができます");
         }
     }
 
@@ -138,17 +133,17 @@ public class Manual {
             this.status = ManualStatus.ARCHIVED;
             markUpdatedNow();
         } else {
-            throw new IllegalStateException("公開されてぁE��マニュアルのみアーカイブできまぁE);
+            throw new IllegalStateException("公開されているマニュアルのみアーカイブできます");
         }
     }
 
     public void restoreToApproved() {
         if (this.status == ManualStatus.ARCHIVED) {
             this.status = ManualStatus.APPROVED;
-            // 復帰後�E承認日時を保持するため、approvedAt は更新しなぁE        } else {
-            throw new IllegalStateException("同カチE��リでアーカイブされたマニュアルのみ復帰できまぁE);
-        }
-    }
+              // 復帰後は承認日時を保持するため、approvedAt は更新しない
+            throw new IllegalStateException("同カテゴリでアーカイブされたマニュアルのみ復帰できます");
+    }}
+
     public void markCreatedNow() {
         this.createdAt = LocalDateTime.now();
     }

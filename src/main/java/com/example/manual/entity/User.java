@@ -38,7 +38,6 @@ public class User {
 
 
 
-  //ゲチE��ー
   //#region getter
   public Long getId() {
     return this.id;
@@ -73,22 +72,22 @@ public class User {
   }
 
   public LocalDateTime getUpdatedAt() {
-  //#endregion
+
     return this.updatedAt;
   }
 
-  //セチE��ー
+  //#endregion
   //#region setter
   public void setPassword(String password) {
     this.password = password;
   }
 
   public void setDisplayName(String displayName) {
-  //#endregion
+
     this.displayName = displayName;
   }
-
-  //メソチE��
+  //#endregion
+  //メソッド
   public void markRoleAdmin() {
     this.role = UserRole.ADMIN;
   }

@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.01  
-更新日: 2026-04-08
+Version: 01.00.02  
+更新日: 2026-04-11
 
 ---
 
@@ -259,6 +259,67 @@ Entity 設計、Repository 整理、画面モック作成に着手した。
 - MyPage DTO の項目確定
 - コンパイルエラー整理
 - DTO と Service シグネチャの整合
+
+---
+
+## 2026-04-11
+
+### 作業概要
+編集/複製の共通入力画面方針と Thymeleaf 学習内容を確定し、検索UIや資料更新の方針を整理した。あわせて、モックHTMLとCSSの整理、Thymeleaf反映項目の一覧化を行った。
+
+### 実施内容
+
+#### 編集 / 複製 共通入力画面の設計確定
+- `manual-form.html` を編集/複製の共通画面として使用する方針を確定
+- `mode = edit / copy` で表示切替する設計を整理
+- 新規作成は別画面に分離する方針を確定
+- 固定タイトルを **マニュアルエディター** に統一
+- 入力欄初期値は元マニュアルの内容をそのまま表示する方針
+- Controller / Service は編集保存 / 複製保存の入口を分離
+
+#### Thymeleaf 学習整理
+- `th:text` `th:each` `th:if` `th:href` `th:action` `th:field` の用途整理
+- 既存の `class` 属性と Thymeleaf 属性の併記が可能と確認
+- `th:text` は文字を持つ最内タグに付与する理解を整理
+- タグ名と属性名の誤記による構文ミス例を整理
+
+#### index 画面の設計準備
+- 検索エリア / カテゴリ一覧 / マニュアル一覧の骨組みを整理
+- `main / header / section / form / ul / li / article / span / small` の構成を整理
+
+#### 検索UI・状態変更の設計整理
+- ステータス初期選択を `DRAFT / PENDING / APPROVED` に設定
+- 使用停止カテゴリを検索フォーム内のミニ開閉へ移動
+- サイドバーをクイックビュー中心に再設計
+- 差し戻し / アーカイブ / 復帰は詳細画面のインライン入力で確定する方針に整理
+- 承認はダイアログ後に必要時のみインライン入力を開く方針を整理
+
+#### 検索実装の土台整理
+- `ManualSearchConditionDto` を前提に検索条件を整理
+- `Specification` を用いた検索方針を確定
+- `ManualSpecification` のメソッド分割方針を整理
+- `ManualService.searchManuals(...)` を `Specification + Sort` で実装する方針を整理
+
+#### モック / CSS / 資料更新
+- `manual-create.html`（新規作成）を別画面として整理
+- `manual-form.html`（編集/複製）を共通画面として整理
+- 文字カウントのリアルタイム表示を入力欄に付与
+- `admin.css` の `.admin-status` 系クラスを復元
+- `common.css` に日本語フォントスタックを追加
+- 未使用CSSの削除と、mock HTML の復元を実施
+- Thymeleaf 反映項目一覧を `docs/07_thymeleaf-binding-items.md` に整理
+- `docs/02` `docs/03` `docs/04` `docs/05` `docs/06` `README` の差分更新を継続
+
+### 学び
+- 入力画面の共通化は UI と保存処理を分離すると説明しやすい
+- `Specification` は検索条件の追加に強い
+- ラベル名と内部項目名は分離して整理する方が説明しやすい
+
+### 次回着手予定
+- index 画面の Thymeleaf 化
+- 検索 API の Controller 接続
+- `ManualDetailDto` と履歴表示の整合
+- 起動時エラーになりそうな重複マッピング整理
 
 ---
 

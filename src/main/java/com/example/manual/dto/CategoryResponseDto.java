@@ -11,7 +11,7 @@ private String categoryName;
 private Integer displayOrder;
 private boolean isActive;
 
-//„Ç≤„ÉÅEÇø„Éº
+//getter
   //#region getter
 public Long getId() {
 return this.id;
@@ -30,7 +30,7 @@ public boolean isActive() {
   return this.isActive;
 }
 
-// „Çª„ÉÅEÇø„Éº
+// setter
   //#region setter
 public void setId(Long id) {
   this.id = id;

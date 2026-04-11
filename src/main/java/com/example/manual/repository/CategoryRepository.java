@@ -8,12 +8,10 @@ import com.example.manual.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long>{
 
-  //å…¨ä»¶å–å¾—ï¼ˆã‚«ãƒE‚´ãƒªåæEé E¼E
+  //å…¨ä»¶å–å¾—ï¼ˆã‚«ãƒ†ã‚´ãƒªåæ˜‡é †ï¼‰
   List<Category> findAllByOrderByCategoryNameAsc();
-  //(ä½¿ç”¨ä¸­ã‚«ãƒE‚´ãƒªåæEé E
+   //(ä½¿ç”¨ä¸­ã‚«ãƒ†ã‚´ãƒªåæ˜‡é †)
   List<Category> findByIsActiveTrueOrderByCategoryNameAsc();
-  //(æ—§ã‚«ãƒE‚´ãƒªåæEé E
+   //(æ—§ã‚«ãƒ†ã‚´ãƒªåæ˜‡é †)
   List<Category> findByIsActiveFalseOrderByCategoryNameAsc();
 }
-  //#region ‚±‚Ì•ª‚¯•û‚ğ‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
-  //#endregion

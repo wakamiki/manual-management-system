@@ -28,7 +28,7 @@ public class Category {
   @Column(nullable = false)
   private LocalDateTime updatedAt;
 
-  //„Ç≤„ÉÅEÇø„Éº
+
   //#region getter
   public Long getId() {
     return this.id;
@@ -47,26 +47,24 @@ public class Category {
   }
 
   public LocalDateTime getUpdatedAt() {
-  //#endregion
+
     return this.updatedAt;
   }
 
   public boolean isActive() {
     return this.isActive;
   }
-
-  //„Çª„ÉÅEÇø„Éº
+  //#endregion
   //#region setter
   public void setDisplayOrder(Integer displayOrder) {
     this.displayOrder = displayOrder;
   }
 
   public void setCategoryName(String categoryName) {
-  //#endregion
+
     this.categoryName = categoryName;
   }
 
-  //„É°„ÇΩ„ÉÅEÉâ
   public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
   }
@@ -83,5 +81,5 @@ public class Category {
   public void markInactive() {
     this.isActive = false;
   }
-
+  //#endregion
 }

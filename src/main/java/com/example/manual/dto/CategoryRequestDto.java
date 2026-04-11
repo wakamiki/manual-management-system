@@ -16,7 +16,7 @@ private String categoryName;
 @NotNull
 private Integer displayOrder;
 
-//„Ç≤„ÉÅEÇø„Éº
+//getter
   //#region getter
 public String getCategoryName() {
 return this.categoryName;
@@ -27,7 +27,7 @@ public Integer getDisplayOrder() {
   return this.displayOrder;
 }
 
-// „Çª„ÉÅEÇø„Éº
+// setter
   //#region setter
 public void setCategoryName(String categoryName) {
   this.categoryName = categoryName;

@@ -18,8 +18,6 @@ private String content;
 @NotNull
 private Long categoryId;
 @Size(max = 100)
-
-//„Ç≤„ÉÅEÇø„Éº
 private String changeNote;
 
   //#region getter
@@ -36,11 +34,10 @@ return this.categoryId;
 }
 
 public String getChangeNote() {
-  //#endregion
+
   return this.changeNote;
 }
-
-//„Çª„ÉÅEÇø„Éº
+  //#endregion
   //#region setter
 public void setTitle(String title) {
   this.title = title;
@@ -55,8 +52,8 @@ public void setCategoryId(Long categoryId) {
 }
 
 public void setChangeNote(String cangeNote) {
-  //#endregion
+
   this.changeNote = cangeNote;
 }
-
+  //#endregion
 }

@@ -19,7 +19,6 @@ public class ManualDraftRequestDto {
     private String changeNote;
     private ManualStatus status;
 
-    //„Ç≤„ÉÅEÇø„Éº
   //#region getter
     public String getTitle() {
         return this.title;
@@ -42,7 +41,6 @@ public class ManualDraftRequestDto {
         return this.status;
     }
 
-    //„Çª„ÉÅEÇø„Éº
   //#region setter
     public void setTitle(String title) {
         this.title = title;

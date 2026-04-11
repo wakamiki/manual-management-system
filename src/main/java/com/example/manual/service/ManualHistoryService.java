@@ -37,9 +37,10 @@ public ManualHistory createHistory(Manual manual,String changeNote,Principal pri
   return manualHistoryRepository.save(history);
 }
 
-//ãƒã‚§ãƒ³ã‚¸ãƒãEãƒˆå¿E ˆä½œæEäºˆå®E
 
-//manualIDã§ç´ã¥ãEŸå±¥æ­´ã‚’åEã¦å–å¾Eæ›´æ–°å±¥æ­´æ˜E E
+//ãƒã‚§ãƒ³ã‚¸ãƒãƒ¼ãƒˆå¿…é ˆä½œæˆäºˆå®š
+
+//manualIDã§ç´ã¥ã„ãŸå±¥æ­´ã‚’å…¨ã¦å–å¾—(æ›´æ–°å±¥æ­´æ˜‡é †)
 public List<ManualHistory> getManualIdHistory(Long manualId) {
   return manualHistoryRepository.findByManual_IdOrderByChangedAtDesc(manualId);
 }
@@ -74,5 +75,4 @@ public List<ManualDetailHistoryDto>getManualHistoryDetailDtoList(Long manualId){
   return  historyDetailDtoList;
 }
 }
-  //#region ‚±‚Ì•ª‚¯•û‚ğ‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
-  //#endregion
+

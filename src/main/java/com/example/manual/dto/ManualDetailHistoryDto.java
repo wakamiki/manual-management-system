@@ -12,7 +12,6 @@ public class ManualDetailHistoryDto {
     private String changedByUserName;
 
 
-    //„Ç≤„ÉÅEÇø„Éº
   //#region getter
     public String getChangeNote(){
         return this.changeNote;
@@ -27,7 +26,6 @@ public class ManualDetailHistoryDto {
         return this.changedByUserName;
     }
 
-    //„Çª„ÉÅEÇø„Éº
   //#region setter
     public void setChangeNote(String changeNote){
         this.changeNote = changeNote;
@@ -38,7 +36,8 @@ public class ManualDetailHistoryDto {
     }
 
     public void setChangedByUserName(String changedByUserName){
-  //#endregion
+
         this.changedByUserName = changedByUserName;
     }
+      //#endregion
 }
