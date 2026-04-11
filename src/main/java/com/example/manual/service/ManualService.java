@@ -3,12 +3,14 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualListDto;
 import com.example.manual.dto.ManualRequestDto;
@@ -18,6 +20,11 @@ import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
 import com.example.manual.entity.User;
+import com.example.manual.enums.ManualStatus;
+import com.example.manual.enums.UserRole;
+import com.example.manual.exception.InvalidStateException;
+import com.example.manual.exception.NotFoundException;
+import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
 import com.example.manual.repository.ManualSpecification;
 
@@ -49,32 +56,12 @@ public class ManualService {
     manualRepository.save(manual);
 }
 
-//role必須　対応ボタン　承認（チェンジノート無）
-  public void approveManual(Long manualId, Principal principal) {
-    Manual manual = findManualOrThrow(manualId);
-    manual.approve();
-    manual.markUpdatedNow();
-    manual.markApprovedNow();
-  //TODO: ロールと作成者と別人か判定を入れる
-    manualRepository.save(manual);
-  }
-
-  //role必須　対応ボタン　承認（チェンジノート有）
-  public void approveEditManual(Long manualId,String changeNote,Principal principal) {
-    Manual manual = findManualOrThrow(manualId);
-    manual.approve();
-    manual.markUpdatedNow();
-    manual.markApprovedNow();
-  //TODO: ロールと作成者と別人か判定を入れる
-    Manual savedManual = manualRepository.save(manual);
-    //manualHistoryService.createHistory(savedManual,changeNote,principal);
-  }
 
   //新規作成下書き保存　対応ボタン　下書き保存
   public void saveDraftForCreate(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-    User user = userService.getUserByloginId(principal.getName());
+    User user = userService.getUserByPrincipal(principal);
     manual.setTitle(requestDto.getTitle());
     manual.setContent(requestDto.getContent());
     manual.markUpdatedNow();
@@ -89,7 +76,7 @@ public class ManualService {
   public void saveDraftForCopy(Long manualId,ManualRequestDto requestDto,Principal principal) {
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-    User user = userService.getUserByloginId(principal.getName());
+    User user = userService.getUserByPrincipal(principal);
     manual.setTitle(requestDto.getTitle());
     manual.setContent(requestDto.getContent());
     manual.markUpdatedNow();
@@ -105,7 +92,7 @@ public class ManualService {
   public void submitToPending(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-    User user = userService.getUserByloginId(principal.getName());
+    User user = userService.getUserByPrincipal(principal);
     manual.setTitle(requestDto.getTitle());
     manual.setContent(requestDto.getContent());
     manual.markCreatedNow();
@@ -120,7 +107,7 @@ public class ManualService {
   public void editToPending(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-    User user = userService.getUserByloginId(principal.getName());
+    User user = userService.getUserByPrincipal(principal);
     manual.setTitle(requestDto.getTitle());
     manual.setContent(requestDto.getContent());
     manual.markCreatedNow();
@@ -132,29 +119,6 @@ public class ManualService {
     //チェンジノート必須ではない
     manualHistoryService.createHistory(savedManual, requestDto.getChangeNote(),principal);  
   }  
-
-  //対応ボタン　差し戻し（チェンジノート必須）
-  public void rollbackEditManual(Long manualId,String changeNote,Principal principal) {
-  Manual manual = findManualOrThrow(manualId);
-  manual.markUpdatedNow();
-  manual.rollbackToDraft();
- 
-  Manual savedManual = manualRepository.save(manual);
-    //manualHistoryService.createHistory(savedManual,changeNote,principal); 
-    //TODO: ロール判定
-  }
-
-  //対応ボタン　アーカイブ（チェンジノート必須）
-  public void archiveManual(Long manualId,ManualRequestDto requestDto,Principal principal){
-    Manual manual = findManualOrThrow(manualId);
-    manual.archive();
-    manual.markUpdatedNow();
-
-    Manual savedManual = manualRepository.save(manual);
-    //manualHistoryService.createHistory(savedManual,changeNote,principal); 
-   //TODO: ロール判定
-   //懸念点　下書きからアーカイブの時にタイトル　コンテンツが白紙の可能性
-  }
 
 //#endregion
 //#region 新規タブ画面遷移
@@ -173,7 +137,7 @@ public class ManualService {
       detailDto.setCreatedAt(manual.getCreatedAt());
       detailDto.setUpdatedAt(manual.getUpdatedAt());
       detailDto.setHistories(history);
-      return detailDto;
+      return detailDto; //TODO: チェンジノート　リストにする
     }
 
     //対応ボタン　編集（新規タブ）
@@ -188,28 +152,76 @@ public class ManualService {
       return toManualFormInputDto(manual);
     }
 
-    //対応ボタン　差し戻し（新規タブ）
-  public ManualResponseDto goToRollbackPage(Long manualId, Principal principal) {
-      //TODO: ロール判定
-  Manual manual = findManualOrThrow(manualId);
-  return toManualFormInputDto(manual);
+//#endregion
+//#region action
+//TODO: 通知実装予定
+  //対応ボタン　承認（チェンジノート無）
+  public void approveManual(Long manualId, Principal principal) {
+    Manual manual = findManualOrThrow(manualId);
+    if (!canApproveManual(manual, manual.getCategory(), principal)) {
+      throw new UnauthorizedException("判定エラー");
+    }
+    manual.approve();
+    manual.markUpdatedNow();
+    manual.markApprovedNow();
+    manualRepository.save(manual);
   }
 
-    //対応ボタン　アーカイブ（新規タブ） チェンジノート必須
-  public ManualResponseDto goToArchivePage(Long manualId,Principal principal) {
-      //TODO: ロール判定
+  //ifで更新履歴あり（空チェック、クリエイト）の分岐をする。//TODO: 通知実装予定
+  //対応ボタン　承認（チェンジノート有）
+  public void approveManualWithComment(Long manualId,String changeNote,Principal principal) {
+    Manual manual = findManualOrThrow(manualId);
+    if (!canApproveManual(manual, manual.getCategory(), principal)) {
+      throw new UnauthorizedException("判定エラー");
+    }
+    manual.approve();
+    manual.markUpdatedNow();
+    manual.markApprovedNow();
+    Manual savedManual = manualRepository.save(manual);
+    if(changeNote==null||changeNote.isBlank()){
+    }else{
+    manualHistoryService.createHistory(savedManual,changeNote,principal);
+    }
+  }
+
+  //対応ボタン　差し戻し（チェンジノート必須）　//TODO: 通知実装予定
+  public void rollbackEditManual(Long manualId,String changeNote,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
-  return toManualFormInputDto(manual);
+  if (!canRollbackManual(manual, principal, changeNote)) {
+    throw new UnauthorizedException("判定エラー");
+  }
+  manual.markUpdatedNow();
+  manual.rollbackToDraft();
+  Manual savedManual = manualRepository.save(manual);
+  manualHistoryService.createHistory(savedManual,changeNote,principal); 
+  }
+
+  //対応ボタン　アーカイブ
+  public void archiveManual(Long manualId,ManualActionRequestDto actionRequestDto,Principal principal){
+    Manual manual = findManualOrThrow(manualId);
+    User user = userService.getUserByPrincipal(principal);
+    Category category = categoryService.getCategoryById(manual.getCategory().getId());
+    if(!canArchiveManual(user,manual,category,actionRequestDto.getChangeNote())){
+      throw new UnauthorizedException("判定エラー");
+    }
+    manual.archive();
+    manual.markUpdatedNow();
+    Manual savedManual = manualRepository.save(manual);
+    manualHistoryService.createHistory(savedManual,actionRequestDto.getChangeNote(),principal);
   }
 
   //対応ボタン　復帰
-  public ManualResponseDto goToRestorePage(Long manualId,Principal principal) {
+  public void restoreManual(Long manualId,String changeNote,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
-  //TODO:同一カテゴリー　アクティブ判定
-  //TODO: ロール判定
-  return toManualFormInputDto(manual);
-    }
-
+  if (!canRestoreManual(manual, principal, changeNote)) {
+      throw new UnauthorizedException("判定エラー");
+  }
+  manual.restoreToApproved();
+  manual.markUpdatedNow();
+  Manual savedManual = manualRepository.save(manual);
+  manualHistoryService.createHistory(savedManual,changeNote,principal);
+  }
+  
 //#endregion
 //#region 検索・取得補助
 
@@ -240,9 +252,98 @@ public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
 }
 
 //#endregion
+
 //#region 状態確認
 //#endregion
 //#region 権限確認
+
+private boolean canArchiveManual(User user, Manual manual,Category category,String changeNote){
+//ロール権限　ログイン中　ステータスDRAFT/PENDING/APPROVED　アクティブカテゴリ　チェンジノート必須　タイトル・コンテンツ空白不可
+if(user.getRole()!=UserRole.ADMIN&&user.getRole()!=UserRole.APPROVER){
+  throw new UnauthorizedException("権限が不足しています。");
+}
+if (!user.isActive()) {
+  throw new UnauthorizedException("有効なユーザーではありません。");
+}
+if(manual.getStatus()!=ManualStatus.DRAFT&&manual.getStatus()!=ManualStatus.PENDING&&manual.getStatus()!=ManualStatus.APPROVED){
+  throw new InvalidStateException("マニュアルのステータスが条件を満たしていません。");
+}
+if(!category.isActive()){
+  throw new UnauthorizedException("指定カテゴリはアクティブではありません。");
+}
+if (changeNote==null||changeNote.isBlank()) {
+  throw new NotFoundException("更新履歴が見つかりません。");
+}
+if(manual.getTitle()==null||manual.getContent()==null||manual.getTitle().isBlank()||manual.getContent().isBlank()){
+  throw new NotFoundException("タイトル・コンテンツがありません。");
+}
+return true;
+}
+
+//TODO: 通知実装予定
+private boolean canApproveManual(Manual manual,Category category,Principal principal){
+//APPROVER / ADMIN　isActive必須　PEDINGのみ 作成者本人不可　使用停止カテゴリ不可　
+User user =userService.getUserByPrincipal(principal);
+if(user.getRole()!=UserRole.ADMIN&&user.getRole()!=UserRole.APPROVER){
+    throw new UnauthorizedException("権限が不足しています。");
+}
+if (!user.isActive()) {
+    throw new UnauthorizedException("有効なユーザーではありません。");
+}
+if (manual.getStatus()!=ManualStatus.PENDING) {
+    throw new InvalidStateException("承認ができるのはステータス:PENDINGのマニュアルのみです。");
+}
+if (Objects.equals(manual.getUser().getId(), user.getId())) {
+    throw new InvalidStateException("自分が作成したマニュアルの承認をすることは出来ません。");
+}
+if (!category.isActive()) {
+    throw new InvalidStateException("有効でないカテゴリーでは承認することが出来ません。");
+}
+return true;
+}
+
+private boolean canRollbackManual(Manual manual,Principal principal,String changeNote){
+// APPROVER / ADMIN  isActive PENDINGのみ（PENDING→DRAFT）　作成者本人不可　チェンジノート必須
+User user =userService.getUserByPrincipal(principal);
+if(user.getRole()!=UserRole.ADMIN&&user.getRole()!=UserRole.APPROVER){
+    throw new UnauthorizedException("権限が不足しています。");
+}
+if (!user.isActive()) {
+    throw new UnauthorizedException("有効なユーザーではありません。");
+}
+if (manual.getStatus()!=ManualStatus.PENDING) {
+    throw new InvalidStateException("承認ができるのはステータス:PENDINGのマニュアルのみです。");
+}
+if (Objects.equals(manual.getUser().getId(), user.getId())) {
+    throw new InvalidStateException("自分が作成したマニュアルの承認をすることは出来ません。");
+}
+if (changeNote==null||changeNote.isBlank()) {
+  throw new NotFoundException("更新履歴が見つかりません。");
+}
+return true;
+}
+
+private boolean canRestoreManual(Manual manual,Principal principal,String changeNote){
+//APPROVER / ADMIN isActive ARCHIVEDのみ　アクティブカテゴリ　チェンジノート必須
+  User user =userService.getUserByPrincipal(principal);
+  if(user.getRole()!=UserRole.ADMIN&&user.getRole()!=UserRole.APPROVER){
+    throw new UnauthorizedException("権限が不足しています。");
+}
+if (!user.isActive()) {
+    throw new UnauthorizedException("有効なユーザーではありません。");
+}
+if (manual.getStatus()!=ManualStatus.ARCHIVED) {
+    throw new InvalidStateException("復帰が行えるのはステータス:ARCHIVEDのマニュアルのみです。");
+}
+if (!manual.getCategory().isActive()) {
+    throw new InvalidStateException("有効でないカテゴリーでは承認することが出来ません。");
+}
+if (changeNote==null||changeNote.isBlank()) {
+  throw new NotFoundException("更新履歴が見つかりません。");
+}
+  return true;
+}
+
 //#endregion
 //#region Entity作成・更新補助
 //#endregion

@@ -31,7 +31,7 @@ public ManualHistory createHistory(Manual manual,String changeNote,Principal pri
   ManualHistory history = new ManualHistory();
   history.setChangeNote(changeNote);
   history.markChangedNow();
-  User changedByUser = userService.getUserByloginId(principal.getName());
+  User changedByUser = userService.getUserByPrincipal(principal);
   history.setChangedByUser(changedByUser);
   history.setManual(manual);
   return manualHistoryRepository.save(history);
@@ -60,8 +60,7 @@ public List<ManualHistoryDto>getManualHistorySummaryDtoList(Long manualId){
   }
   return historyDtoList;
 }
-
-//マニュアル詳細画面用
+//詳細表示用
 public List<ManualDetailHistoryDto>getManualHistoryDetailDtoList(Long manualId){
   List<ManualHistory>manualHistories = this.getManualIdHistory(manualId);
   List<ManualDetailHistoryDto>historyDetailDtoList = new ArrayList<>();

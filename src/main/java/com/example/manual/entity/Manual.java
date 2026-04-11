@@ -142,7 +142,6 @@ public class Manual {
     public void restoreToApproved() {
         if (this.status == ManualStatus.ARCHIVED) {
             this.status = ManualStatus.APPROVED;
-            markUpdatedNow();
             // 復帰後は承認日時を保持するため、approvedAt は更新しない
         } else {
             throw new IllegalStateException("同カテゴリでアーカイブされたマニュアルのみ復帰できます");

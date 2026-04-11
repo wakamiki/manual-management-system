@@ -1,5 +1,6 @@
 package com.example.manual.service;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User getUserByloginId(String loginId) {
-        Optional<User> userOpt = userRepository.findByLoginId(loginId);
+//#region 取得系
+
+    public User getUserByPrincipal(Principal principal) {
+        Optional<User> userOpt = userRepository.findByLoginId(principal.getName());
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
         }
@@ -63,8 +66,5 @@ public class UserService {
         User user = userOpt.get();
         return user.getDisplayName();
     }
-
-    //小メソッド群
-
-
+//#endregion
 }
