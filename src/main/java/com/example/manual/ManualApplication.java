@@ -11,3 +11,5 @@ public class ManualApplication {
 	}
 
 }
+  //#region ‚±‚Ì•ª‚¯•û‚ð‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

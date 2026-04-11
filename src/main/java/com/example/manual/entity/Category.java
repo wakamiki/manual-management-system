@@ -28,7 +28,8 @@ public class Category {
   @Column(nullable = false)
   private LocalDateTime updatedAt;
 
-  //ゲッター
+  //ゲチE��ー
+  //#region getter
   public Long getId() {
     return this.id;
   }
@@ -46,6 +47,7 @@ public class Category {
   }
 
   public LocalDateTime getUpdatedAt() {
+  //#endregion
     return this.updatedAt;
   }
 
@@ -53,16 +55,18 @@ public class Category {
     return this.isActive;
   }
 
-  //セッター
+  //セチE��ー
+  //#region setter
   public void setDisplayOrder(Integer displayOrder) {
     this.displayOrder = displayOrder;
   }
 
   public void setCategoryName(String categoryName) {
+  //#endregion
     this.categoryName = categoryName;
   }
 
-  //メソッド
+  //メソチE��
   public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
   }

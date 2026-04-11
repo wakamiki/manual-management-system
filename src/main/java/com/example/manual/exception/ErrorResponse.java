@@ -19,3 +19,5 @@ public class ErrorResponse {
         return this.timestamp;
     }
 }
+  //#region ‚±‚Ì•ª‚¯•û‚ð‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

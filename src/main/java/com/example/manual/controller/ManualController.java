@@ -1,4 +1,4 @@
-package com.example.manual.controller;
+﻿package com.example.manual.controller;
 
 import java.security.Principal;
 import java.util.List;
@@ -31,68 +31,58 @@ public ManualController(ManualService manualService) {
     this.manualService = manualService;
     }
 
-//#region 画面初期表示
 
-@GetMapping("/keyword")
+@GetMapping
 public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
     List<ManualListDto>manualDtoList = manualService.searchManuals(condition);
     return manualDtoList;
 }
 //#endregion
-//#region 登録・更新
-    //対応ボタン　マニュアル公開（編集なし）
     @PostMapping("/{manualId}/actions/submit")
     public String submitManual(@PathVariable Long manualId, Principal principal) {
         manualService.submitManual(manualId);
-        return "マニュアルを公開しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧貞・髢九＠縺ｾ縺励◆縲・;
     }
 
-    //対応ボタン　下書き保存
-    @PostMapping("/{manualId}/draft")
+    @PostMapping("/{manualId}/actions/save-draft")
     public String saveDraftForCreate(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
         manualService.saveDraftForCreate(manualId,requestDto, principal);
-        return "マニュアルを下書きに保存しました";
+        return "繝槭ル繝･繧｢繝ｫ繧剃ｸ区嶌縺阪↓菫晏ｭ倥＠縺ｾ縺励◆";
     }
     
-    //対応ボタン　下書き保存(複製ボタンから遷移)
-    @PostMapping("/{manualId}/draft")
+    @PostMapping("/{manualId}/actions/save-draft-copy")
     public String saveDraftForCopy(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
         manualService.saveDraftForCopy(manualId,requestDto, principal);
-        return "複製マニュアルを下書きに保存しました";
+        return "隍・｣ｽ繝槭ル繝･繧｢繝ｫ繧剃ｸ区嶌縺阪↓菫晏ｭ倥＠縺ｾ縺励◆";
     }
 
-    //対応ボタン　マニュアルを公開（新規作成から遷移）
-    @PostMapping("/{manualId}/pending")
+    @PostMapping("/{manualId}/actions/submit-pending")
     public String submitToPending(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
         manualService.submitToPending(manualId, requestDto, principal);
-        return "マニュアルを承認待ち公開しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧呈価隱榊ｾ・■蜈ｬ髢九＠縺ｾ縺励◆縲・;
     }
 
-    //対応ボタン　マニュアルを公開(編集画面から遷移)
-    @PostMapping("/{manualId}/pending")
+    @PostMapping("/{manualId}/actions/edit-to-pending")
     public String editToPending(@PathVariable Long manualId,@Valid ManualRequestDto requestDto, Principal principal) {
         manualService.editToPending(manualId, requestDto, principal);
-        return "マニュアルを承認待ち公開しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧呈価隱榊ｾ・■蜈ｬ髢九＠縺ｾ縺励◆縲・;
     }
 
 //#endregion
-//#region 新規タブ画面遷移
 
-    //対応ボタン　詳細を見る（新規タブ）
     @GetMapping("/{manualId}")
     public ManualDetailDto goToDetailPage(@PathVariable Long manualId) {
         ManualDetailDto detailDto = manualService.goToDetailPage(manualId);
         return detailDto;
     }
 
-    //対応ボタン　複製（新規タブ）
     @PostMapping("/{manualId}/actions/copy") 
     public ManualResponseDto goToCopyPage(@PathVariable Long manualId, Principal principal) {
         ManualResponseDto responseDto = manualService.goToCopyPage(manualId, principal);
         return responseDto;
      }
     
-     //対応ボタン　 編集（新規タブ）
+    @PostMapping("/{manualId}/actions/edit")
     public ManualResponseDto goToEditPage(@PathVariable Long manualId, Principal principal) {
         ManualResponseDto responseDto = manualService.goToEditPage(manualId, principal);
         return responseDto;
@@ -100,40 +90,34 @@ public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
     
 //#endregion
 //#region action
-    //対応ボタン　承認（チェンジノート無）
     @PostMapping("/{manualId}/actions/approve")
     public String approveManual(@PathVariable Long manualId, Principal principal) {
         manualService.approveManual(manualId, principal);
-        return "マニュアルを承認しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧呈価隱阪＠縺ｾ縺励◆縲・;
     }
 
-    //対応ボタン　承認（チェンジノート有）
     @PostMapping("/{manualId}/actions/approve-with-comment")
     public String approveManualWithComment(@PathVariable Long manualId,@Valid ManualActionRequestDto actionRequestDto, Principal principal) {
         manualService.approveManualWithComment(manualId,actionRequestDto.getChangeNote(),principal);
-        return "マニュアルを承認しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧呈価隱阪＠縺ｾ縺励◆縲・;
     }
-    //対応ボタン　差し戻し（チェンジノート必須）
     @PostMapping("/{manualId}/actions/rollback")
     public String rollbackEditManual(@PathVariable Long manualId,@Valid ManualActionRequestDto actionRequestDto,Principal principal) {
         manualService.rollbackEditManual(manualId,actionRequestDto.getChangeNote(), principal);
-        return "マニュアルを差し戻しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧貞ｷｮ縺玲綾縺励∪縺励◆縲・;
     }
 
-    //対応ボタン　アーカイブ（チェンジノート必須）
     @PostMapping("/{manualId}/actions/archive")
     public String archiveManual(@PathVariable Long manualId,@Valid ManualActionRequestDto actionRequestDto,Principal principal){
         manualService.archiveManual(manualId, actionRequestDto, principal);
-        return "マニュアルをアーカイブしました。";
+        return "繝槭ル繝･繧｢繝ｫ繧偵い繝ｼ繧ｫ繧､繝悶＠縺ｾ縺励◆縲・;
     }
-        //対応ボタン　復帰（チェンジノート必須）
     @PostMapping("/{manualId}/actions/restore")
     public String restoreManual(@PathVariable Long manualId,ManualActionRequestDto actionRequestDto,Principal principal) {
         manualService.restoreManual(manualId,actionRequestDto.getChangeNote(),principal);
-        return "マニュアルをアーカイブから復帰しました。";
+        return "繝槭ル繝･繧｢繝ｫ繧偵い繝ｼ繧ｫ繧､繝悶°繧牙ｾｩ蟶ｰ縺励∪縺励◆縲・;
         }
 //#endregion
-//#region　共通処理
     private String getLoginId(Principal principal) {
         String loginId = principal.getName();
         return loginId;

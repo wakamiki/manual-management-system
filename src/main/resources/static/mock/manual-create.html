@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>マニュアルエディター</title>
+  <title>マニュアル新規作成</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="../css/common.css">
 </head>
@@ -11,15 +11,14 @@
   <main class="container mock-page">
     <div class="page-title-bar tight-gap">
       <div>
-        <span class="badge mb-1 mode-badge">編集</span>
-        <h1 class="h4 mb-1">マニュアルエディター</h1>
-        <p class="text-muted mb-0">マニュアルID: 1001 / 作成日時: 2026-04-04 09:00 / 更新日時: 2026-04-08 10:30 / 作成者: 山田 花子</p>
+        <h1 class="h4 mb-1">マニュアル新規作成</h1>
+        <p class="text-muted mb-0">必要な項目だけ入力して、新しいマニュアルを作成します。下書きは一時保存、公開は申請に進みます。</p>
       </div>
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </div>
 
     <div class="alert mock-alert mt-0 mb-2" role="alert">
-      編集内容を更新できます。更新履歴は任意です。
+      新規マニュアルの作成内容を入力してください。
     </div>
 
     <form class="card">
@@ -42,15 +41,10 @@
             <option>総務部</option>
           </select>
         </div>
-        <div class="mb-3">
-          <label for="changeNote" class="form-label">更新履歴</label>
-          <input id="changeNote" type="text" class="form-control" maxlength="100">
-          <div class="text-count" data-for="changeNote" data-max="100">0 / 100</div>
-        </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary">更新保存</button>
-        <button type="button" class="btn btn-outline-primary">下書きに保存</button>
+        <button type="submit" class="btn btn-primary">下書きに保存</button>
+        <button type="button" class="btn btn-outline-primary">マニュアル公開</button>
       </div>
     </form>
   </main>
@@ -78,7 +72,7 @@
       }
     }
 
-    ["title", "content", "changeNote"].forEach((inputId) => {
+    ["title", "content"].forEach((inputId) => {
       const input = document.getElementById(inputId);
       const counter = document.querySelector(`.text-count[data-for="${inputId}"]`);
 

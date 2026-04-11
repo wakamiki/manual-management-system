@@ -1,6 +1,6 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.03  
+Version: 01.03.04  
 更新日: 2026-04-11
 
 ---
@@ -60,10 +60,9 @@ Version: 01.03.03
 ### 2-3. 例外ハンドリング
 - ControllerAdvice で共通エラーレスポンスへ変換する
 - 主な例外候補
-  - `ResourceNotFoundException`
-  - `ValidationException`
+  - `NotFoundException`
   - `UnauthorizedException`
-  - `InvalidStatusTransitionException`
+  - `InvalidStateException`
 
 ### 2-4. ID 命名方針
 - Entity 主キーは `id`
@@ -117,7 +116,10 @@ Version: 01.03.03
 
 ### 3-4. 作成
 - POST `/api/manuals`
-- 画面は `manual-form` を使うが、API はユースケースごとに分けてよい
+- 画面は新規作成専用画面を使う
+- 編集 / 複製は `manual-form` を使う
+- API はユースケースごとに分けてよい
+- 新規作成では changeNote は任意とする
 
 ### 3-5. 更新
 - PUT `/api/manuals/{manualId}`

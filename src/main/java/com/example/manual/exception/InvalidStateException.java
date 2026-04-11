@@ -6,3 +6,5 @@ public class InvalidStateException extends RuntimeException {
     super(message);
   }
 }
+  //#region ‚±‚Ì•ª‚¯•û‚ð‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

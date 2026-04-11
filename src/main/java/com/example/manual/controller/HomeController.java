@@ -8,9 +8,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        //ã‚«ãƒ†ã‚´ãƒªå–å¾—
-        //ãƒãƒ‹ãƒ¥ã‚¢ãƒ«å–å¾—
+        //ã‚«ãƒE‚´ãƒªå–å¾E
+        //ãƒãƒ‹ãƒ¥ã‚¢ãƒ«å–å¾E
         return "index";
     }
 
 }
+  //#region ‚±‚Ì•ª‚¯•û‚ğ‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

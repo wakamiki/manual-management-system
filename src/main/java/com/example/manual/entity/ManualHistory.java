@@ -31,7 +31,8 @@ public class ManualHistory {
   @JoinColumn(name = "change_user_id")
   private User changedByUser;
 
-  //ゲッター
+  //ゲチE��ー
+  //#region getter
   public Long getId() {
     return this.id;
   }
@@ -47,10 +48,12 @@ public class ManualHistory {
   }
 
   public User getChangedByUser(){
+  //#endregion
     return  this.changedByUser;
   }
 
-  //セッター
+  //セチE��ー
+  //#region setter
   public void setManual(Manual manual) {
     this.manual = manual;
   }
@@ -60,10 +63,11 @@ public class ManualHistory {
   }
 
   public void setChangedByUser(User changedByUser){
+  //#endregion
     this.changedByUser = changedByUser;
   }
 
-  //メソッド
+  //メソチE��
   public void markChangedNow() {
     this.changedAt = LocalDateTime.now();
   }

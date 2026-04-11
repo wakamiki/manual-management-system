@@ -11,7 +11,8 @@ private String categoryName;
 private Integer displayOrder;
 private boolean isActive;
 
-//ゲッター
+//ゲチE��ー
+  //#region getter
 public Long getId() {
 return this.id;
 }
@@ -21,6 +22,7 @@ return this.categoryName;
 }
 
 public Integer getDisplayOrder() {
+  //#endregion
 return this.displayOrder;
 }
 
@@ -28,7 +30,8 @@ public boolean isActive() {
   return this.isActive;
 }
 
-// セッター
+// セチE��ー
+  //#region setter
 public void setId(Long id) {
   this.id = id;
 }
@@ -42,6 +45,7 @@ public void setDisplayOrder(Integer displayOrder) {
 }
 
 public void setActive(boolean active) {
+  //#endregion
   this.isActive = active;
 }
 

@@ -16,21 +16,25 @@ private String categoryName;
 @NotNull
 private Integer displayOrder;
 
-//ゲッター
+//ゲチE��ー
+  //#region getter
 public String getCategoryName() {
 return this.categoryName;
 }
 
 public Integer getDisplayOrder() {
+  //#endregion
   return this.displayOrder;
 }
 
-// セッター
+// セチE��ー
+  //#region setter
 public void setCategoryName(String categoryName) {
   this.categoryName = categoryName;
 }
 
 public void setDisplayOrder(Integer displayOrder) {
+  //#endregion
   this.displayOrder = displayOrder;
 }
 

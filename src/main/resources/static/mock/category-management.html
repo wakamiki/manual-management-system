@@ -1,9 +1,9 @@
-ï»¿<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www/thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ã‚«ãƒ†ã‚´ãƒªç®¡ç†ç”»é¢</title>
+  <title>ƒJƒeƒSƒŠŠÇ—‰æ–Ê</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="../css/common.css">
   <link rel="stylesheet" href="../css/admin.css">
@@ -12,34 +12,34 @@
   <main class="container admin-page">
     <header class="page-title-bar">
       <div>
-        <h1 class="h4 mb-1">ã‚«ãƒ†ã‚´ãƒªç®¡ç†</h1>
-        <p class="mb-0 text-muted">ã‚«ãƒ†ã‚´ãƒªåã€è¡¨ç¤ºé †ã€åˆ©ç”¨çŠ¶æ…‹ã‚’ç®¡ç†ã—ã¾ã™ã€‚</p>
+        <h1 class="h4 mb-1">ƒJƒeƒSƒŠŠÇ—</h1>
+        <p class="mb-0 text-muted">ƒJƒeƒSƒŠ–¼A•\Ž¦‡A—˜—pó‘Ô‚ðŠÇ—‚µ‚Ü‚·B</p>
       </div>
-      <button onclick="window.close()" class="btn btn-outline-secondary">é–‰ã˜ã‚‹</button>
+      <button onclick="window.close()" class="btn btn-outline-secondary">•Â‚¶‚é</button>
     </header>
 
     <div class="alert admin-alert mb-4" role="alert">
-      ã‚«ãƒ†ã‚´ãƒªã‚’æ›´æ–°ã—ã¾ã—ãŸã€‚
+      ƒJƒeƒSƒŠ‚ðXV‚µ‚Ü‚µ‚½B
     </div>
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="card-header">ã‚«ãƒ†ã‚´ãƒªç™»éŒ² / æ›´æ–°</div>
+        <div class="card-header">ƒJƒeƒSƒŠ“o˜^ / XV</div>
         <div class="card-body">
           <form>
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
-              <input id="categoryName" type="text" class="form-control" value="å–¶æ¥­éƒ¨">
+              <input id="categoryName" type="text" class="form-control" value="‰c‹Æ•”">
             </div>
             <div class="mb-4">
               <label for="displayOrder" class="form-label">displayOrder</label>
               <input id="displayOrder" type="number" class="form-control" value="1">
             </div>
             <div class="admin-form-actions">
-              <button type="button" class="btn btn-primary">ä¿å­˜</button>
-              <button type="button" class="btn btn-outline-primary">æ›´æ–°</button>
-              <button type="button" class="btn btn-outline-danger">ä½¿ç”¨åœæ­¢</button>
-              <button type="button" class="btn btn-outline-secondary">å¾©å¸°</button>
+              <button type="button" class="btn btn-primary">•Û‘¶</button>
+              <button type="button" class="btn btn-outline-primary">XV</button>
+              <button type="button" class="btn btn-outline-danger">Žg—p’âŽ~</button>
+              <button type="button" class="btn btn-outline-secondary">•œ‹A</button>
             </div>
           </form>
         </div>
@@ -47,8 +47,8 @@
 
       <div class="card admin-table-card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span>ã‚«ãƒ†ã‚´ãƒªä¸€è¦§</span>
-          <span class="admin-note">è¡¨ç¤ºé †ã§ä¸¦ã³æ›¿ãˆ</span>
+          <span>ƒJƒeƒSƒŠˆê——</span>
+          <span class="admin-note">•\Ž¦‡‚Å•À‚Ñ‘Ö‚¦</span>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -58,63 +58,63 @@
                   <th scope="col">categoryName</th>
                   <th scope="col">displayOrder</th>
                   <th scope="col">status</th>
-                  <th scope="col">æ“ä½œ</th>
+                  <th scope="col">‘€ì</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>å–¶æ¥­éƒ¨</td>
+                  <td>‰c‹Æ•”</td>
                   <td>1</td>
-                  <td><span class="admin-status is-active">ä½¿ç”¨ä¸­</span></td>
+                  <td><span class="admin-status is-active">Žg—p’†</span></td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">æ›´æ–°</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">ä½¿ç”¨åœæ­¢</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">XV</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm">Žg—p’âŽ~</button>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>çµŒç†éƒ¨</td>
+                  <td>Œo—•”</td>
                   <td>2</td>
-                  <td><span class="admin-status is-active">ä½¿ç”¨ä¸­</span></td>
+                  <td><span class="admin-status is-active">Žg—p’†</span></td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">æ›´æ–°</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">ä½¿ç”¨åœæ­¢</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">XV</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm">Žg—p’âŽ~</button>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>ç·å‹™éƒ¨</td>
+                  <td>‘–±•”</td>
                   <td>3</td>
-                  <td><span class="admin-status is-active">ä½¿ç”¨ä¸­</span></td>
+                  <td><span class="admin-status is-active">Žg—p’†</span></td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">æ›´æ–°</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">ä½¿ç”¨åœæ­¢</button>
+                      <button type="button" class="btn btn-outline-primary btn-sm">XV</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm">Žg—p’âŽ~</button>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <td>æ—§å–¶æ¥­éƒ¨</td>
+                  <td>‹Œ‰c‹Æ•”</td>
                   <td>9</td>
-                  <td><span class="admin-status is-inactive">åœæ­¢ä¸­</span></td>
+                  <td><span class="admin-status is-inactive">’âŽ~’†</span></td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-secondary btn-sm">å¾©å¸°</button>
+                      <button type="button" class="btn btn-outline-secondary btn-sm">•œ‹A</button>
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <nav class="admin-pagination" aria-label="ã‚«ãƒ†ã‚´ãƒªä¸€è¦§ãƒšãƒ¼ã‚¸åˆ‡ã‚Šæ›¿ãˆ">
+          <nav class="admin-pagination" aria-label="ƒJƒeƒSƒŠˆê——ƒy[ƒWØ‚è‘Ö‚¦">
             <ul class="pagination justify-content-center mb-0">
-              <li class="page-item disabled"><span class="page-link">å‰ã¸</span></li>
+              <li class="page-item disabled"><span class="page-link">‘O‚Ö</span></li>
               <li class="page-item active"><span class="page-link">1</span></li>
               <li class="page-item"><a class="page-link" href="#">2</a></li>
               <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">æ¬¡ã¸</a></li>
+              <li class="page-item"><a class="page-link" href="#">ŽŸ‚Ö</a></li>
             </ul>
           </nav>
         </div>

@@ -19,9 +19,10 @@ private String content;
 private Long categoryId;
 @Size(max = 100)
 
-//ゲッター
+//ゲチE��ー
 private String changeNote;
 
+  //#region getter
 public String getTitle() {
 return this.title;
 }
@@ -35,10 +36,12 @@ return this.categoryId;
 }
 
 public String getChangeNote() {
+  //#endregion
   return this.changeNote;
 }
 
-//セッター
+//セチE��ー
+  //#region setter
 public void setTitle(String title) {
   this.title = title;
 }
@@ -52,6 +55,7 @@ public void setCategoryId(Long categoryId) {
 }
 
 public void setChangeNote(String cangeNote) {
+  //#endregion
   this.changeNote = cangeNote;
 }
 

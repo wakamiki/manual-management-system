@@ -24,7 +24,8 @@ public class ManualDetailDto {
   private List<ManualHistory> histories;
 
 
-  //#region ゲッター
+  //#region ゲチE��ー
+  //#region getter
   public Long getManualId() {
     return this.manualId;
   }
@@ -66,11 +67,12 @@ public class ManualDetailDto {
   }
 
   public List<ManualHistory> getHistories() {
+  //#endregion
     return this.histories;
   }
-  //#endregion
 
-  //#region セッター
+  //#region セチE��ー
+  //#region setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
   }
@@ -112,7 +114,7 @@ public class ManualDetailDto {
   }
 
   public void setHistories(List<ManualHistory> histories) {
+  //#endregion
     this.histories = histories;
   }
-  //#endregion
 }

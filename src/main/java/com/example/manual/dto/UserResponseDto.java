@@ -11,7 +11,8 @@ private String password;
 private String displayName;
 private UserRole role;
 
-//ゲッター
+//ゲチE��ー
+  //#region getter
 public  String getLoginId() {
 return this.loginId;
 }
@@ -25,10 +26,12 @@ return this.displayName;
 }
 
 public UserRole getRole() {
+  //#endregion
   return this.role;
 }
 
-//セッター
+//セチE��ー
+  //#region setter
 public void setLoginId(String loginId) {
   this.loginId = loginId;
 }
@@ -42,6 +45,7 @@ public void setDisplayName(String displayName) {
 }
 
 public void setRole(UserRole role) {
+  //#endregion
   this.role = role;
 }
 

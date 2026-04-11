@@ -52,7 +52,7 @@ public class UserService {
     public User getUserByPrincipal(Principal principal) {
         Optional<User> userOpt = userRepository.findByLoginId(principal.getName());
         if (userOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "持E��したユーザーが存在しません");
         }
         User user = userOpt.get();
         return user;
@@ -61,10 +61,12 @@ public class UserService {
     public String getDisplayNameByLoginId(String loginId) {
         Optional<User> userOpt = userRepository.findByLoginId(loginId);
         if (userOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "持E��したユーザーが存在しません");
         }
         User user = userOpt.get();
         return user.getDisplayName();
     }
 //#endregion
 }
+  //#region ���̕�����������ƕ�����₷��
+  //#endregion

@@ -19,7 +19,8 @@ public class ManualDraftRequestDto {
     private String changeNote;
     private ManualStatus status;
 
-    //ゲッター
+    //ゲチE��ー
+  //#region getter
     public String getTitle() {
         return this.title;
     }
@@ -37,10 +38,12 @@ public class ManualDraftRequestDto {
     }
 
     public ManualStatus getStatus() {
+  //#endregion
         return this.status;
     }
 
-    //セッター
+    //セチE��ー
+  //#region setter
     public void setTitle(String title) {
         this.title = title;
     }
@@ -58,6 +61,7 @@ public class ManualDraftRequestDto {
     }
 
     public void setStatus(ManualStatus status) {
+  //#endregion
         this.status = status;
     }
 }

@@ -1,12 +1,13 @@
-package com.example.manual.controller;
+﻿package com.example.manual.controller;
 
-import java.security.Principal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/my-page")
 public class MyPageController {
 
-  //小メソッド群
-      public String getLoginId(Principal principal) {
-        String loginId = principal.getName();
-        return loginId;
-    }
+  @GetMapping
+  public void getMyPage() {}
 }

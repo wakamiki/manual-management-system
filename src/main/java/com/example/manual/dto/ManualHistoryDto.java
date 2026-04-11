@@ -11,21 +11,25 @@ public class ManualHistoryDto {
     private LocalDateTime changedAt;
 
 
-    //ゲッター
+    //ゲチE��ー
+  //#region getter
     public String getChangeNote(){
         return this.changeNote;
     }
 
     public LocalDateTime getChangedAt(){
+  //#endregion
         return this.changedAt;
     }
 
-    //セッター
+    //セチE��ー
+  //#region setter
     public void setChangeNote(String changeNote){
         this.changeNote = changeNote;
     }
 
     public void setChangedAt(LocalDateTime changedAt){
+  //#endregion
         this.changedAt = changedAt;
     }
 

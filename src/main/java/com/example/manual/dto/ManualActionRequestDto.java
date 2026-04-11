@@ -9,13 +9,13 @@ public class ManualActionRequestDto {
 
   //#region getter
   public String getChangeNote(){
+  //#endregion
     return this.changeNote;
   }
 
-  //#endregion 
   //#region setter
   public void setChangeNote(String changeNote){
+  //#endregion
     this.changeNote = changeNote;
   }
-  //#endregion  
 }

@@ -8,10 +8,12 @@ import com.example.manual.entity.ManualHistory;
 
 public interface ManualHistoryRepository extends JpaRepository<ManualHistory, Long> {
 
-  //manualIDã§å±¥æ­´å–å¾—(æ›´æ–°å±¥æ­´æ˜‡é †)
+  //manualIDã§å±¥æ­´å–å¾Eæ›´æ–°å±¥æ­´æ˜E E
   List<ManualHistory> findByManual_IdOrderByChangedAtDesc(Long manualId);
 
-  //ä¸€è¦§å–å¾—changedAtã®é™é †
+  //ä¸€è¦§å–å¾—changedAtã®é™é E
   List<ManualHistory> findAllByOrderByChangedAtDesc();
 
 }
+  //#region ‚±‚Ì•ª‚¯•û‚ğ‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

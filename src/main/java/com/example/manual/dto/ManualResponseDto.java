@@ -23,7 +23,8 @@ private LocalDateTime updatedAt;
 private LocalDateTime approvedAt;
 private LocalDateTime changedAt;
 
-//ゲッター
+//ゲチE��ー
+  //#region getter
 public Long getManualId() {
   return this.manualId;
 }
@@ -69,10 +70,12 @@ public LocalDateTime getApprovedAt() {
 }
 
 public LocalDateTime getChangedAt() {
+  //#endregion
   return this.changedAt;
 }
 
-//セッター
+//セチE��ー
+  //#region setter
 public void setManualId(long manualId) {
   this.manualId = manualId;
 }
@@ -118,6 +121,7 @@ public void setApprovedAt(LocalDateTime approvedAt) {
 }
 
 public void setChangedAt(LocalDateTime changedAt) {
+  //#endregion
   this.changedAt = changedAt;
 }
 

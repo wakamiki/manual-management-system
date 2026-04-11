@@ -12,3 +12,5 @@ Optional<User>findByLoginId(String id);
 }
 
 
+  //#region ‚±‚Ì•ª‚¯•û‚ð‚·‚é‚Æ•ª‚©‚è‚â‚·‚¢
+  //#endregion

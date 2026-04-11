@@ -11,16 +11,18 @@ import com.example.manual.enums.ManualStatus;
 public interface ManualRepository extends JpaRepository<Manual, Long> 
 , JpaSpecificationExecutor<Manual> {
 
-  //一覧取得（更新が新しいもの順）
+  //一覧取得（更新が新しいも�E頁E��E
   List<Manual> findAllByOrderByUpdatedAtDesc();
 
-  // 検索ワードが含まれる一覧取得（更新が新しいもの順）
+  // 検索ワードが含まれる一覧取得（更新が新しいも�E頁E��E
   List<Manual> findByTitleContainingOrderByUpdatedAtDesc(String keyword);
 
-  //status絞り込み検索機能（更新が新しいもの順）
+  //status絞り込み検索機�E�E�更新が新しいも�E頁E��E
   List<Manual> findByStatusOrderByUpdatedAtDesc(ManualStatus status);
 
   
 }
 
 
+  //#region ���̕�����������ƕ�����₷��
+  //#endregion
