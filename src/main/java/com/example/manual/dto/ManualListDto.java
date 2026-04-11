@@ -1,6 +1,7 @@
 package com.example.manual.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.manual.enums.ManualStatus;
 
@@ -10,10 +11,12 @@ public class ManualListDto {
   }
   private Long manualId;
   private String title;
+  private String content;
   private ManualStatus status;
   private String categoryName;
   private LocalDateTime updatedAt;
   private String createdByName;
+  private List<ManualHistoryDto> histries;
 
   //ゲッター
   public Long getManualId() {
@@ -22,6 +25,10 @@ public class ManualListDto {
 
   public String getTitle() {
     return this.title;
+  }
+
+  public String getContent(){
+    return this.content;
   }
 
   public ManualStatus getStatus() {
@@ -40,6 +47,10 @@ public class ManualListDto {
     return this.createdByName;
   }
 
+  public List<ManualHistoryDto> getHistries(){
+    return  this.histries;
+  }
+
   //セッター
   public void setManualId(Long manualId) {
      this.manualId = manualId;
@@ -47,6 +58,10 @@ public class ManualListDto {
 
   public void setTitle(String title) {
      this.title = title;
+  }
+
+    public void setContent(String content){
+    this.content = content;
   }
 
   public void setStatus(ManualStatus status) {
@@ -63,6 +78,10 @@ public class ManualListDto {
 
   public void setCreatedByName(String createdByName) {
      this.createdByName = createdByName;
+  }
+
+  public void setHistries(List<ManualHistoryDto>histries){
+    this.histries= histries;
   }
 
 }

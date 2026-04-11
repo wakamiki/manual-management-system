@@ -3,11 +3,13 @@ package com.example.manual.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 
-public interface ManualRepository extends JpaRepository<Manual, Long> {
+public interface ManualRepository extends JpaRepository<Manual, Long> 
+, JpaSpecificationExecutor<Manual> {
 
   //一覧取得（更新が新しいもの順）
   List<Manual> findAllByOrderByUpdatedAtDesc();
@@ -17,4 +19,8 @@ public interface ManualRepository extends JpaRepository<Manual, Long> {
 
   //status絞り込み検索機能（更新が新しいもの順）
   List<Manual> findByStatusOrderByUpdatedAtDesc(ManualStatus status);
+
+  
 }
+
+

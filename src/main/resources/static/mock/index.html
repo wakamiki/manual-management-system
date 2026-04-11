@@ -19,19 +19,23 @@
           <details class="search-filter">
             <summary>カテゴリ</summary>
             <div class="search-filter-panel">
-              <label class="search-check"><input type="checkbox" checked> すべて</label>
-              <label class="search-check"><input type="checkbox"> 営業部</label>
+              <label class="search-check"><input type="checkbox" checked> 営業部</label>
               <label class="search-check"><input type="checkbox"> 経理部</label>
               <label class="search-check"><input type="checkbox"> 総務部</label>
+              <details class="search-subfilter">
+                <summary>使用停止中</summary>
+                <div class="search-subfilter-panel">
+                  <label class="search-check search-check-sub"><input type="checkbox"> 旧営業部</label>
+                </div>
+              </details>
             </div>
           </details>
           <details class="search-filter">
             <summary>ステータス</summary>
             <div class="search-filter-panel">
-              <label class="search-check"><input type="checkbox" checked> すべて</label>
-              <label class="search-check"><input type="checkbox"> 下書き</label>
-              <label class="search-check"><input type="checkbox"> 申請中</label>
-              <label class="search-check"><input type="checkbox"> 承認済</label>
+              <label class="search-check"><input type="checkbox" checked> 下書き</label>
+              <label class="search-check"><input type="checkbox" checked> 申請中</label>
+              <label class="search-check"><input type="checkbox" checked> 承認済</label>
               <label class="search-check"><input type="checkbox"> アーカイブ</label>
             </div>
           </details>
@@ -42,20 +46,37 @@
       </div>
     </header>
 
-    <div class="alert mock-alert mx-4 mt-2 mb-0" role="alert">
+    <div class="alert mock-alert index-alert mb-0" role="alert">
       マニュアルを更新しました。
     </div>
 
     <div class="row g-4 align-items-start">
-      <aside class="col-3 sidebar">
+      <aside class="col-lg-2 col-md-3 sidebar">
         <div class="card">
           <div class="card-body">
             <div>
-              <h2 class="h5">カテゴリ</h2>
+              <h2 class="h5">クイックビュー</h2>
             </div>
             <div>
               <ul class="list-group list-group-flush">
-                <li class="list-group-item active">営業部</li>
+                <li class="list-group-item active d-flex justify-content-between align-items-center">
+                  <span>自分の作成分</span>
+                  <span class="sidebar-count">8</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>申請中</span>
+                  <span class="sidebar-count">3</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>最近更新</span>
+                  <span class="sidebar-count">5</span>
+                </li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h2 class="h5">カテゴリ</h2>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">営業部</li>
                 <li class="list-group-item">経理部</li>
                 <li class="list-group-item">総務部</li>
               </ul>
@@ -78,13 +99,17 @@
                   <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
                   <span class="sidebar-home-badge sidebar-home-badge-pending">4</span>
                 </span>
+                <span class="sidebar-home-user">
+                  <span class="sidebar-home-user-label">ログイン中</span>
+                  <span class="sidebar-home-user-name">山田 花子</span>
+                </span>
               </a>
             </div>
           </div>
         </div>
       </aside>
 
-      <section class="col-9">
+      <section class="col-lg-10 col-md-9">
         <div class="accordion w-100" id="accordionExample">
           <div class="accordion-item">
             <div class="accordion-header">
@@ -110,7 +135,7 @@
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
-                <h2 class="h5 mb-2">更新履歴</h2>
+                <h2 class="history-title mb-2">更新履歴</h2>
                 <ul class="history-list mb-0">
                   <li>2026-04-05: 本文の修正</li>
                   <li>2026-04-04: 新規作成</li>
@@ -143,7 +168,7 @@
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
-                <h2 class="h5 mb-2">更新履歴</h2>
+                <h2 class="history-title mb-2">更新履歴</h2>
                 <ul class="history-list mb-0">
                   <li>2026-04-03: 承認済へ変更</li>
                   <li>2026-04-01: 初回公開</li>

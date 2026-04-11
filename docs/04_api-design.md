@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.01  
-更新日: 2026-04-08
+Version: 01.03.03  
+更新日: 2026-04-11
 
 ---
 
@@ -80,19 +80,20 @@ Version: 01.03.01
 - GET `/api/manuals`
 - 条件例
   - keyword
-  - categoryId
+  - categoryIds
   - statuses
-- 一覧返却項目は画面要件に合わせて以下を含めてよい
+- 初期表示では `statuses = [DRAFT, PENDING, APPROVED]` を前提としてよい
+- 検索条件は `ManualSearchConditionDto` にまとめて扱ってよい
+- 一覧返却項目は画面要件に合わせて以下を含める
   - manualId
-  - categoryName
   - title
-  - content
   - status
-  - historyDate
   - updatedAt
-  - updatedByUser
-  - changeNote
   - createdByUser
+- アコーディオン展開時に以下を返却してよい
+  - categoryName
+  - content
+  - histories
 
 ### 3-2. 詳細取得
 - GET `/api/manuals/{manualId}`
@@ -106,6 +107,10 @@ Version: 01.03.01
   - updatedAt
   - createdByUser
   - histories
+- histories の各要素には以下を含めてよい
+  - changedAt
+  - changeNote
+  - changedByUser
 
 ### 3-3. 履歴取得
 - GET `/api/manuals/{manualId}/histories`
@@ -123,8 +128,10 @@ Version: 01.03.01
 - rollback
 - archive
 - restore
-- UI 上は rollback / archive / restore を `manual-form` で `changeNote` 入力後に確定してよい
+- UI 上は rollback / archive / restore を詳細画面のインライン入力で `changeNote` 入力後に確定してよい
+- approve は確認ダイアログを出し、必要に応じてインライン入力で履歴コメントを受け取ってよい
 - restore 対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする
+- 詳細画面のボタン表示はモックに合わせて一時的に共通表示としてよい
 
 ### 3-7. 複製
 - POST `/api/manuals/{manualId}/actions/copy`
@@ -137,16 +144,33 @@ Version: 01.03.01
 - `ManualRequestDto`
 - `ManualDraftRequestDto`
 - `ManualCopyRequestDto`
+- `ManualSearchConditionDto`
 - `CategoryRequestDto`
 - `UserRequestDto`
 
 ### 4-2. Response DTO
 - `ManualResponseDto`
+- `ManualListDto`
 - `ManualDetailDto`
 - `CategoryResponseDto`
 - `UserResponseDto`
 
-### 4-3. 通知 / マイページ DTO
+### 4-3. 一覧検索 DTO 補足
+- `ManualSearchConditionDto`
+  - keyword
+  - categoryIds
+  - statuses
+- `ManualListDto`
+  - manualId
+  - title
+  - status
+  - updatedAt
+  - createdByName
+  - categoryName
+- 一覧取得では `Specification` を用いて `ManualSearchConditionDto` の条件を組み合わせてよい
+- 内部項目名は `changeNote` のままでよいが、画面上の入力ラベルは `更新履歴` と表示してよい
+
+### 4-4. 通知 / マイページ DTO
 - `NotificationBadgeDto`
 - `NotificationItemDto`
 - `MyPageDto`

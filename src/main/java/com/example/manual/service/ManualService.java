@@ -1,21 +1,26 @@
 package com.example.manual.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.manual.dto.ManualDetailDto;
+import com.example.manual.dto.ManualListDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
+import com.example.manual.dto.ManualSearchConditionDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
 import com.example.manual.entity.User;
-import com.example.manual.enums.ManualStatus;
 import com.example.manual.repository.ManualRepository;
+import com.example.manual.repository.ManualSpecification;
+
 
 @Service
 public class ManualService {
@@ -27,17 +32,13 @@ public class ManualService {
 
   public ManualService(ManualRepository manualRepository
     ,ManualHistoryService manualHistoryService
-    ,UserService userService,CategoryService categoryService) {
+    ,UserService userService,CategoryService categoryService
+    ) {
     this.manualRepository = manualRepository;
     this.manualHistoryService = manualHistoryService;
     this.userService = userService;
     this.categoryService = categoryService;
   }
-
-  public void createDraftManual(ManualRequestDto requestDto) {
-
-  }
-
 //#region 公開メソッド
 
 //対応ボタン　マニュアル公開（編集なし）
@@ -49,7 +50,7 @@ public class ManualService {
 }
 
 //role必須　対応ボタン　承認（チェンジノート無）
-  public void approveManual(Long manualId,Authentication authentication) {
+  public void approveManual(Long manualId, Principal principal) {
     Manual manual = findManualOrThrow(manualId);
     manual.approve();
     manual.markUpdatedNow();
@@ -59,7 +60,7 @@ public class ManualService {
   }
 
   //role必須　対応ボタン　承認（チェンジノート有）
-  public void approveEditManual(Long manualId,String changeNote,Authentication authentication) {
+  public void approveEditManual(Long manualId,String changeNote,Principal principal) {
     Manual manual = findManualOrThrow(manualId);
     manual.approve();
     manual.markUpdatedNow();
@@ -133,7 +134,7 @@ public class ManualService {
   }  
 
   //対応ボタン　差し戻し（チェンジノート必須）
-  public void rollbackEditManual(Long manualId,String changeNote,Authentication authentication) {
+  public void rollbackEditManual(Long manualId,String changeNote,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
   manual.markUpdatedNow();
   manual.rollbackToDraft();
@@ -144,7 +145,7 @@ public class ManualService {
   }
 
   //対応ボタン　アーカイブ（チェンジノート必須）
-  public void archiveManual(Long manualId,ManualRequestDto requestDto,Authentication authentication){
+  public void archiveManual(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     manual.archive();
     manual.markUpdatedNow();
@@ -156,12 +157,12 @@ public class ManualService {
   }
 
 //#endregion
-
 //#region 新規タブ画面遷移
 
     //対応ボタン　詳細を見る(新規タブ)
   public ManualDetailDto goToDetailPage(Long manualId) {
       Manual manual = findManualOrThrow(manualId);
+      List<ManualHistory>history = manualHistoryService.getManualIdHistory(manualId);
       ManualDetailDto detailDto = new ManualDetailDto();
       detailDto.setManualId(manual.getId());
       detailDto.setCategoryName(manual.getCategory().getCategoryName());
@@ -171,8 +172,7 @@ public class ManualService {
       detailDto.setStatus(manual.getStatus());
       detailDto.setCreatedAt(manual.getCreatedAt());
       detailDto.setUpdatedAt(manual.getUpdatedAt());
-      List<ManualHistory>histories = manualHistoryService.getManualIdHistory(manualId);
-      detailDto.setHistories(histories);
+      detailDto.setHistories(history);
       return detailDto;
     }
 
@@ -189,21 +189,21 @@ public class ManualService {
     }
 
     //対応ボタン　差し戻し（新規タブ）
-  public ManualResponseDto goToRollbackPage(Long manualId, Authentication authentication) {
+  public ManualResponseDto goToRollbackPage(Long manualId, Principal principal) {
       //TODO: ロール判定
   Manual manual = findManualOrThrow(manualId);
   return toManualFormInputDto(manual);
   }
 
     //対応ボタン　アーカイブ（新規タブ） チェンジノート必須
-  public ManualResponseDto goToArchivePage(Long manualId,Authentication authentication) {
+  public ManualResponseDto goToArchivePage(Long manualId,Principal principal) {
       //TODO: ロール判定
   Manual manual = findManualOrThrow(manualId);
   return toManualFormInputDto(manual);
   }
 
   //対応ボタン　復帰
-  public ManualResponseDto goToRestorePage(Long manualId,Authentication authentication) {
+  public ManualResponseDto goToRestorePage(Long manualId,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
   //TODO:同一カテゴリー　アクティブ判定
   //TODO: ロール判定
@@ -211,10 +211,35 @@ public class ManualService {
     }
 
 //#endregion
-
 //#region 検索・取得補助
-//#endregion
 
+public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
+  Specification<Manual> specification = Specification
+  .where(ManualSpecification.containsKeyword(condition.getKeyword()))
+  .and(ManualSpecification.hasCategoryIds(condition.getCategoryIds()))
+  .and(ManualSpecification.hasStatuses(condition.getStatuses()));
+
+  List<Manual> manualList = manualRepository.findAll(
+    specification,
+    Sort.by(Sort.Direction.DESC, "updatedAt"));
+    List<ManualListDto>manualDtoList = new ArrayList<>();
+  for (Manual manual : manualList) {
+    ManualListDto manualDto = new ManualListDto();
+    manualDto.setTitle(manual.getTitle());
+    manualDto.setContent(manual.getContent());
+    manualDto.setCategoryName(manual.getCategory().getCategoryName());
+    manualDto.setManualId(manual.getId());
+    manualDto.setStatus(manual.getStatus());
+    manualDto.setUpdatedAt(manual.getUpdatedAt());
+    manualDto.setCreatedByName(manual.getUser().getDisplayName());
+    manualDto.setHistries(
+      manualHistoryService.getManualHistorySummaryDtoList(manual.getId()));
+    manualDtoList.add(manualDto);
+    }
+  return manualDtoList;
+}
+
+//#endregion
 //#region 状態確認
 //#endregion
 //#region 権限確認
@@ -234,28 +259,20 @@ ManualResponseDto responseDto = new ManualResponseDto();
   return responseDto;
 }
 
-//#endregion
-
-// Responseにユーザー名とid未実装　権限チェック(ログイン中ユーザーか)
-  public void createAndSubmitManual(ManualRequestDto requestDto) {
+private ManualListDto toManualListDto(Manual manual) {
+  ManualListDto listDto = new ManualListDto();
+  listDto.setManualId(manual.getId());
+  listDto.setTitle(manual.getTitle());
+  listDto.setContent(manual.getContent());
+  listDto.setStatus(manual.getStatus());
+  listDto.setCategoryName(manual.getCategory().getCategoryName());
+  listDto.setUpdatedAt(manual.getUpdatedAt());
+  listDto.setCreatedByName(manual.getUser().getDisplayName());
+  return listDto;
 }
 
-    //マニュアルを直接返す形になっている編集予定
-  public List<Manual> getAllManuals() {
-      return manualRepository.findAllByOrderByUpdatedAtDesc();
-    }
-
-    // マニュアルを直接返す形になっている編集予定
-  public List<Manual> searchByTitle(String keyword) {
-    return manualRepository.findByTitleContainingOrderByUpdatedAtDesc(keyword);
-  }
-
-
-  public List<Manual> searchByStatus(ManualStatus status) {
-    return manualRepository.findByStatusOrderByUpdatedAtDesc(status);
-  }
-
-  //#region 共通処理
+//#endregion
+//#region 共通処理
   private Manual findManualOrThrow(Long id) {
     Optional<Manual> manualOpt = manualRepository.findById(id);
     if (manualOpt.isEmpty()) {
@@ -263,5 +280,5 @@ ManualResponseDto responseDto = new ManualResponseDto();
     }
     return manualOpt.get();
  }
- //#endregion
+//#endregion
 }

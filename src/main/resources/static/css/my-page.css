@@ -1,9 +1,3 @@
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
-
-body {
-  background-color: #f4f8f8;
-}
-
 .my-page {
   max-width: 1180px;
 }
@@ -15,8 +9,8 @@ body {
 .mypage-user-summary {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
 .mypage-user-name {
@@ -31,8 +25,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 14px;
   flex-wrap: wrap;
+  gap: 14px;
 }
 
 .home-icon-preview {
@@ -43,85 +37,85 @@ body {
 }
 
 .home-icon-button {
+  position: relative;
   width: 66px;
   height: 66px;
   border: 1px solid #b8cfd2;
   border-radius: 13px;
   background: linear-gradient(180deg, #f9fcfc 0%, #eef5f6 100%);
-  position: relative;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .home-icon-shape {
   position: absolute;
-  left: 50%;
   top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-primary);
   font-size: 26px;
   line-height: 1;
-  color: #56969d;
-  transform: translate(-50%, -50%);
 }
 
 .home-badge {
   position: absolute;
   right: -7px;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 2px solid var(--color-bg-surface);
+  border-radius: 999px;
+  box-shadow: 0 3px 8px rgba(31, 52, 56, 0.16);
+  color: var(--color-bg-surface);
   font-size: 10px;
   font-weight: 700;
-  border: 2px solid #ffffff;
-  box-shadow: 0 3px 8px rgba(31, 52, 56, 0.16);
 }
 
 .home-badge-rollback {
   top: 4px;
-  background-color: #ef9a48;
+  background-color: var(--color-warning);
 }
 
 .home-badge-pending {
   bottom: 4px;
-  background-color: #74a886;
+  background-color: var(--color-success);
 }
 
 .overview-tile {
+  padding: 11px 13px;
   border: 1px solid #c6dadd;
   border-radius: 14px;
-  padding: 11px 13px;
-  background-color: #ffffff;
+  background-color: var(--color-bg-surface);
 }
 
 .overview-tile-rollback {
-  background-color: #fff6ec;
+  background-color: var(--color-bg-rollback-soft);
   border-color: #f0d2b0;
 }
 
 .overview-tile-pending {
-  background-color: #f3faf5;
-  border-color: #c7ddd7;
+  background-color: var(--color-bg-pending-soft);
+  border-color: var(--color-success-border);
 }
 
 .overview-label {
-  font-size: 12px;
-  color: #5c7276;
   margin-bottom: 4px;
+  color: #5c7276;
+  font-size: 12px;
 }
 
 .overview-count {
+  color: #23464c;
   font-size: 16px;
   font-weight: 700;
-  color: #23464c;
   line-height: 1;
 }
 
 .overview-note {
   margin-top: 4px;
-  color: #6c757d;
+  color: var(--color-text-muted);
   font-size: 11px;
 }
 
@@ -132,23 +126,23 @@ body {
 }
 
 .mypage-tabs .nav-link {
+  padding: 10px 18px;
   border: 1px solid transparent;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   color: #4f6b70;
   font-weight: 600;
-  padding: 10px 18px;
 }
 
 .mypage-tabs .nav-link.active {
+  background-color: var(--color-bg-page);
+  border-color: #d6e2e4 #d6e2e4 var(--color-bg-page);
   color: #18464d;
-  background-color: #f4f8f8;
-  border-color: #d6e2e4 #d6e2e4 #f4f8f8;
 }
 
 .tab-pane-body {
   padding: 24px;
-  background-color: #ffffff;
+  background-color: var(--color-bg-surface);
 }
 
 .tab-content > .tab-pane {
@@ -163,15 +157,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
   flex-wrap: wrap;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
-.notification-list {
+.notification-list,
+.dashboard-list {
   display: flex;
   flex-direction: column;
+}
+
+.notification-list {
   gap: 10px;
+}
+
+.dashboard-list {
+  gap: 12px;
 }
 
 .notification-card {
@@ -179,7 +181,7 @@ body {
   border: 1px solid #d4e1e3;
   border-radius: 14px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: var(--color-bg-surface);
 }
 
 .notification-accent {
@@ -188,11 +190,11 @@ body {
 }
 
 .notification-card-rollback .notification-accent {
-  background-color: #ef9a48;
+  background-color: var(--color-warning);
 }
 
 .notification-card-pending .notification-accent {
-  background-color: #74a886;
+  background-color: var(--color-success);
 }
 
 .notification-content {
@@ -200,12 +202,28 @@ body {
   padding: 14px 18px;
 }
 
-.notification-meta {
+.notification-meta,
+.dashboard-meta,
+.notification-actions,
+.dashboard-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
+}
+
+.notification-meta {
+  gap: 10px;
   margin-bottom: 6px;
+}
+
+.dashboard-meta {
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.notification-actions,
+.dashboard-actions {
+  gap: 8px;
 }
 
 .notification-chip {
@@ -215,23 +233,24 @@ body {
   min-height: 24px;
   padding: 0 10px;
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--color-bg-surface);
   font-size: 12px;
   font-weight: 700;
 }
 
 .notification-chip-rollback {
-  background-color: #ef9a48;
+  background-color: var(--color-warning);
 }
 
 .notification-chip-pending {
-  background-color: #74a886;
+  background-color: var(--color-success);
 }
 
-.notification-title {
-  font-size: 16px;
+.notification-title,
+.dashboard-title {
   margin-bottom: 6px;
   color: #20474d;
+  font-size: 16px;
 }
 
 .notification-text {
@@ -239,60 +258,28 @@ body {
   line-height: 1.5;
 }
 
-.notification-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.dashboard-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .dashboard-card {
+  padding: 16px 18px;
   border: 1px solid #d4e1e3;
   border-radius: 14px;
-  background-color: #ffffff;
-  padding: 16px 18px;
+  background-color: var(--color-bg-surface);
 }
 
 .dashboard-card-pending {
-  background-color: #f8fbfb;
+  background-color: var(--color-bg-surface-soft);
 }
 
 .dashboard-card-main {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 18px;
-  flex-wrap: wrap;
-}
-
-.dashboard-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
-.dashboard-title {
-  font-size: 16px;
-  margin-bottom: 6px;
-  color: #20474d;
 }
 
 .dashboard-text {
   color: #55656a;
   line-height: 1.45;
-}
-
-.dashboard-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
 }
 
 @media (max-width: 767.98px) {
@@ -303,9 +290,5 @@ body {
 
   .home-icon-preview {
     margin-top: 8px;
-  }
-
-  .notification-title {
-    font-size: 16px;
   }
 }

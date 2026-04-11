@@ -414,3 +414,74 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 - `UserRepository` / `UserService` の `loginId` 基準整理
 - `ManualHistory` の更新者記録設計
 - 下書き保存分岐の実装着手
+
+---
+
+## 2026-04-11
+
+### 作業概要
+検索 UI と検索実装の土台を進めつつ、画面設計・API 設計・DB 設計の資料を現在のモックと Entity 実装に合わせて更新した。あわせて、詳細画面の状態変更操作を `manual-form` から切り離し、インライン入力で確定する方針へ整理した。
+
+### 実施内容
+
+#### 検索 UI とトップ画面整理
+- トップ画面のステータス初期値を `DRAFT / PENDING / APPROVED` 選択済みに整理
+- 使用停止カテゴリを検索フォーム内のミニ開閉へ移動
+- 左サイドバーをカテゴリ一覧中心から `クイックビュー + 補助ナビ` へ再設計
+  - `自分の作成分`
+  - `申請中`
+  - `最近更新`
+- ホームアイコン横にログイン中ユーザー名を表示する形へ整理
+
+#### 詳細画面の状態変更方針整理
+- 差し戻し / アーカイブ / 復帰は詳細画面内のインライン入力で `changeNote` を入力して確定する方針へ変更
+- 承認は確認ダイアログを表示し、必要な場合のみインライン入力を開く方針へ整理
+- `manual-detail.html` に共通インライン操作パネルのモックを追加
+- 画面上のラベルは `changeNote` ではなく `更新履歴` と表示する方針へ統一
+
+#### 検索実装の土台作成
+- `ManualSearchConditionDto` を前提に検索条件を整理
+- `ManualRepository` で `Specification` を使う方針を確定
+- `ManualSpecification`
+  - `containsKeyword(...)`
+  - `hasCategoryIds(...)`
+  - `hasStatuses(...)`
+  の形で条件を分離
+- `ManualService.searchManuals(...)` を `Specification + Sort` で検索し、`ManualListDto` へ詰め替える形へ整理
+
+#### 資料更新
+- `docs/03`
+  - トップ画面一覧項目
+  - 検索条件
+  - 詳細画面ボタン表示
+  - インライン入力方針
+  を更新
+- `docs/04`
+  - `ManualSearchConditionDto`
+  - `ManualListDto`
+  - 一覧検索と状態変更の運用補足
+  を追記
+- `docs/05`
+  - 現在の Entity 実装基準で DB 設計を全面更新
+  - `login_id`
+  - `operated_by_user_id`
+  - `change_user_id`
+  などの実カラム名へ反映
+- `docs/06`
+  - 一覧表示 / アコーディオン展開 / 複数選択検索 / インライン入力のテスト観点を追加
+- `README`
+  - 詳細画面のインライン入力方針
+  - `更新履歴` ラベル
+  - DB 設計更新の反映
+
+### 学び
+- 検索 UI とサイドバーは、役割を分けると画面全体の説明がしやすくなる
+- `Specification` は最初の理解コストはあるが、検索条件が増える前提では保守しやすい
+- DB 設計書は docs だけでなく Entity 実装と並べて見ないとズレやすい
+- `changeNote` のような内部項目名と、画面表示ラベル `更新履歴` は分けて整理すると説明しやすい
+
+### 次回着手予定
+- `ManualService` / `ManualController` の未完成箇所整理
+- 検索 API の Controller 接続
+- `ManualDetailDto` と履歴表示の整合
+- 起動時エラーになりそうな重複マッピング整理

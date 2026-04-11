@@ -1,10 +1,13 @@
 package com.example.manual.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.manual.dto.ManualDetailHistoryDto;
+import com.example.manual.dto.ManualHistoryDto;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
 import com.example.manual.entity.User;
@@ -24,7 +27,6 @@ public class ManualHistoryService {
       this.userService = userService;
   }
 
-//null可　ユーザー追加予定
 public ManualHistory createHistory(Manual manual,String changeNote,Principal principal){
   ManualHistory history = new ManualHistory();
   history.setChangeNote(changeNote);
@@ -44,5 +46,32 @@ public List<ManualHistory> getManualIdHistory(Long manualId) {
 
 public List<ManualHistory> getAllHistories(){
   return manualHistoryRepository.findAllByOrderByChangedAtDesc();
+}
+
+//一覧表示用
+public List<ManualHistoryDto>getManualHistorySummaryDtoList(Long manualId){
+  List<ManualHistory>manualHistories = this.getManualIdHistory(manualId);
+  List<ManualHistoryDto>historyDtoList = new ArrayList<>();
+  for (ManualHistory history :  manualHistories) {
+    ManualHistoryDto historyDto = new ManualHistoryDto(); 
+    historyDto.setChangeNote(history.getChangeNote());
+    historyDto.setChangedAt(history.getChangedAt());
+    historyDtoList.add(historyDto);
+  }
+  return historyDtoList;
+}
+
+//マニュアル詳細画面用
+public List<ManualDetailHistoryDto>getManualHistoryDetailDtoList(Long manualId){
+  List<ManualHistory>manualHistories = this.getManualIdHistory(manualId);
+  List<ManualDetailHistoryDto>historyDetailDtoList = new ArrayList<>();
+  for (ManualHistory history :  manualHistories) {
+    ManualDetailHistoryDto historyDetailDto = new ManualDetailHistoryDto(); 
+    historyDetailDto.setChangeNote(history.getChangeNote());
+    historyDetailDto.setChangedAt(history.getChangedAt());
+    historyDetailDto.setChangedByUserName(history.getChangedByUser().getDisplayName());
+    historyDetailDtoList.add(historyDetailDto);
+  }
+  return  historyDetailDtoList;
 }
 }

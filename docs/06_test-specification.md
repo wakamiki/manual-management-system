@@ -1,7 +1,7 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.01  
-更新日: 2026-04-08
+Version: 01.03.03  
+更新日: 2026-04-11
 
 ---
 
@@ -88,6 +88,7 @@ Version: 01.03.01
 - categoryId 未選択時のエラー
 - 下書き保存時と申請時の必須差分
 - changeNote のケース別必須判定
+- 画面ラベル `更新履歴` と内部項目 `changeNote` の対応確認
 - 複製時の status 初期化確認
 - rollback / archive / restore での changeNote 必須確認
 
@@ -119,6 +120,12 @@ Version: 01.03.01
 | MAN-011 | 正常 | category 複数選択 + status 複数選択で絞り込み | 条件一致のみ表示 |
 | MAN-012 | 正常 | 0件 | 結果0件表示 |
 | MAN-013 | 正常 | 詳細の更新日時表示 | 時間まで表示される |
+| MAN-013A | 正常 | 初期表示の status 条件 | DRAFT / PENDING / APPROVED のみ選択済で表示される |
+| MAN-013B | 正常 | 一覧の常時表示項目 | manualId / title / status / updatedAt / createdByUser / category が表示される |
+| MAN-013C | 正常 | 一覧のアコーディオン展開表示 | content / 更新履歴 が表示される |
+| MAN-013D | 正常 | カテゴリ複数選択 | 営業部 / 経理部 / 総務部 を複数同時に絞り込める |
+| MAN-013E | 正常 | 使用停止カテゴリ選択 | `使用停止中` 展開後に旧カテゴリで絞り込める |
+| MAN-013F | 正常 | ステータス選択肢 | `すべて` を使わず複数選択で絞り込める |
 
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
@@ -170,12 +177,14 @@ Version: 01.03.01
 ## 8-2. manual-form 経由の確定操作
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| FORM-001 | 正常 | rollback を入力画面で確定 | changeNote 入力後に DRAFT へ更新される |
-| FORM-002 | 正常 | archive を入力画面で確定 | changeNote 入力後に ARCHIVED へ更新される |
-| FORM-003 | 正常 | restore を入力画面で確定 | approvedAt を保持した ARCHIVED が APPROVED へ戻る |
-| FORM-004 | 異常 | rollback で changeNote 未入力 | エラー表示 |
-| FORM-005 | 異常 | archive で changeNote 未入力 | エラー表示 |
-| FORM-006 | 異常 | restore で changeNote 未入力 | エラー表示 |
+| FORM-001 | 正常 | rollback を詳細画面のインライン入力で確定 | changeNote 入力後に DRAFT へ更新される |
+| FORM-002 | 正常 | archive を詳細画面のインライン入力で確定 | changeNote 入力後に ARCHIVED へ更新される |
+| FORM-003 | 正常 | restore を詳細画面のインライン入力で確定 | approvedAt を保持した ARCHIVED が APPROVED へ戻る |
+| FORM-004 | 正常 | approve で確認ダイアログ `はい` | インライン入力が開き、履歴コメント付きで承認できる |
+| FORM-005 | 正常 | approve で確認ダイアログ `いいえ` | コメントなしで承認できる |
+| FORM-006 | 異常 | rollback で changeNote 未入力 | エラー表示 |
+| FORM-007 | 異常 | archive で changeNote 未入力 | エラー表示 |
+| FORM-008 | 異常 | restore で changeNote 未入力 | エラー表示 |
 
 ---
 

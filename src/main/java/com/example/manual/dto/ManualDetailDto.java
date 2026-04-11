@@ -3,8 +3,8 @@ package com.example.manual.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.manual.enums.ManualStatus;
 import com.example.manual.entity.ManualHistory;
+import com.example.manual.enums.ManualStatus;
 
 public class ManualDetailDto {
   public ManualDetailDto() {
@@ -24,7 +24,7 @@ public class ManualDetailDto {
   private List<ManualHistory> histories;
 
 
-  //ゲッター
+  //#region ゲッター
   public Long getManualId() {
     return this.manualId;
   }
@@ -68,8 +68,9 @@ public class ManualDetailDto {
   public List<ManualHistory> getHistories() {
     return this.histories;
   }
+  //#endregion
 
-  //セッター
+  //#region セッター
   public void setManualId(Long manualId) {
     this.manualId = manualId;
   }
@@ -113,5 +114,5 @@ public class ManualDetailDto {
   public void setHistories(List<ManualHistory> histories) {
     this.histories = histories;
   }
-
+  //#endregion
 }

@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.01  
-更新日: 2026-04-08
+Version: 01.06.02  
+更新日: 2026-04-11
 
 ---
 
@@ -83,19 +83,20 @@ Version: 01.06.01
   - approvedAt
 - 複製後の値
   - status = DRAFT
-  - createdByUser = current user
+  - operatedByUser = current user
   - category = selected category
   - changeNote = required
 - 複製時は履歴を必ず1件保存する
 
 ### 5-2. 入力画面
 - 入力画面は `manual-form` に統一する
-- 同じ画面を新規 / 編集 / 複製 / 差し戻し / アーカイブ / 復帰のモードで使い分ける
+- 同じ画面を新規 / 編集 / 複製のモードで使い分ける
 - 新規モードでは `マニュアルID / 作成日時 / 更新日時 / 作成者` を表示しない
-- 編集モードと複製モードでは `マニュアルID / 作成日時 / 更新日時 / 作成者 / 履歴日時 / 履歴作成者 / ステータス` を表示する
+- 編集モードと複製モードでは `マニュアルID / 作成日時 / 更新日時 / 作成者` を表示する
 - 入力画面の主操作は `下書きに保存` と `マニュアル公開` とする
 - 入力画面内には複製ボタンを置かない
-- 差し戻し / アーカイブ / 復帰は入力画面で `changeNote` を入力してから確定する
+- 差し戻し / アーカイブ / 復帰は詳細画面のインライン入力で `changeNote` を入力してから確定する
+- 承認は確認ダイアログで履歴コメント有無を選択し、必要な場合のみインライン入力を開いてよい
 - `下書きに保存` では `PENDING → DRAFT` を許可する
 - 復帰対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする
 - 画面統合と API 統合は分けて考える
@@ -112,16 +113,18 @@ Version: 01.06.01
 ## 6. Entity 設計
 
 ### 6-1. 主要 Entity
-- Users
+- User
 - Manual
 - ManualHistory
 - Category
 - Notification
+- UserOperationHistory
 
 ### 6-2. Manual
 - 最新状態を保持する本体
 - `status` `createdAt` `updatedAt` `approvedAt` は専用メソッドで更新する
-- `createdByUser` を持つ
+- Entity 上は `user` を持ち、現在の JoinColumn は `operated_by_user_id`
+- 画面 / DTO 上では `createdByUser` として扱ってよい
 
 ### 6-3. ManualHistory
 - 変更履歴を保持する append-only データ
@@ -130,13 +133,29 @@ Version: 01.06.01
 - `changedAt`
 - `changedByUser`
 
-### 6-4. Notification
+### 6-4. User
+- `loginId`
+- `displayName`
+- `role`
+- `isActive`
+- `lastLoginAt`
+
+### 6-5. Notification
 - 通知データ本体
 - `targetUser`
 - `manual`
 - `type`
 - `message`
 - `isRead`
+- `createdAt`
+- 現時点では Entity は空実装で、今後拡張対象とする
+
+### 6-6. UserOperationHistory
+- 管理操作や監査用の履歴
+- `targetUser`
+- `operatedByUser`
+- `operationType`
+- `operationDetail`
 - `createdAt`
 
 ---
@@ -190,6 +209,7 @@ Version: 01.06.01
 ## 9. DTO 方針
 - Request DTO と Response DTO を分ける
 - List DTO / Detail DTO / Action DTO を使い分ける
+- 一覧検索条件は `ManualSearchConditionDto` へまとめてよい
 - Notification 表示用に以下を持つ
   - NotificationBadgeDto
   - NotificationItemDto
@@ -201,3 +221,4 @@ Version: 01.06.01
 - DTO の形式チェックは `@Valid` + Bean Validation で行う
 - 業務ルール依存の必須判定は Service で行う
 - `changeNote` はケースごとに Service 側で必須判定してよい
+- 画面ラベルは `更新履歴` と表示してよいが、内部項目名は `changeNote` のままでよい

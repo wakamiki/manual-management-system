@@ -25,11 +25,13 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control" value="配送手順の流れ">
+          <input id="title" type="text" class="form-control" value="配送手順の流れ" maxlength="100">
+          <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">本文</label>
-          <textarea id="content" class="form-control" rows="8">既定本文</textarea>
+          <textarea id="content" class="form-control" rows="8" maxlength="10000">既定本文</textarea>
+          <div class="text-count" data-for="content" data-max="10000">0 / 10000</div>
         </div>
         <div class="mb-3">
           <label for="category" class="form-label">カテゴリ</label>
@@ -40,8 +42,9 @@
           </select>
         </div>
         <div class="mb-3">
-          <label for="changeNote" class="form-label">変更理由</label>
-          <input id="changeNote" type="text" class="form-control">
+          <label for="changeNote" class="form-label">更新履歴</label>
+          <input id="changeNote" type="text" class="form-control" maxlength="100">
+          <div class="text-count" data-for="changeNote" data-max="100">0 / 100</div>
         </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
@@ -54,5 +57,41 @@
     </form>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function updateTextCount(inputId, maxLength) {
+      const input = document.getElementById(inputId);
+      const counter = document.querySelector(`.text-count[data-for="${inputId}"]`);
+
+      if (!input || !counter) {
+        return;
+      }
+
+      const currentLength = input.value.length;
+      counter.textContent = `${currentLength} / ${maxLength}`;
+      counter.classList.remove("is-near-limit", "is-over-limit");
+
+      if (currentLength >= maxLength) {
+        counter.classList.add("is-over-limit");
+        return;
+      }
+
+      if (currentLength >= Math.floor(maxLength * 0.8)) {
+        counter.classList.add("is-near-limit");
+      }
+    }
+
+    ["title", "content", "changeNote"].forEach((inputId) => {
+      const input = document.getElementById(inputId);
+      const counter = document.querySelector(`.text-count[data-for="${inputId}"]`);
+
+      if (!input || !counter) {
+        return;
+      }
+
+      const maxLength = Number(counter.dataset.max);
+      updateTextCount(inputId, maxLength);
+      input.addEventListener("input", () => updateTextCount(inputId, maxLength));
+    });
+  </script>
 </body>
 </html>
