@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.02  
-更新日: 2026-04-11
+Version: 01.00.03  
+更新日: 2026-04-12
 
 ---
 
@@ -262,67 +262,6 @@ Entity 設計、Repository 整理、画面モック作成に着手した。
 
 ---
 
-## 2026-04-11
-
-### 作業概要
-編集/複製の共通入力画面方針と Thymeleaf 学習内容を確定し、検索UIや資料更新の方針を整理した。あわせて、モックHTMLとCSSの整理、Thymeleaf反映項目の一覧化を行った。
-
-### 実施内容
-
-#### 編集 / 複製 共通入力画面の設計確定
-- `manual-form.html` を編集/複製の共通画面として使用する方針を確定
-- `mode = edit / copy` で表示切替する設計を整理
-- 新規作成は別画面に分離する方針を確定
-- 固定タイトルを **マニュアルエディター** に統一
-- 入力欄初期値は元マニュアルの内容をそのまま表示する方針
-- Controller / Service は編集保存 / 複製保存の入口を分離
-
-#### Thymeleaf 学習整理
-- `th:text` `th:each` `th:if` `th:href` `th:action` `th:field` の用途整理
-- 既存の `class` 属性と Thymeleaf 属性の併記が可能と確認
-- `th:text` は文字を持つ最内タグに付与する理解を整理
-- タグ名と属性名の誤記による構文ミス例を整理
-
-#### index 画面の設計準備
-- 検索エリア / カテゴリ一覧 / マニュアル一覧の骨組みを整理
-- `main / header / section / form / ul / li / article / span / small` の構成を整理
-
-#### 検索UI・状態変更の設計整理
-- ステータス初期選択を `DRAFT / PENDING / APPROVED` に設定
-- 使用停止カテゴリを検索フォーム内のミニ開閉へ移動
-- サイドバーをクイックビュー中心に再設計
-- 差し戻し / アーカイブ / 復帰は詳細画面のインライン入力で確定する方針に整理
-- 承認はダイアログ後に必要時のみインライン入力を開く方針を整理
-
-#### 検索実装の土台整理
-- `ManualSearchConditionDto` を前提に検索条件を整理
-- `Specification` を用いた検索方針を確定
-- `ManualSpecification` のメソッド分割方針を整理
-- `ManualService.searchManuals(...)` を `Specification + Sort` で実装する方針を整理
-
-#### モック / CSS / 資料更新
-- `manual-create.html`（新規作成）を別画面として整理
-- `manual-form.html`（編集/複製）を共通画面として整理
-- 文字カウントのリアルタイム表示を入力欄に付与
-- `admin.css` の `.admin-status` 系クラスを復元
-- `common.css` に日本語フォントスタックを追加
-- 未使用CSSの削除と、mock HTML の復元を実施
-- Thymeleaf 反映項目一覧を `docs/07_thymeleaf-binding-items.md` に整理
-- `docs/02` `docs/03` `docs/04` `docs/05` `docs/06` `README` の差分更新を継続
-
-### 学び
-- 入力画面の共通化は UI と保存処理を分離すると説明しやすい
-- `Specification` は検索条件の追加に強い
-- ラベル名と内部項目名は分離して整理する方が説明しやすい
-
-### 次回着手予定
-- index 画面の Thymeleaf 化
-- 検索 API の Controller 接続
-- `ManualDetailDto` と履歴表示の整合
-- 起動時エラーになりそうな重複マッピング整理
-
----
-
 ## 2026-04-09
 
 ### 作業概要
@@ -481,11 +420,25 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 ## 2026-04-11
 
 ### 作業概要
-検索 UI と検索実装の土台を進めつつ、画面設計・API 設計・DB 設計の資料を現在のモックと Entity 実装に合わせて更新した。あわせて、詳細画面の状態変更操作を `manual-form` から切り離し、インライン入力で確定する方針へ整理した。
+編集/複製の共通入力画面方針と Thymeleaf 学習内容を確定し、検索 UI・状態変更・検索実装の土台を整理した。あわせて、モックHTML/CSSと各種資料の更新を進め、詳細画面の状態変更はインライン入力で確定する方針に統一した。
 
 ### 実施内容
 
-#### 検索 UI とトップ画面整理
+#### 編集 / 複製 共通入力画面の設計確定
+- `manual-form.html` を編集/複製の共通画面として使用する方針を確定
+- `mode = edit / copy` で表示切替する設計を整理
+- 新規作成は別画面に分離する方針を確定
+- 固定タイトルを **マニュアルエディター** に統一
+- 入力欄初期値は元マニュアルの内容をそのまま表示する方針
+- Controller / Service は編集保存 / 複製保存の入口を分離
+
+#### Thymeleaf 学習整理
+- `th:text` `th:each` `th:if` `th:href` `th:action` `th:field` の用途整理
+- 既存の `class` 属性と Thymeleaf 属性の併記が可能と確認
+- `th:text` は文字を持つ最内タグに付与する理解を整理
+- タグ名と属性名の誤記による構文ミス例を整理
+
+#### 検索 UI と状態変更の整理
 - トップ画面のステータス初期値を `DRAFT / PENDING / APPROVED` 選択済みに整理
 - 使用停止カテゴリを検索フォーム内のミニ開閉へ移動
 - 左サイドバーをカテゴリ一覧中心から `クイックビュー + 補助ナビ` へ再設計
@@ -493,14 +446,12 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
   - `申請中`
   - `最近更新`
 - ホームアイコン横にログイン中ユーザー名を表示する形へ整理
-
-#### 詳細画面の状態変更方針整理
 - 差し戻し / アーカイブ / 復帰は詳細画面内のインライン入力で `changeNote` を入力して確定する方針へ変更
 - 承認は確認ダイアログを表示し、必要な場合のみインライン入力を開く方針へ整理
 - `manual-detail.html` に共通インライン操作パネルのモックを追加
 - 画面上のラベルは `changeNote` ではなく `更新履歴` と表示する方針へ統一
 
-#### 検索実装の土台作成
+#### 検索実装の土台整理
 - `ManualSearchConditionDto` を前提に検索条件を整理
 - `ManualRepository` で `Specification` を使う方針を確定
 - `ManualSpecification`
@@ -510,7 +461,21 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
   の形で条件を分離
 - `ManualService.searchManuals(...)` を `Specification + Sort` で検索し、`ManualListDto` へ詰め替える形へ整理
 
-#### 資料更新
+#### index 画面の設計準備
+- 検索エリア / カテゴリ一覧 / マニュアル一覧の骨組みを整理
+- `main / header / section / form / ul / li / article / span / small` の構成を整理
+
+#### モック / CSS / 資料更新
+- `manual-create.html`（新規作成）を別画面として整理
+- `manual-form.html`（編集/複製）を共通画面として整理
+- 文字カウントのリアルタイム表示を入力欄に付与
+- `admin.css` の `.admin-status` 系クラスを復元
+- `common.css` に日本語フォントスタックを追加
+- 未使用CSSの削除と、mock HTML の復元を実施
+- Thymeleaf 反映項目一覧を `docs/07_thymeleaf-binding-items.md` に整理
+- `docs/02` `docs/03` `docs/04` `docs/05` `docs/06` `README` の差分更新を継続
+
+#### 資料更新（検索・詳細・DB・テスト）
 - `docs/03`
   - トップ画面一覧項目
   - 検索条件
@@ -537,12 +502,47 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 
 ### 学び
 - 検索 UI とサイドバーは、役割を分けると画面全体の説明がしやすくなる
-- `Specification` は最初の理解コストはあるが、検索条件が増える前提では保守しやすい
+- 入力画面の共通化は UI と保存処理を分離すると説明しやすい
+- `Specification` は検索条件の追加に強い
 - DB 設計書は docs だけでなく Entity 実装と並べて見ないとズレやすい
 - `changeNote` のような内部項目名と、画面表示ラベル `更新履歴` は分けて整理すると説明しやすい
 
 ### 次回着手予定
-- `ManualService` / `ManualController` の未完成箇所整理
+- index 画面の Thymeleaf 化
 - 検索 API の Controller 接続
 - `ManualDetailDto` と履歴表示の整合
 - 起動時エラーになりそうな重複マッピング整理
+
+---
+
+## 2026-04-12
+
+### 作業概要
+文字化け・import 全赤の復旧対応と、カテゴリ運用ルールの整理、テンプレート配置・画面操作の微調整を進めた。
+
+### 実施内容
+- Java Language Server の `jdt_ws` 削除で import 全赤を復旧
+- Java/HTML/MD の UTF-8 統一を実施
+- `pom.xml` の `java.version` を 17 に戻し、ビルド成功を確認
+- `templates` への HTML コピーと CSS 参照調整
+- `templates/css` を配信する ResourceHandler を追加
+- index サイドバーのレスポンシブ崩れを修正
+- カテゴリ管理の displayOrder placeholder / min 値を調整
+- マイページのタブがキーボード入力に反応しないように調整
+- 未承認マニュアル欄に更新日を表示
+- カテゴリ運用方針を整理
+  - 復帰時の displayOrder 最終化は廃止
+  - ユーザー作成時の初期状態・必須項目・userId 変更不可を整理
+  - パスワードリセットの注意事項・監査ログ項目を整理
+  - 同名カテゴリは確認フロー、コード導入方針を整理
+  - 停止カテゴリの扱いは保持し、同名上書き時に一括アーカイブ
+
+### 学び
+- OneDrive 同期が IDE のワークスペース破損を引き起こすため、停止/除外が有効
+- 仕様反映は docs 先行にすることで混乱が減る
+
+### 次回着手予定
+- カテゴリ更新ロジックの簡素化（displayOrder 割り込み）
+- 同名カテゴリ確認フローのUI設計
+
+---

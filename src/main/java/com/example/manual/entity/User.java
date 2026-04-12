@@ -38,7 +38,7 @@ public class User {
 
 
 
-  //#region getter
+  //getter
   public Long getId() {
     return this.id;
   }
@@ -76,8 +76,8 @@ public class User {
     return this.updatedAt;
   }
 
-  //#endregion
-  //#region setter
+
+  //setter
   public void setPassword(String password) {
     this.password = password;
   }
@@ -86,7 +86,15 @@ public class User {
 
     this.displayName = displayName;
   }
-  //#endregion
+
+  private void setLoginId(String loginId){
+    this.loginId = loginId;
+  }
+
+  private void setUserRole(UserRole role){
+    this.role =role;
+  }
+
   //メソッド
   public void markRoleAdmin() {
     this.role = UserRole.ADMIN;
@@ -114,5 +122,16 @@ public class User {
   }
   public void markUpdatedNow() {
     this.updatedAt = LocalDateTime.now();
+  }
+
+  public static User createNew(String loginId,String displayName,UserRole role){
+    User user = new User();
+    user.setLoginId(loginId);
+    user.setDisplayName(displayName);
+    user.setUserRole(role);
+    user.activate();
+    user.markCreatedNow();
+    user.markUpdatedNow();
+    return user;
   }
 }

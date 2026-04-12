@@ -22,9 +22,15 @@ private LocalDateTime createdAt;
 private LocalDateTime updatedAt;
 private LocalDateTime approvedAt;
 private LocalDateTime changedAt;
-  //#region getter
+private Long categoryId;
+
+
 public Long getManualId() {
   return this.manualId;
+}
+
+public Long getCategoryId(){
+  return this.categoryId;
 }
 
 public String getTitle() {
@@ -71,10 +77,13 @@ public LocalDateTime getChangedAt() {
 
   return this.changedAt;
 }
-  //#endregion
-  //#region setter
+
 public void setManualId(long manualId) {
   this.manualId = manualId;
+}
+
+public void setCategoryId(long categoryId){
+  this.categoryId=categoryId;
 }
 
 public void setTitle(String title) {
@@ -121,5 +130,4 @@ public void setChangedAt(LocalDateTime changedAt) {
 
   this.changedAt = changedAt;
 }
-  //#endregion
 }

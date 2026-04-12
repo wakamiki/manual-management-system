@@ -13,6 +13,7 @@ public class ManualListDto {
   private String title;
   private String content;
   private ManualStatus status;
+  private Long categoryId;
   private String categoryName;
   private LocalDateTime updatedAt;
   private String createdByName;
@@ -35,6 +36,10 @@ public class ManualListDto {
     return this.status;
   }
 
+  public Long getCategoryId(){
+    return  this.categoryId;
+  }
+
   public String getCategoryName() {
     return this.categoryName;
   }
@@ -51,8 +56,8 @@ public class ManualListDto {
 
     return  this.histries;
   }
-    //#endregion
-  //#region setter
+
+  //setter
   public void setManualId(Long manualId) {
      this.manualId = manualId;
   }
@@ -67,6 +72,10 @@ public class ManualListDto {
 
   public void setStatus(ManualStatus status) {
      this.status = status;
+  }
+
+  public void setCategoryId(Long categoryId){
+  this.categoryId=categoryId;
   }
 
   public void setCategoryName(String categoryName) {
@@ -85,6 +94,5 @@ public class ManualListDto {
 
     this.histries= histries;
   }
-    //#endregion
 
 }
