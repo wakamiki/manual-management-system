@@ -1,4 +1,4 @@
-﻿package com.example.manual.controller;
+package com.example.manual.controller;
 
 import java.security.Principal;
 import java.util.List;

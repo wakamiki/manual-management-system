@@ -11,5 +11,5 @@ public class ManualApplication {
 	}
 
 }
-  //#region ฑฬ•ชฏ•๛๐ท้ฦ•ชฉ่โทข
+  //#region ใ“ใฎๅใ‘ๆ–นใ’ใใใจๅใใใใใ
   //#endregion

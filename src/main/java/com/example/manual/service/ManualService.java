@@ -1,4 +1,4 @@
-﻿package com.example.manual.service;
+package com.example.manual.service;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -47,6 +47,8 @@ public class ManualService {
     this.categoryService = categoryService;
   }
 
+
+  //対応ボタン　新規作成
   public void submitManual(Long manualId) {
     Manual manual = findManualOrThrow(manualId);
     manual.markUpdatedNow();
@@ -54,7 +56,7 @@ public class ManualService {
     manualRepository.save(manual);
 }
 
-
+  //対応ボタン　新規作成保存（DRAFT）
   public void saveDraftForCreate(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
@@ -68,7 +70,29 @@ public class ManualService {
     manual.setUser(user);
     manualRepository.save(manual);
   }
+  
+  //対応ボタン　新規作成マニュアル公開(PENDING)
+  public void submitToPending(Long manualId,ManualRequestDto requestDto,Principal principal){
+    Manual manual = findManualOrThrow(manualId);
+    Category category = categoryService.getCategoryById(requestDto.getCategoryId());
+    User user = userService.getUserByPrincipal(principal);
+    manual.setTitle(requestDto.getTitle());
+    manual.setContent(requestDto.getContent());
+    manual.markCreatedNow();
+    manual.markUpdatedNow();
+    manual.submitPENDING();
+    manual.setCategory(category);
+    manual.setUser(user);
+    manualRepository.save(manual);
+  }
 
+    //対応ボタン　編集（新規タブ）
+  public ManualResponseDto goToEditPage(Long manualId, Principal principal) {
+  Manual manual = findManualOrThrow(manualId);
+  return toManualFormInputDto(manual);
+    }
+
+  //対応ボタン　編集保存(DRAFT)
   public void saveDraftForCopy(Long manualId,ManualRequestDto requestDto,Principal principal) {
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
@@ -84,20 +108,7 @@ public class ManualService {
     manualHistoryService.createHistory(savedManual, requestDto.getChangeNote(),principal);
   }
 
-  public void submitToPending(Long manualId,ManualRequestDto requestDto,Principal principal){
-    Manual manual = findManualOrThrow(manualId);
-    Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-    User user = userService.getUserByPrincipal(principal);
-    manual.setTitle(requestDto.getTitle());
-    manual.setContent(requestDto.getContent());
-    manual.markCreatedNow();
-    manual.markUpdatedNow();
-    manual.submitPENDING();
-    manual.setCategory(category);
-    manual.setUser(user);
-    manualRepository.save(manual);
-  }
-
+  //対応ボタン　編集マニュアル公開(PENDING)
   public void editToPending(Long manualId,ManualRequestDto requestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
@@ -113,8 +124,7 @@ public class ManualService {
     manualHistoryService.createHistory(savedManual, requestDto.getChangeNote(),principal);  
   }  
 
-//#endregion
-
+  //対応ボタン　マニュアル詳細画面（新規タブ）
   public ManualDetailDto goToDetailPage(Long manualId) {
       Manual manual = findManualOrThrow(manualId);
       List<ManualHistory>history = manualHistoryService.getManualIdHistory(manualId);
@@ -131,18 +141,12 @@ public class ManualService {
       return detailDto; //TODO: チェンジノート　リストにする
     }
 
-  public ManualResponseDto goToEditPage(Long manualId, Principal principal) {
-  Manual manual = findManualOrThrow(manualId);
-  return toManualFormInputDto(manual);
-    }
-
+  //対応ボタン　複製（新規タブ）
   public ManualResponseDto goToCopyPage(Long manualId, Principal principal) {
       Manual manual = findManualOrThrow(manualId);
       return toManualFormInputDto(manual);
     }
 
-//#endregion
-//#region action
 //TODO: 通知実装予定
   //対応ボタン　承認（チェンジノート無）
   public void approveManual(Long manualId, Principal principal) {
@@ -156,6 +160,7 @@ public class ManualService {
     manualRepository.save(manual);
   }
 
+  //対応ボタン　承認（チェンジノート有）
   public void approveManualWithComment(Long manualId,String changeNote,Principal principal) {
     Manual manual = findManualOrThrow(manualId);
     if (!canApproveManual(manual, manual.getCategory(), principal)) {
@@ -171,6 +176,7 @@ public class ManualService {
     }
   }
 
+  //対応ボタン　差し戻し
   public void rollbackEditManual(Long manualId,String changeNote,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
   if (!canRollbackManual(manual, principal, changeNote)) {
@@ -182,6 +188,7 @@ public class ManualService {
   manualHistoryService.createHistory(savedManual,changeNote,principal); 
   }
 
+  //対応ボタン　アーカイブ
   public void archiveManual(Long manualId,ManualActionRequestDto actionRequestDto,Principal principal){
     Manual manual = findManualOrThrow(manualId);
     User user = userService.getUserByPrincipal(principal);
@@ -195,6 +202,7 @@ public class ManualService {
     manualHistoryService.createHistory(savedManual,actionRequestDto.getChangeNote(),principal);
   }
 
+  //対応ボタン　復帰
   public void restoreManual(Long manualId,String changeNote,Principal principal) {
   Manual manual = findManualOrThrow(manualId);
   if (!canRestoreManual(manual, principal, changeNote)) {
@@ -206,8 +214,9 @@ public class ManualService {
   manualHistoryService.createHistory(savedManual,changeNote,principal);
   }
   
-//#endregion
 
+  
+//index　検索表示
 public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
   Specification<Manual> specification = Specification
   .where(ManualSpecification.containsKeyword(condition.getKeyword()))
@@ -234,11 +243,9 @@ public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
   return manualDtoList;
 }
 
-//#endregion
 
-//#region 
-//#endregion
-//#region 
+
+//ロール判定
 
 private boolean canArchiveManual(User user, Manual manual,Category category,String changeNote){
 if(user.getRole()!=UserRole.ADMIN&&user.getRole()!=UserRole.APPROVER){
@@ -323,7 +330,6 @@ if (changeNote==null||changeNote.isBlank()) {
   return true;
 }
 
-  // Permission check skeletons (shared helpers)
   private void ensureApproverOrAdmin(User user) {
     if (user.getRole() != UserRole.ADMIN && user.getRole() != UserRole.APPROVER) {
       throw new UnauthorizedException("");
@@ -369,9 +375,7 @@ if (changeNote==null||changeNote.isBlank()) {
       throw new NotFoundException("");
     }
   }
-//#endregion
-//#endregion
-//#region DTO変換
+
 private ManualResponseDto toManualFormInputDto(Manual manual){
 ManualResponseDto responseDto = new ManualResponseDto();
   responseDto.setManualId(manual.getId());
@@ -396,8 +400,8 @@ private ManualListDto toManualListDto(Manual manual) {
   return listDto;
 }
 
-//#endregion
-//#region 共通処理
+//共通処理
+
   private Manual findManualOrThrow(Long id) {
     Optional<Manual> manualOpt = manualRepository.findById(id);
     if (manualOpt.isEmpty()) {
@@ -405,5 +409,5 @@ private ManualListDto toManualListDto(Manual manual) {
     }
     return manualOpt.get();
  }
-//#endregion
+
 }
