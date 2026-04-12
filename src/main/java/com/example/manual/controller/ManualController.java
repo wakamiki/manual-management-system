@@ -33,15 +33,15 @@ public ManualController(ManualService manualService) {
 
 
 @GetMapping
-public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
-    List<ManualListDto>manualDtoList = manualService.searchManuals(condition);
+public List<ManualListDto>searchManuals(@Valid ManualSearchConditionDto condition,Principal principal){
+    List<ManualListDto>manualDtoList = manualService.searchManuals(condition,principal);
     return manualDtoList;
 }
 //#endregion
 //#region 登録・更新
     //対応ボタン　マニュアル公開（編集なし）
     @PostMapping("/{manualId}/actions/submit")
-    public String submitManual(@PathVariable Long manualId, Principal principal) {
+    public String submitManual(@PathVariable Long manualId,Principal principal) {
         manualService.submitManual(manualId);
         return "マニュアルを公開しました。";
     }
@@ -74,8 +74,8 @@ public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
 //#endregion 新規タブ画面遷移
     //対応ボタン　詳細を見る（新規タブ）
     @GetMapping("/{manualId}")
-    public ManualDetailDto goToDetailPage(@PathVariable Long manualId) {
-        ManualDetailDto detailDto = manualService.goToDetailPage(manualId);
+    public ManualDetailDto goToDetailPage(@PathVariable Long manualId,Principal principal) {
+        ManualDetailDto detailDto = manualService.goToDetailPage(manualId,principal);
         return detailDto;
     }
      //対応ボタン　複製（新規タブ）
@@ -124,10 +124,5 @@ public List<ManualListDto>searchManuals(ManualSearchConditionDto condition){
         manualService.restoreManual(manualId,actionRequestDto.getChangeNote(),principal);
         return "マニュアルをアーカイブから復帰しました。";
         }
-//#endregion 共通処理
-    private String getLoginId(Principal principal) {
-        String loginId = principal.getName();
-        return loginId;
-    }
-//#endregion
+
 }
