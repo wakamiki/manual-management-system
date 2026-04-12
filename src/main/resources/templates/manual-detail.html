@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マニュアル詳細画面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+  <main class="container mock-page">
+    <header class="page-title-bar tight-gap">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <h1 class="h4 mb-0">配送手順の流れ</h1>
+          <span class="badge bg-success">承認済</span>
+        </div>
+        <p class="text-muted mb-0">マニュアルID: 1001 / 営業部 / 作成日: 2026-04-04 / 更新日時: 2026-04-05 10:30 / 作成者: 山田 花子</p>
+      </div>
+      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
+    </header>
+
+    <div class="alert mock-alert mt-0 mb-2" role="alert">
+      マニュアルを更新しました。
+    </div>
+
+    <section class="card mb-4">
+      <div class="card-body">
+        <h2 class="h5">本文</h2>
+        <p class="mb-0">本文のレビュー</p>
+      </div>
+    </section>
+
+    <section class="card mb-4">
+      <div class="card-body">
+        <h2 class="h5">更新履歴</h2>
+        <ul class="mb-0">
+          <li>2026-04-05 10:30 / 更新者: 佐藤 次郎 / 本文の修正</li>
+          <li>2026-04-04 09:00 / 更新者: 山田 花子 / 初回作成</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2">
+      <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary">編集（作成者専用）</a>
+      <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">複製</a>
+      <button type="button" class="btn btn-outline-primary">マニュアル公開</button>
+      <button type="button" class="btn btn-outline-success">承認</button>
+      <button type="button" class="btn btn-outline-warning">差し戻し</button>
+      <button type="button" class="btn btn-outline-danger">アーカイブ</button>
+      <button type="button" class="btn btn-outline-info">復帰</button>
+    </div>
+
+    <section class="card mt-3 inline-action-panel">
+      <div class="card-body">
+        <div class="inline-action-patterns mb-3">
+          <span class="inline-action-chip is-active">差し戻し: 更新履歴 必須</span>
+          <span class="inline-action-chip">アーカイブ: 更新履歴 必須</span>
+          <span class="inline-action-chip">復帰: 更新履歴 必須</span>
+          <span class="inline-action-chip">承認: ダイアログ後に任意入力</span>
+        </div>
+
+        <div class="inline-action-header">
+          <div>
+            <p class="inline-action-label mb-1">差し戻しを実行</p>
+            <h2 class="h5 mb-1">更新履歴を入力してください</h2>
+            <p class="text-muted mb-0">差し戻し / アーカイブ / 復帰は、詳細画面内で更新履歴を入力して確定します。</p>
+          </div>
+          <span class="badge bg-warning text-dark">更新履歴 必須</span>
+        </div>
+
+        <div class="alert inline-action-note mt-3 mb-3" role="alert">
+          承認ボタン押下時は「履歴コメントを残しますか」の確認ダイアログを表示します。`はい` の場合のみこの入力パネルを開き、`いいえ` の場合はそのまま承認します。
+        </div>
+
+        <div class="mb-3">
+          <label for="inlineChangeNote" class="form-label">更新履歴</label>
+          <textarea id="inlineChangeNote" class="form-control" rows="3" maxlength="100" placeholder="差し戻し内容を入力してください"></textarea>
+          <div class="text-count" data-for="inlineChangeNote" data-max="100">0 / 100</div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-outline-warning">差し戻しを確定</button>
+          <button type="button" class="btn btn-outline-secondary">キャンセル</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function updateTextCount(inputId, maxLength) {
+      const input = document.getElementById(inputId);
+      const counter = document.querySelector(`.text-count[data-for="${inputId}"]`);
+
+      if (!input || !counter) {
+        return;
+      }
+
+      const currentLength = input.value.length;
+      counter.textContent = `${currentLength} / ${maxLength}`;
+      counter.classList.remove("is-near-limit", "is-over-limit");
+
+      if (currentLength >= maxLength) {
+        counter.classList.add("is-over-limit");
+        return;
+      }
+
+      if (currentLength >= Math.floor(maxLength * 0.8)) {
+        counter.classList.add("is-near-limit");
+      }
+    }
+
+    const inlineChangeNote = document.getElementById("inlineChangeNote");
+    const inlineCounter = document.querySelector('.text-count[data-for="inlineChangeNote"]');
+
+    if (inlineChangeNote && inlineCounter) {
+      const maxLength = Number(inlineCounter.dataset.max);
+      updateTextCount("inlineChangeNote", maxLength);
+      inlineChangeNote.addEventListener("input", () => updateTextCount("inlineChangeNote", maxLength));
+    }
+  </script>
+</body>
+</html>

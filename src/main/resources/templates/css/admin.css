@@ -1,0 +1,120 @@
+.admin-page {
+  padding-top: 32px;
+  padding-bottom: 40px;
+}
+
+.admin-page .page-title-bar {
+  margin-bottom: 8px;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.admin-form-card .card-header,
+.admin-table-card .card-header {
+  background-color: #eef5f6;
+  border-bottom: 1px solid #d3e1e3;
+  color: #30575b;
+  font-weight: 600;
+}
+
+.admin-form-actions,
+.admin-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-inline-actions .btn {
+  min-width: 88px;
+}
+
+.admin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.admin-status.is-active {
+  background-color: rgba(116, 168, 134, 0.18);
+  color: #4f7d60;
+}
+
+.admin-status.is-inactive {
+  background-color: rgba(108, 117, 125, 0.16);
+  color: #5d6770;
+}
+
+.admin-status.is-admin {
+  background-color: rgba(86, 150, 157, 0.18);
+  color: #3c6f75;
+}
+
+.admin-status.is-approver {
+  background-color: rgba(242, 177, 65, 0.18);
+  color: #9b6a18;
+}
+
+.admin-status.is-user {
+  background-color: rgba(86, 150, 157, 0.12);
+  color: #4a7f85;
+}
+
+
+.admin-page .table thead th {
+  background-color: #f5f9f9;
+  color: #48676c;
+  border-bottom: 1px solid #d3e1e3;
+  font-size: 13px;
+}
+
+.admin-page .table tbody td {
+  vertical-align: middle;
+}
+
+.admin-note {
+  font-size: 11px;
+  color: #64757a;
+}
+
+.admin-alert {
+  border-radius: 10px;
+  border: 1px solid #c7ddd7;
+  background-color: #f3faf5;
+  color: #476b57;
+  font-size: 13px;
+  line-height: 1.2;
+  padding: 8px 12px;
+  margin-bottom: 8px !important;
+}
+
+.admin-pagination {
+  margin-top: 16px;
+}
+
+.admin-page .pagination .page-link {
+  color: #4a7f85;
+  border-color: #cfe0e3;
+  font-size: 12px;
+}
+
+.admin-page .pagination .page-item.active .page-link {
+  background-color: #56969d;
+  border-color: #56969d;
+  color: #ffffff;
+}
+
+@media (max-width: 991.98px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ホーム画面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+  <main class="container index-page">
+    <header class="page-header">
+      <div>
+        <h1 class="h4 mb-0">業務マニュアル管理システム</h1>
+      </div>
+      <div class="page-actions">
+        <form class="search-form">
+          <details class="search-filter">
+            <summary>カテゴリ</summary>
+            <div class="search-filter-panel">
+              <label class="search-check"><input type="checkbox" checked> 営業部</label>
+              <label class="search-check"><input type="checkbox"> 経理部</label>
+              <label class="search-check"><input type="checkbox"> 総務部</label>
+              <details class="search-subfilter">
+                <summary>使用停止中</summary>
+                <div class="search-subfilter-panel">
+                  <label class="search-check search-check-sub"><input type="checkbox"> 旧営業部</label>
+                </div>
+              </details>
+            </div>
+          </details>
+          <details class="search-filter">
+            <summary>ステータス</summary>
+            <div class="search-filter-panel">
+              <label class="search-check"><input type="checkbox" checked> 下書き</label>
+              <label class="search-check"><input type="checkbox" checked> 申請中</label>
+              <label class="search-check"><input type="checkbox" checked> 承認済</label>
+              <label class="search-check"><input type="checkbox"> アーカイブ</label>
+            </div>
+          </details>
+          <input type="search" class="form-control" placeholder="キーワード検索">
+          <button type="submit" class="btn btn-outline-primary">検索</button>
+        </form>
+        <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary create-button">新規作成</a>
+      </div>
+    </header>
+
+    <div class="alert mock-alert index-alert mb-0" role="alert">
+      マニュアルを更新しました。
+    </div>
+
+    <div class="row g-4 align-items-start">
+      <aside class="col-lg-2 col-md-3 sidebar">
+        <div class="card">
+          <div class="card-body">
+            <div>
+              <h2 class="h5">クイックビュー</h2>
+            </div>
+            <div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item active d-flex justify-content-between align-items-center">
+                  <span>自分の作成分</span>
+                  <span class="sidebar-count">8</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>申請中</span>
+                  <span class="sidebar-count">3</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span>最近更新</span>
+                  <span class="sidebar-count">5</span>
+                </li>
+              </ul>
+            </div>
+            <div class="sidebar-section">
+              <h2 class="h5">カテゴリ</h2>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">営業部</li>
+                <li class="list-group-item">経理部</li>
+                <li class="list-group-item">総務部</li>
+              </ul>
+            </div>
+            <div class="stopedCategory">
+              <button class="stopped-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
+                <span>使用停止中</span>
+                <span class="stopped-toggle-icon">＋</span>
+              </button>
+              <div class="collapse" id="stoppedCategoryList">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">旧営業部</li>
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar-home">
+              <a href="./my-page.html" class="sidebar-home-link" target="_blank" rel="noopener noreferrer" aria-label="マイページ">
+                <span class="sidebar-home-icon-wrap">
+                  <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
+                  <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
+                  <span class="sidebar-home-badge sidebar-home-badge-pending">4</span>
+                </span>
+                <span class="sidebar-home-user">
+                  <span class="sidebar-home-user-label">ログイン中</span>
+                  <span class="sidebar-home-user-name">山田 花子</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="col-lg-10 col-md-9">
+        <div class="accordion w-100" id="accordionExample">
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <strong class="fw-semibold">マニュアルの作成手順</strong>
+                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
+                  </div>
+                  <div class="align-items-center gap-2">
+                    <span class="text-muted"><small>マニュアルID: 1001</small></span>
+                    <span class="category">カテゴリ</span>
+                    <span class="badge bg-primary">申請待ち</span>
+                  </div>
+                </div>
+              </button>
+            </div>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <p>見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
+                </div>
+                <h2 class="history-title mb-2">更新履歴</h2>
+                <ul class="history-list mb-0">
+                  <li>2026-04-05: 本文の修正</li>
+                  <li>2026-04-04: 新規作成</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <div class="w-100">
+                  <div class="d-flex justify-content-between align-items-center gap-2">
+                    <strong class="fw-semibold">発注処理フロー</strong>
+                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 佐藤 次郎</small></span>
+                  </div>
+                  <div class="align-items-center gap-2">
+                    <span class="text-muted"><small>マニュアルID: 1002</small></span>
+                    <span class="category">カテゴリ</span>
+                    <span class="badge bg-success">承認済</span>
+                  </div>
+                </div>
+              </button>
+            </div>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <p>発注依頼から納品確認までの確認事項をまとめています。</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
+                </div>
+                <h2 class="history-title mb-2">更新履歴</h2>
+                <ul class="history-list mb-0">
+                  <li>2026-04-03: 承認済へ変更</li>
+                  <li>2026-04-01: 初回公開</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav class="mt-4" aria-label="ページネーション">
+          <ul class="pagination justify-content-center mb-0">
+            <li class="page-item disabled"><span class="page-link">前へ</span></li>
+            <li class="page-item active"><span class="page-link">1</span></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">次へ</a></li>
+          </ul>
+        </nav>
+      </section>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -15,27 +15,31 @@ public class CategoryRequestDto {
 private String categoryName;
 @NotNull
 private Integer displayOrder;
+private Long id;
 
 //getter
-  //#region getter
+public Long getId(){
+  return  this.id;
+}
+
 public String getCategoryName() {
 return this.categoryName;
 }
 
 public Integer getDisplayOrder() {
-  //#endregion
   return this.displayOrder;
 }
 
 // setter
-  //#region setter
 public void setCategoryName(String categoryName) {
   this.categoryName = categoryName;
 }
 
 public void setDisplayOrder(Integer displayOrder) {
-  //#endregion
   this.displayOrder = displayOrder;
 }
 
+public void setId(Long id){
+  this.id=id;
+}
 }

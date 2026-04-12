@@ -141,6 +141,11 @@ Version: 01.06.03
 - `isActive`
 - `lastLoginAt`
 
+### 6-4A. Category 補足
+- 同名カテゴリは原則確認対象とする
+- カテゴリコードを導入して同名の区別に使う
+- 名前更新時にマニュアル全文チェックは行わない
+
 ### 6-5. Notification
 - 通知データ本体
 - `targetUser`
@@ -158,6 +163,8 @@ Version: 01.06.03
 - `operationType`
 - `operationDetail`
 - `createdAt`
+- 監査ログは user_operation_histories に保存する
+- 例: RESET_PASSWORD を記録し、操作者/対象/日時/理由を残す
 
 ---
 
@@ -175,6 +182,12 @@ Version: 01.06.03
 - 差し戻し
 - アーカイブ
 - 復帰
+
+---
+
+## 8. カテゴリ停止・上書き時の扱い
+- 停止カテゴリに紐づくマニュアルは原則そのまま保持（非表示扱い）
+- 同名カテゴリの上書きで再アクティブ化した場合は、旧カテゴリ配下のマニュアルを一括アーカイブする
 
 ### 7-2. ManualHistoryService
 - 履歴保存

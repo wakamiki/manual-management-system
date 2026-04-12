@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ユーザー管理画面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <main class="container admin-page">
+    <header class="page-title-bar">
+      <div>
+        <h1 class="h4 mb-1">ユーザー管理</h1>
+        <p class="mb-0 text-muted">ユーザー情報、権限、利用状態を管理します。</p>
+      </div>
+      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
+    </header>
+
+    <div class="alert admin-alert mb-4" role="alert">
+      ユーザーを新規作成しました。
+    </div>
+
+    <section class="admin-layout">
+      <div class="card admin-form-card">
+        <div class="card-header">ユーザー登録 / 更新</div>
+        <div class="card-body">
+          <form>
+            <div class="mb-3">
+              <label for="userId" class="form-label">userId</label>
+              <input id="userId" type="text" class="form-control" value="user02">
+            </div>
+            <div class="mb-3">
+              <label for="displayName" class="form-label">displayName</label>
+              <input id="displayName" type="text" class="form-control" value="山田 花子">
+            </div>
+            <div class="mb-4">
+              <label for="role" class="form-label">role</label>
+              <select id="role" class="form-select">
+                <option selected>USER</option>
+                <option>APPROVER</option>
+                <option>ADMIN</option>
+              </select>
+            </div>
+            <div class="admin-form-actions">
+              <button type="button" class="btn btn-primary">保存</button>
+              <button type="button" class="btn btn-outline-primary">更新</button>
+              <button type="button" class="btn btn-outline-danger">停止</button>
+              <button type="button" class="btn btn-outline-secondary">復帰</button>
+              <button type="button" class="btn btn-outline-warning">パスワードリセット</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card admin-table-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>ユーザー一覧</span>
+          <span class="admin-note">全 4 件</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">userId</th>
+                  <th scope="col">displayName</th>
+                  <th scope="col">role</th>
+                  <th scope="col">status</th>
+                  <th scope="col">lastLoginAt</th>
+                  <th scope="col">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>admin01</td>
+                  <td>管理 太郎</td>
+                  <td><span class="admin-status is-admin">ADMIN</span></td>
+                  <td><span class="admin-status is-active">利用中</span></td>
+                  <td>2026-04-05 09:15</td>
+                  <td>
+                    <div class="admin-inline-actions">
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
+                      <button type="button" class="btn btn-outline-warning btn-sm">PW再設定</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>approver01</td>
+                  <td>承認 次郎</td>
+                  <td><span class="admin-status is-approver">APPROVER</span></td>
+                  <td><span class="admin-status is-active">利用中</span></td>
+                  <td>2026-04-05 08:42</td>
+                  <td>
+                    <div class="admin-inline-actions">
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm">停止</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>user01</td>
+                  <td>一般 一郎</td>
+                  <td><span class="admin-status is-user">USER</span></td>
+                  <td><span class="admin-status is-active">利用中</span></td>
+                  <td>2026-04-04 19:20</td>
+                  <td>
+                    <div class="admin-inline-actions">
+                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
+                      <button type="button" class="btn btn-outline-danger btn-sm">停止</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>user99</td>
+                  <td>停止 対象</td>
+                  <td><span class="admin-status is-user">USER</span></td>
+                  <td><span class="admin-status is-inactive">停止中</span></td>
+                  <td>2026-03-21 14:05</td>
+                  <td>
+                    <div class="admin-inline-actions">
+                      <button type="button" class="btn btn-outline-secondary btn-sm">復帰</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <nav class="admin-pagination" aria-label="ユーザー一覧ページ切り替え">
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item disabled"><span class="page-link">前へ</span></li>
+              <li class="page-item active"><span class="page-link">1</span></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">次へ</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

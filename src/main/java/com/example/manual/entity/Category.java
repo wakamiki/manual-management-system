@@ -29,7 +29,6 @@ public class Category {
   private LocalDateTime updatedAt;
 
 
-  //#region getter
   public Long getId() {
     return this.id;
   }
@@ -54,8 +53,7 @@ public class Category {
   public boolean isActive() {
     return this.isActive;
   }
-  //#endregion
-  //#region setter
+
   public void setDisplayOrder(Integer displayOrder) {
     this.displayOrder = displayOrder;
   }
@@ -81,5 +79,4 @@ public class Category {
   public void markInactive() {
     this.isActive = false;
   }
-  //#endregion
 }

@@ -1,5 +1,7 @@
 package com.example.manual.dto;
 
+import java.time.LocalDateTime;
+
 public class CategoryResponseDto {
 
   public CategoryResponseDto() {
@@ -10,6 +12,8 @@ private Long id;
 private String categoryName;
 private Integer displayOrder;
 private boolean isActive;
+private boolean  confirmOverwrite;
+private LocalDateTime updatedAt;
 
 //getter
   //#region getter
@@ -30,8 +34,15 @@ public boolean isActive() {
   return this.isActive;
 }
 
-// setter
-  //#region setter
+public boolean confirmOverwrite(){
+  return this.confirmOverwrite;
+}
+
+public LocalDateTime getUpdatedAt(){
+  return this.updatedAt;
+}
+
+  // setter
 public void setId(Long id) {
   this.id = id;
 }
@@ -45,8 +56,15 @@ public void setDisplayOrder(Integer displayOrder) {
 }
 
 public void setActive(boolean active) {
-  //#endregion
   this.isActive = active;
+}
+
+public void confirmOverwrite(boolean confirmOverwrite){
+  this.confirmOverwrite=confirmOverwrite;
+}
+
+public void setUpdatedAt(LocalDateTime updatedAt){
+  this.updatedAt=updatedAt;
 }
 
 }
