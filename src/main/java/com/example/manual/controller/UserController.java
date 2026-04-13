@@ -32,15 +32,16 @@ public class UserController {
 
   @PostMapping
   public void createUser() {
-    //初期状態はアクティブ　ユーザーID・displayNAME・ロール必須　adminのみ実行可
+    //初期状態はアクティブ　loginID・displayNAME・ロール必須　adminのみ実行可　ログインID重複チェック
     //操作者　対象ユーザー　実行日時
   }
 
   @PutMapping("/{userId}")
   public void updateUser() {
-    //氏名変更対応・ロール変更想定
-    //ユーザーIDは変更不可　adminのみ実行可
-    //操作者　対象ユーザー　実行日時
+    //氏名変更対応・ロール変更想定　ユーザーID変更可能
+    //adminのみ実行可　ログインID重複チェック
+    //DB DisplayName role 
+    //操作者　対象ユーザー　実行日時 loginId displayName Role 
   }
 
   @PutMapping("/{userId}/deactivate")

@@ -17,6 +17,8 @@ public class ManualListDto {
   private String categoryName;
   private LocalDateTime updatedAt;
   private String createdByName;
+  private LocalDateTime createdAt;
+  private boolean isRolledBack;
   private List<ManualHistoryDto> histries;
 
   //#region getter
@@ -48,8 +50,16 @@ public class ManualListDto {
     return this.updatedAt;
   }
 
+  public LocalDateTime getCreatedAt() {
+    return this.createdAt;
+  }
+
   public String getCreatedByName() {
     return this.createdByName;
+  }
+
+  public boolean isRolledBack() {
+    return this.isRolledBack;
   }
 
   public List<ManualHistoryDto> getHistries(){
@@ -83,11 +93,19 @@ public class ManualListDto {
   }
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
-     this.updatedAt = updatedAt;
+    this.updatedAt = updatedAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
   }
 
   public void setCreatedByName(String createdByName) {
-     this.createdByName = createdByName;
+    this.createdByName = createdByName;
+  }
+
+  public void setRolledBack(boolean isRolledBack) {
+    this.isRolledBack = isRolledBack;
   }
 
   public void setHistries(List<ManualHistoryDto>histries){

@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.03  
-更新日: 2026-04-11
+Version: 01.06.05  
+更新日: 2026-04-13
 
 ---
 
@@ -126,6 +126,10 @@ Version: 01.06.03
 - `status` `createdAt` `updatedAt` `approvedAt` は専用メソッドで更新する
 - Entity 上は `user` を持ち、現在の JoinColumn は `operated_by_user_id`
 - 画面 / DTO 上では `createdByUser` として扱ってよい
+- 差し戻し判定用に `isRolledBack` を保持する
+  - 新規作成時: `false`
+  - 差し戻し時: `true`
+  - 再申請時: `false`
 
 ### 6-3. ManualHistory
 - 変更履歴を保持する append-only データ
@@ -203,6 +207,7 @@ Version: 01.06.03
 - 自分の作成マニュアル取得
 - 未承認マニュアル取得
 - バッヂ表示情報作成
+- 初回表示時に必要な一覧を全取得し、タブ切替は画面内で表示切替する
 
 ---
 

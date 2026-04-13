@@ -37,6 +37,7 @@ public class Manual {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime approvedAt;
+    private boolean isRolledBack=false;
 
   //#region getter
     public Long getId() {
@@ -75,8 +76,12 @@ public class Manual {
 
         return this.approvedAt;
     }
-  //#endregion
-  //#region setter
+
+    public boolean isRolledBack() {
+        return this.isRolledBack;
+    }
+
+  // setter
     public void setCategory(Category category) {
         this.category = category;
     }
@@ -93,7 +98,11 @@ public class Manual {
 
         this.content = content;
     }
-  //#endregion
+
+    public void setRolledBack(boolean isRolledBack) {
+        this.isRolledBack = isRolledBack;
+    }
+
     public void markStatusDRAFT() {
         this.status = ManualStatus.DRAFT;
         markUpdatedNow();

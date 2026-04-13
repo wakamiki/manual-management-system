@@ -1,28 +1,28 @@
 package com.example.manual.controller;
 
+import java.security.Principal;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.manual.dto.MyPageDto;
+import com.example.manual.service.MyPageService;
 
 @RestController
 @RequestMapping("/my-page")
 public class MyPageController {
 
-  @GetMapping
-  public void getMyPage() {
-  //必要な情報　差し戻し通知　未承認通知
-  //通知マニュアル情報（更新日時、マニュアルID　マニュアルタイトル）
+  private final MyPageService myPageService;
+
+  public MyPageController(MyPageService myPageService){
+    this.myPageService=myPageService;
   }
 
-    @PostMapping
-  public void getUserCreatedManual(){
-    //ステータス　マニュアルID　更新日時　マニュアルタイトル　
-  }
+//取得系
 
   @GetMapping
-  public void getPendingManual(){
-    //自分が作成したマニュアルは承認できないので出てきて欲しくない。
-    //マニュアルID　作成者　マニュアルタイトル　更新日時
+  public MyPageDto showMyPage(Principal principal) {
+  return myPageService.getMyPageData(principal);
   }
 }

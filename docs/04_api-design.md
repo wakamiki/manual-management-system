@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.04  
-更新日: 2026-04-11
+Version: 01.03.06  
+更新日: 2026-04-13
 
 ---
 
@@ -42,7 +42,7 @@ Version: 01.03.04
 - POST `/api/auth/logout`
 
 ### 1-5. My Page API
-- GET `/api/my-page`
+- GET `/my-page`
 
 ---
 
@@ -176,6 +176,9 @@ Version: 01.03.04
 - `NotificationBadgeDto`
 - `NotificationItemDto`
 - `MyPageDto`
+  - rollbackManualList
+  - createdManualList
+  - draftManualList
 
 ---
 
@@ -190,7 +193,7 @@ Version: 01.03.04
 ---
 
 ## 6. My Page API 補足
-- `GET /api/my-page`
+- `GET /my-page`
 - USER の返却対象
   - 通知
   - 作成マニュアル
@@ -198,3 +201,4 @@ Version: 01.03.04
   - 通知
   - 作成マニュアル
   - 未承認マニュアル
+- 初回表示時に必要な一覧を全取得し、タブ切替は画面内で表示切替する

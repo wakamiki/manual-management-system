@@ -1,6 +1,7 @@
 package com.example.manual.service;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.manual.dto.UserRequestDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.User;
+import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
+import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.UserRepository;
 
 import jakarta.validation.Valid;
@@ -26,47 +29,85 @@ public class UserService {
         this.user = user;
     }
 
-    public UserResponseDto createUser(@Valid UserRequestDto requestDto){
-        if (!canCreateUser(requestDto)) {
-            throw new InvalidStateException("判定エラー");            
+    public UserResponseDto createUser(
+            @Valid UserRequestDto requestDto,
+            Principal principal) {
+
+        if (!canCreateUser(requestDto,principal)) {
+            throw new InvalidStateException("判定エラー");
         }
-        User user = new User();
-        user.createNew(requestDto.getLoginId(), requestDto.getDisplayName(), requestDto.getRole());
+        User targetUser = new User();
+        targetUser.createNew(
+                requestDto.getLoginId(),
+                requestDto.getDisplayName(),
+                requestDto.getRole());
+
+        User savedUser = userRepository.save(targetUser);
+
+        UserResponseDto responseDto = new UserResponseDto();
+        responseDto.setLoginId(savedUser.getLoginId());
+        responseDto.setDisplayName(savedUser.getDisplayName());
+        responseDto.setRole(savedUser.getRole());
+        responseDto.activate(savedUser.isActive());
         return responseDto;
     }
 
-    public UserResponseDto updateUser(@Valid UserRequestDto requestDto,Principal principal){
+    public UserResponseDto updateUser(
+            @Valid UserRequestDto requestDto,
+            Principal principal) {
+
         if (!canUpdateUser(requestDto,principal)) {
-            throw new InvalidStateException("判定エラー");            
+            throw new InvalidStateException("判定エラー");
         }
+        UserRole role = requestDto.getRole();
+
+        User targetUser = new User();
+        targetUser.applyRole(role);
+        targetUser.setDisplayName(requestDto.getDisplayName());
+        targetUser.markUpdatedNow();
+        User savedUser = userRepository.save(targetUser);
+
+        UserResponseDto responseDto = new UserResponseDto();
+        responseDto.setLoginId(savedUser.getLoginId());
+        responseDto.setDisplayName(savedUser.getDisplayName());
+        responseDto.setRole(savedUser.getRole());
+        responseDto.activate(savedUser.isActive());
+        responseDto.setLastLoginAt(savedUser.getLastLoginAt());
         return responseDto;
     }
 
-    public UserResponseDto changeRole(@Valid UserRequestDto requestDto,Principal principal){
+    public UserResponseDto changeRole(
+            @Valid UserRequestDto requestDto,
+            Principal principal) {
+
         if (!canChangeRole(requestDto,principal)) {
-            throw new InvalidStateException("判定エラー");            
+            throw new InvalidStateException("判定エラー");
         }
+        UserResponseDto responseDto = new UserResponseDto();
         return responseDto;
     }
 
     public UserResponseDto deactivateUser(Principal principal){
         if (!canDeactivateUser(principal)) {
-             throw new InvalidStateException("判定エラー");           
+             throw new InvalidStateException("判定エラー");
         }
+        UserResponseDto responseDto = new UserResponseDto();
         return responseDto;
     }
 
     public UserResponseDto activateUser(Principal principal){
         if (!canActivateUser(principal)) {
-            throw new InvalidStateException("判定エラー");            
+            throw new InvalidStateException("判定エラー");
         }
+        UserResponseDto responseDto = new UserResponseDto();
         return responseDto;
     }
 
     public UserResponseDto resetPassword(Principal principal) {
         if (!canResetPassword(principal)) {
-            throw new InvalidStateException("判定エラー");            
+            throw new InvalidStateException("判定エラー");
         }
+        UserResponseDto responseDto = new UserResponseDto();
         return responseDto;
     }
 
@@ -74,55 +115,83 @@ public class UserService {
         if (!canUserSaved(user,principal)) {
             throw new InvalidStateException("判定エラー");
         }
+        UserResponseDto responseDto = new UserResponseDto();
         return userRepository.save(user);
     }
 
 //取得系
 
     public User getUserByPrincipal(Principal principal) {
-        Optional<User> userOpt = userRepository.findByLoginId(principal.getName());
+        Optional<User> userOpt =
+            userRepository.findByLoginId(principal.getName());
         if (userOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
         }
         User user = userOpt.get();
         return user;
     }
 
     public String getDisplayNameByLoginId(String loginId) {
-        Optional<User> userOpt = userRepository.findByLoginId(loginId);
+        Optional<User> userOpt =
+            userRepository.findByLoginId(loginId);
         if (userOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
         }
         User user = userOpt.get();
         return user.getDisplayName();
     }
 
     //権限判定
-        private boolean canCreateUser(UserRequestDto requestDto){
+    private boolean canCreateUser(
+            UserRequestDto requestDto,
+            Principal principal) {
 
-        return true;
-    }  
-        private boolean canUpdateUser(UserRequestDto requestDto){
-        return true;
-    }
-        
-        private boolean canChangeRole(UserRequestDto requestDto){
-        return true;
-    }
-
-        private boolean canDeactivateUser(UserRequestDto requestDto){
-        return true;
-    }
-
-        private boolean canActivateUser(UserRequestDto requestDto){
+            User playUser = getUserByPrincipal(principal);
+            List<User>users = userRepository.findAll();
+            if (playUser.getRole()!=UserRole.ADMIN) {
+                throw new UnauthorizedException("権限が不足しています。");
+            }
+            for (User tergetUser : users) {
+            if(requestDto.getLoginId().equals(tergetUser.getLoginId())){
+                throw new InvalidStateException(
+                    "すでに同じユーザーIDが使われています。");
+            }
+            }
         return true;
     }
 
-        private boolean canResetPassword(UserRequestDto requestDto) {
+    private boolean canUpdateUser(
+            UserRequestDto requestDto,
+            Principal principal) {
+
+            User playUser = getUserByPrincipal(principal);
         return true;
     }
 
-        private boolean canUserSaved(UserRequestDto requestDto){
+    private boolean canChangeRole(
+            UserRequestDto requestDto,
+            Principal principal){
+        return true;
+    }
+
+        private boolean canDeactivateUser(Principal principal){
+        return true;
+    }
+
+        private boolean canActivateUser(Principal principal){
+        return true;
+    }
+
+        private boolean canResetPassword(Principal principal) {
+        return true;
+    }
+
+    private boolean canUserSaved(
+            User user,
+            Principal principal) {
+
         return true;
     }
 

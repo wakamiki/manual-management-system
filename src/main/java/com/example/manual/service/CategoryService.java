@@ -21,12 +21,18 @@ public class CategoryService {
 public final CategoryRepository categoryRepository;
 public final UserService userService;
 
-public CategoryService(CategoryRepository categoryRepository,UserService userService){
+public CategoryService(
+    CategoryRepository categoryRepository,
+    UserService userService) {
+
     this.categoryRepository = categoryRepository;
     this.userService = userService;
   }
 
-public CategoryResponseDto createCategory(CategoryRequestDto requestDto,Principal principal) {
+  public void createCategory(
+      CategoryRequestDto requestDto,
+      Principal principal) {
+
     int targetOrder = requestDto.getDisplayOrder();
     shiftUpOrderNumbers(targetOrder, null);
     if(!isAdmin(principal)){
@@ -42,17 +48,22 @@ public CategoryResponseDto createCategory(CategoryRequestDto requestDto,Principa
     category.markCreatedNow();
     category.markUpdatedNow();
     category.markActive();
-    Category savedCategory = categoryRepository.save(category);
+    categoryRepository.save(category);
 
-    CategoryResponseDto responseDto = new CategoryResponseDto();
-    responseDto.setId(savedCategory.getId());
-    responseDto.setCategoryName(savedCategory.getCategoryName());
-    responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
-    responseDto.setActive(savedCategory.isActive());
-    return  responseDto;
+    //情報書き換え対応時に使用。
+    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // responseDto.setId(savedCategory.getId());
+    // responseDto.setCategoryName(savedCategory.getCategoryName());
+    // responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
+    // responseDto.setActive(savedCategory.isActive());
+    // return  responseDto;
   }
 
-public CategoryResponseDto updateCategory(Long categoryId, CategoryRequestDto requestDto,Principal principal) {
+  public void updateCategory(
+      Long categoryId,
+      CategoryRequestDto requestDto,
+      Principal principal) {
+
     Category category = findCategoryOrThrow(categoryId);
     int currentOrder = category.getDisplayOrder();
     int targetOrder = requestDto.getDisplayOrder();
@@ -72,45 +83,43 @@ public CategoryResponseDto updateCategory(Long categoryId, CategoryRequestDto re
     category.setCategoryName(requestDto.getCategoryName());
     category.setDisplayOrder(targetOrder);
     category.markUpdatedNow();
-    Category savedCategory = categoryRepository.save(category);
-    
-    CategoryResponseDto responseDto = new CategoryResponseDto();
-    responseDto.setId(savedCategory.getId());
-    responseDto.setCategoryName(savedCategory.getCategoryName());
-    responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
-    responseDto.setActive(savedCategory.isActive());
-    return  responseDto;
+    categoryRepository.save(category);
+    // 情報書き換え対応時に使用。
+    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // responseDto.setId(savedCategory.getId());
+    // responseDto.setCategoryName(savedCategory.getCategoryName());
+    // responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
+    // responseDto.setActive(savedCategory.isActive());
   }
 
-public CategoryResponseDto deactivateCategory(Principal principal){
+public void deactivateCategory(Principal principal){
     if(!isAdmin(principal)){
       throw new  UnauthorizedException("権限が不足しています。");
     }
     Category category = new Category();
-    
-    category.markInactive();
-    category.markUpdatedNow();   
-    Category savedCategory = categoryRepository.save(category);
 
-    CategoryResponseDto responseDto = new CategoryResponseDto();
-    responseDto.setActive(savedCategory.isActive());
-    responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
-    return responseDto;
+    category.markInactive();
+    category.markUpdatedNow();
+    categoryRepository.save(category);
+    // 情報書き換え対応時に使用。
+    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // responseDto.setActive(savedCategory.isActive());
+    // responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
   }
 
-public CategoryResponseDto activateCategory(Principal principal){
+public void activateCategory(Principal principal){
     if(!isAdmin(principal)){
       throw new  UnauthorizedException("権限が不足しています。");
     }
     Category category = new Category();
     category.markActive();
     category.markUpdatedNow();
-    Category savedCategory = categoryRepository.save(category);
-
-    CategoryResponseDto responseDto = new CategoryResponseDto();
-    responseDto.setActive(savedCategory.isActive());
-    responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
-    return responseDto;
+    categoryRepository.save(category);
+    // 情報書き換え対応時に使用。
+    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // responseDto.setActive(savedCategory.isActive());
+    // responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
+    // return responseDto;
 }
 
 
@@ -146,7 +155,10 @@ private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
   if (end < start) {
     return;
   }
-  List<Category> targets = categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(start, end);
+  List<Category> targets =
+      categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
+          start, end);
+
   for (Category target : targets) {
     target.setDisplayOrder(target.getDisplayOrder() + 1);
   }
@@ -159,7 +171,10 @@ private void shiftUpOrderNumbers(Integer start, Integer end) {
   if (start == null || end == null || end < start) {
     return;
   }
-  List<Category> targets = categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(start, end);
+  List<Category> targets =
+      categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
+          start, end);
+
   for (Category target : targets) {
     target.setDisplayOrder(target.getDisplayOrder() - 1);
   }
@@ -167,7 +182,7 @@ private void shiftUpOrderNumbers(Integer start, Integer end) {
 }
 
   public void findAllActive(){
-  
+
 }
 
 //権限判定
@@ -195,7 +210,8 @@ private boolean isCategoryNameTaken(String categoryName){
 
 //共通処理
 private Category findCategoryOrThrow(Long categoryId) {
-  Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+  Optional<Category> categoryOpt =
+    categoryRepository.findById(categoryId);
   if (categoryOpt.isEmpty()) {
     throw new RuntimeException("カテゴリが見つかりません。");
   }
@@ -203,4 +219,3 @@ private Category findCategoryOrThrow(Long categoryId) {
 }
 
 }
-

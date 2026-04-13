@@ -96,17 +96,7 @@ public class User {
   }
 
   //メソッド
-  public void markRoleAdmin() {
-    this.role = UserRole.ADMIN;
-  }
 
-  public void markRoleApprover() {
-    this.role = UserRole.APPROVER;
-  }
-
-  public void markRoleUser() {
-    this.role = UserRole.USER;
-  }
   public void activate() {
     this.isActive = true;
   }
@@ -134,4 +124,11 @@ public class User {
     user.markUpdatedNow();
     return user;
   }
+
+    public static UserRole applyRole(UserRole role){
+    User targetUser = new User();
+    targetUser.setUserRole(role);
+    return targetUser.getRole();
+  }
+
 }

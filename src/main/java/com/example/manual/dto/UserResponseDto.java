@@ -1,5 +1,7 @@
 package com.example.manual.dto;
 
+import java.time.LocalDateTime;
+
 import com.example.manual.enums.UserRole;
 
 public class UserResponseDto {
@@ -10,8 +12,10 @@ private String loginId;
 private String password;
 private String displayName;
 private UserRole role;
+private boolean isActive;
+private LocalDateTime LastLoginAt;
 
-  //#region getter
+  //getter
 public  String getLoginId() {
 return this.loginId;
 }
@@ -28,8 +32,16 @@ public UserRole getRole() {
 
   return this.role;
 }
-  //#endregion
-  //#region setter
+
+public boolean getActivate(){
+  return this.isActive;
+}
+
+public LocalDateTime getLastLoginAt(){
+  return this.LastLoginAt;
+}
+
+// setter
 public void setLoginId(String loginId) {
   this.loginId = loginId;
 }
@@ -46,5 +58,12 @@ public void setRole(UserRole role) {
 
   this.role = role;
 }
-  //#endregion
+
+public void activate(boolean isActive){
+  this.isActive = isActive;
+}
+
+public void setLastLoginAt(LocalDateTime lastLoginAt){
+  this.LastLoginAt = lastLoginAt;
+}
 }

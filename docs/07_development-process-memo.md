@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.03  
-更新日: 2026-04-12
+Version: 01.00.04  
+更新日: 2026-04-13
 
 ---
 
@@ -544,5 +544,64 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 ### 次回着手予定
 - カテゴリ更新ロジックの簡素化（displayOrder 割り込み）
 - 同名カテゴリ確認フローのUI設計
+
+---
+
+## 2026-04-13
+
+### 作業概要
+マイページ画面の取得方式とタブ表示用データ構造を確定し、差し戻し判定方式・一覧取得の Repository/Service の土台を整理した。あわせて、別タブ更新通知の仕様とコード整形ルールを確定した。
+
+### 実施内容
+
+#### マイページ取得方式の確定
+- 初回表示時に必要データを一括取得し、タブ切り替えは画面内で表示切替する方式に決定
+- 画面表示 Controller は 1 本化し、再リクエストは行わない
+- Bootstrap / JavaScript でタブ表示制御を行う方針
+
+#### マイページ DTO の整理
+- マイページ専用 DTO を作成し、タブ表示用の一覧をまとめて保持する方針に決定
+- `rollbackManualList` / `createdManualList` / `draftManualList` の 3 つを保持
+
+#### 差し戻し判定方式の整理
+- 履歴検索ではなく、`manual` に差し戻しフラグを持たせる方針に決定
+- `rollback_flg BOOLEAN NOT NULL DEFAULT FALSE`
+- 状態遷移ルール
+  - 新規作成時: `false`
+  - 差し戻し時: `true`
+  - 再申請時: `false`
+- getter / setter 名を確定
+  - `isRollbackFlg()`
+  - `setRollbackFlg(boolean rollbackFlg)`
+
+#### 別タブ更新通知の確定
+- 通知キー名: `manualListNeedsRefresh`
+- 表示文言: `別タブで更新が行われました。最新状態に更新します。`
+- 共通メッセージ領域に表示し、3秒後に現在URLを再読込
+- 検索条件・ページ番号を保持
+
+#### Repository / Service の土台実装
+- Repository に以下の検索メソッドを追加
+  - `findByCreatedByUserOrderByCreatedAtDesc(User createdByUser)`
+  - `findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(User createdByUser, ManualStatus status)`
+  - `findByRollbackFlgTrueAndCreatedByUserOrderByUpdatedAtDesc(User createdByUser)`
+- `MyPageService` で一覧取得処理を実装開始
+  - `List<Manual>` 取得
+  - `List<ManualListDto>` への詰め替え準備
+- メソッド呼び出し時の型名誤記を修正
+
+#### 学習・整理したこと
+- JPA 命名ルール: `True` / `Not` / `OrderBy` / `Desc` の使い方
+- 長い代入文・メソッド呼び出しの整形ルールを整理
+
+### 学び
+- 画面初回取得で一覧をまとめると、タブ表示が安定する
+- 差し戻し判定は履歴よりフラグのほうが説明しやすい
+- Repository 命名ルールの理解が実装スピードに直結する
+
+### 次回着手予定
+- マイページ DTO への詰め替え完了
+- 差し戻しフラグの永続化と状態遷移連携
+- タブ表示の Thymeleaf 反映設計
 
 ---
