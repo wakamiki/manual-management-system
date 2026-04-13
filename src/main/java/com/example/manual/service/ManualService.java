@@ -226,7 +226,6 @@ public class ManualService {
   public void approveManual(
       Long manualId,
       Principal principal) {
-
     Manual manual = findManualOrThrow(manualId);
     if (!canApproveManual(
         manual,
@@ -234,6 +233,7 @@ public class ManualService {
         principal)) {
       throw new UnauthorizedException("判定エラー");
     }
+    
     manual.approve();
     manual.markUpdatedNow();
     manual.markApprovedNow();

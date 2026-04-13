@@ -19,10 +19,15 @@ public class MyPageController {
     this.myPageService=myPageService;
   }
 
+
 //取得系
 
   @GetMapping
   public MyPageDto showMyPage(Principal principal) {
   return myPageService.getMyPageData(principal);
   }
+
+  //差し戻し通知件数取得(byユーザーID)
+
+  //承認待ち通知件数取得(byユーザーID)
 }

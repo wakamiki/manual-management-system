@@ -1,6 +1,6 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.05  
+Version: 01.06.07  
 更新日: 2026-04-13
 
 ---
@@ -217,6 +217,16 @@ Version: 01.06.05
 - submit 時: APPROVER 全員へ通知
 - approve 時: 作成者へ通知
 - rollback 時: 作成者へ通知
+
+### 8-1A. 通知と一覧の役割分離
+- 通知は未読件数の提示に限定する
+- 一覧表示は状態条件で全件表示する
+  - 差し戻し一覧: `isRolledBack = true`
+  - 承認待ち一覧: `status = PENDING` かつ `createdByUser != current user`
+
+### 8-1B. 通知既読運用
+- 一覧表示だけでは既読化しない
+- 既読はユーザー操作（既読ボタン）で明示的に更新する
 
 ### 8-2. ホーム通知バッヂ
 - 上段: 差し戻し通知件数

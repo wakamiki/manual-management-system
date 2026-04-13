@@ -45,9 +45,6 @@ public class ManualHistoryService {
   return manualHistoryRepository.save(history);
 }
 
-
-//チェンジノート必須作成予定
-
 //manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistory> getManualIdHistory(Long manualId) {
   return manualHistoryRepository.findByManual_IdOrderByChangedAtDesc(

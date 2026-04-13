@@ -1,6 +1,6 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.04  
+Version: 01.00.06  
 更新日: 2026-04-13
 
 ---
@@ -598,6 +598,19 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 - 画面初回取得で一覧をまとめると、タブ表示が安定する
 - 差し戻し判定は履歴よりフラグのほうが説明しやすい
 - Repository 命名ルールの理解が実装スピードに直結する
+
+### 仕様追記
+- 通知件数は未読のみを対象とする
+- 一覧は状態条件で全件表示する
+  - 差し戻し一覧: `isRolledBack = true`
+  - 承認待ち一覧: `status = PENDING` かつ `createdByUser != current user`
+- 通知は一覧表示だけで既読化せず、既読ボタン操作で更新する
+
+### 本日の相談・確認
+- Notification の目的と項目の整理
+- 通知タイプの命名候補（`ROLLBACK` / `PENDING_APPROVAL`）
+- 未読件数は `targetUser + isRead = false` で取得する方針
+- 承認待ち通知の対象取得は `APPROVER / ADMIN` を除外条件付きで取得する方針
 
 ### 次回着手予定
 - マイページ DTO への詰め替え完了

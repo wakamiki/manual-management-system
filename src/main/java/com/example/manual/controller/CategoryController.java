@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.CategoryRequestDto;
-import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -85,7 +84,7 @@ public class CategoryController {
   }
 
     @GetMapping
-  public void getAllActivCategories() {
+  public void getAllActiveCategories() {
     //adminのみ実行可
   }
 

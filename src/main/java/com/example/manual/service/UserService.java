@@ -119,7 +119,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-//取得系
+//取得・検索系
 
     public User getUserByPrincipal(Principal principal) {
         Optional<User> userOpt =
@@ -128,8 +128,8 @@ public class UserService {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
         }
-        User user = userOpt.get();
-        return user;
+        User targetUser = userOpt.get();
+        return targetUser;
     }
 
     public String getDisplayNameByLoginId(String loginId) {
@@ -139,8 +139,16 @@ public class UserService {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
         }
-        User user = userOpt.get();
-        return user.getDisplayName();
+        User targetUser = userOpt.get();
+        return targetUser.getDisplayName();
+    }
+
+    //Status:admin/approver全取得(特定ユーザーを除く)
+    public List<User>findApproverAndAdminUsersExcept(Long excludedUserId){
+        UserRole[] roles = {UserRole.ADMIN,UserRole.APPROVER};
+        List<User>users = 
+            userRepository.findByRoleInAndIsActiveTrueAndIdNot(roles,excludedUserId);
+        return users;
     }
 
     //権限判定
