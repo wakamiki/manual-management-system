@@ -34,7 +34,6 @@ public class UserService {
     public UserResponseDto createUser(
             @Valid UserRequestDto requestDto,
             Principal principal) {
-
         if (!canCreateUser(requestDto, principal)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -43,6 +42,7 @@ public class UserService {
                 requestDto.getLoginId(),
                 requestDto.getDisplayName(),
                 requestDto.getRole());
+                
 
         User savedUser = userRepository.save(targetUser);
 
@@ -121,8 +121,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
+//=============================================
 // 取得・検索系
+//=============================================
 
     // ユーザー管理画面取得
     public UserListResponseDto getUserManagementViewDeta(Principal principal) {

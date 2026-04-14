@@ -12,15 +12,15 @@ public class ManualRequestDto {
 @NotBlank
 @Size(max=100)
 private String title;
-@Size(max=10000)
 @NotBlank
+@Size(max=10000)
 private String content;
 @NotNull
 private Long categoryId;
 @Size(max = 100)
 private String changeNote;
 
-  //#region getter
+  //getter
 public String getTitle() {
 return this.title;
 }
@@ -37,8 +37,7 @@ public String getChangeNote() {
 
   return this.changeNote;
 }
-  //#endregion
-  //#region setter
+ //setter
 public void setTitle(String title) {
   this.title = title;
 }
@@ -55,5 +54,4 @@ public void setChangeNote(String cangeNote) {
 
   this.changeNote = cangeNote;
 }
-  //#endregion
 }

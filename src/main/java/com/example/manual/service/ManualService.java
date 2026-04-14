@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualHistoryDto;
+import com.example.manual.dto.ManualListDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
@@ -50,6 +51,23 @@ public class ManualService {
     this.userService = userService;
     this.categoryService = categoryService;
     this.notificationService = notificationService;
+  }
+
+  //**作業中**
+  //index表示 
+  public ManualListDto showIndex(
+      Principal principal,
+      ManualSearchConditionDto conditio){
+
+      ManualListDto listDto = new ManualListDto();
+      return listDto;
+  }
+
+  // 対応ボタン 新規作成(新規タブ)
+  public void goToNewCreatePage(Principal principal){
+    if(!canGoToNewCreatePage(principal)){
+      throw new InvalidStateException("判定エラー");
+    }
   }
 
   // 対応ボタン 新規作成
@@ -264,11 +282,11 @@ public class ManualService {
   // 対応ボタン 差し戻し
   public void rollbackEditManual(
       Long manualId,
-      String changeNote,
+      ManualActionRequestDto requestDto,
       Principal principal) {
 
     Manual manual = findManualOrThrow(manualId);
-    if (!canRollbackManual(manual, principal, changeNote)) {
+    if (!canRollbackManual(manual, principal, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
     manual.markReadRolledBack();
@@ -276,7 +294,7 @@ public class ManualService {
     manual.rollbackToDraft();
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
-        savedManual, changeNote, principal);
+        savedManual, requestDto.getChangeNote(), principal);
   }
 
   // 対応ボタン アーカイブ
@@ -303,18 +321,18 @@ public class ManualService {
   // 対応ボタン 復帰
   public void restoreManual(
       Long manualId,
-      String changeNote,
+      ManualActionRequestDto requestDto,
       Principal principal) {
 
     Manual manual = findManualOrThrow(manualId);
-    if (!canRestoreManual(manual, principal, changeNote)) {
+    if (!canRestoreManual(manual, principal, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
     manual.restoreToApproved();
     manual.markUpdatedNow();
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
-        savedManual, changeNote, principal);
+        savedManual, requestDto.getChangeNote(), principal);
   }
 
   //============================
@@ -516,6 +534,14 @@ public class ManualService {
   // ロール判定
   // ============================
 
+  private boolean canGoToNewCreatePage(Principal principal){
+    User user = userService.getUserByPrincipal(principal);
+    if (!user.isActive()) {
+      throw new UnauthorizedException("有効なユーザーではありません。");
+    }
+    return true;
+  }
+  
   private boolean canArchiveManual(
       User user,
       Manual manual,

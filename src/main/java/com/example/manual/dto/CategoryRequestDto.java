@@ -15,6 +15,7 @@ public class CategoryRequestDto {
 private String categoryName;
 @NotNull
 private Integer displayOrder;
+@NotNull
 private Long id;
 
 //getter

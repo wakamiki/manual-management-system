@@ -1,13 +1,15 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ホーム画面</title>
+  <title>index</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/common.css">
   <link rel="stylesheet" href="css/index.css">
 </head>
+
 <body>
   <main class="container index-page">
     <header class="page-header">
@@ -17,7 +19,7 @@
       <div class="page-actions">
         <form class="search-form">
           <details class="search-filter">
-            <summary>カテゴリ</summary>
+            <summary th="">カテゴリ</summary>
             <div class="search-filter-panel">
               <label class="search-check"><input type="checkbox" checked> 営業部</label>
               <label class="search-check"><input type="checkbox"> 経理部</label>
@@ -42,7 +44,8 @@
           <input type="search" class="form-control" placeholder="キーワード検索">
           <button type="submit" class="btn btn-outline-primary">検索</button>
         </form>
-        <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary create-button">新規作成</a>
+        <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+          class="btn btn-primary create-button">新規作成</a>
       </div>
     </header>
 
@@ -82,7 +85,8 @@
               </ul>
             </div>
             <div class="stopedCategory">
-              <button class="stopped-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
+              <button class="stopped-toggle" type="button" data-bs-toggle="collapse"
+                data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
                 <span>使用停止中</span>
                 <span class="stopped-toggle-icon">＋</span>
               </button>
@@ -93,7 +97,8 @@
               </div>
             </div>
             <div class="sidebar-home">
-              <a href="./my-page.html" class="sidebar-home-link" target="_blank" rel="noopener noreferrer" aria-label="マイページ">
+              <a href="./my-page.html" class="sidebar-home-link" target="_blank" rel="noopener noreferrer"
+                aria-label="マイページ">
                 <span class="sidebar-home-icon-wrap">
                   <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
                   <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
@@ -113,7 +118,8 @@
         <div class="accordion w-100" id="accordionExample">
           <div class="accordion-item">
             <div class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+                aria-expanded="true" aria-controls="collapseOne">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center gap-2">
                     <strong class="fw-semibold">マニュアルの作成手順</strong>
@@ -131,9 +137,12 @@
               <div class="accordion-body">
                 <p>見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
                 <h2 class="history-title mb-2">更新履歴</h2>
                 <ul class="history-list mb-0">
@@ -146,7 +155,8 @@
 
           <div class="accordion-item">
             <div class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center gap-2">
                     <strong class="fw-semibold">発注処理フロー</strong>
@@ -164,9 +174,12 @@
               <div class="accordion-body">
                 <p>発注依頼から納品確認までの確認事項をまとめています。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">複製</a>
+                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-secondary btn-sm">編集</a>
+                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                    class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
                 <h2 class="history-title mb-2">更新履歴</h2>
                 <ul class="history-list mb-0">
@@ -192,4 +205,5 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

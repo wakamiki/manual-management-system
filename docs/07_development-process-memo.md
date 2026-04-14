@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.07  
-更新日: 2026-04-13
+Version: 01.00.08  
+更新日: 2026-04-14
 
 ---
 
@@ -619,3 +619,204 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 - タブ表示の Thymeleaf 反映設計
 
 ---
+
+## 2026-04-14
+
+### 作業概要
+トップ画面クイックビューと検索フォームの仕様を整理し、Controller / バリデーション責務の方針を docs に反映した。
+
+### 実施内容
+- クイックビュー「最近更新（直近7日）」の仕様を追記
+- 検索フォームの複数選択・選択保持・Thymeleaf 再表示を追記
+- Controller 方針（GET/POSTの責務分離）を追記
+- バリデーション責務（DTO/Service分担）を明文化
+- 件数取得は `countBy...` 系を使う方針を追記
+- README に進捗を追記
+
+### 学び
+- 仕様は UI と実装指針の両方を揃えると迷いが減る
+
+### 次回着手予定
+- クイックビュー件数取得の実装整理
+- 検索フォームの Thymeleaf 反映設計
+
+---
+# 作業記録（2026/04/14）
+
+## 作業概要
+本日はトップ画面（index）の検索フォームとクイックビューを中心に、Thymeleaf と Spring MVC のフォーム連携理解を進めた。  
+あわせて MyPage / 通知機能の整理、件数取得方式の見直し、Controller 設計の責務整理を行い、画面表示系と更新系の実装方針を固めた。
+
+---
+
+## 本日の作業テーマ
+- MyPage機能の整理
+- 通知機能の進行
+- index検索欄のThymeleaf反映
+- 最近更新件数の取得方式整理
+- ManualController設計見直し
+- Spring MVC フォーム連携理解
+- バリデーション責務整理
+
+---
+
+## 実施内容
+
+### MyPage / 通知機能整理
+- MyPage と通知機能を継続して進行
+- 初回表示時に必要データを一括取得する方針を継続
+- 通知件数は **未読のみを対象** とする方針を確認
+- 差し戻しフラグと既読状態は別管理に整理
+
+---
+
+### index検索欄の Thymeleaf 反映整理
+トップ画面の検索フォームについて、Thymeleaf バインディング構成を整理した。
+
+#### 確認したポイント
+- `th:object`
+- `th:field`
+
+#### DTO設計
+- 検索条件 DTO と一覧表示 DTO の役割分離を整理
+- `ManualSearchConditionDto` を画面と紐づける流れを確認
+
+#### 保持方針
+- `categoryIds`
+- `statuses`
+
+検索後も選択状態を維持する考え方を整理した。
+
+#### 重要な学び
+Thymeleaf は
+
+- 候補一覧
+- 現在の選択値
+
+を分けて考えると設計しやすいことを理解した。
+
+---
+
+### クイックビュー件数の仕様確定
+トップ画面のクイックビュー仕様を整理した。
+
+#### 最近更新
+- 表示内容：直近7日以内に更新されたマニュアル件数
+- 判定基準：`updatedAt >= 今日 - 7日`
+- 表示例：`最近更新 5`
+
+---
+
+### 件数取得方式の見直し
+件数だけ欲しい場合の取得方式を見直した。
+
+#### 方針変更
+一覧取得 + `size()` ではなく  
+**JPA の countBy を利用する方針** に変更した。
+
+#### Repositoryメソッド
+- `countByUpdatedAtAfter()`
+- `countByCreatedByUserAndStatus()`
+
+#### 学び
+件数のみ必要な場合は `countBy` の方が自然で効率的であることを理解した。
+
+---
+
+### Spring MVC フォーム連携学習
+
+#### `@ModelAttribute`
+フォーム入力値を DTO へ自動で詰める役割を整理した。
+
+#### 理解したこと
+- `@ModelAttribute` = DTOへ詰める
+- `th:object` / `th:field` と連携する
+
+---
+
+#### `@Valid`
+DTO に対する入力値チェックの役割を整理した。
+
+#### 役割整理
+- `@ModelAttribute` = DTOへ詰める
+- `@Valid` = DTOの中身を検証する
+
+両者は実務でセット利用が多いことを理解した。
+
+---
+
+### Bean Validation 整理
+代表的なバリデーションアノテーションを整理した。
+
+#### 確認項目
+- `@NotBlank`
+- `@NotNull`
+- `@NotEmpty`
+- `@Size`
+- `@Min`
+- `@Max`
+- `@Pattern`
+- `@Email`
+
+#### 今回使用想定
+##### title
+- `@NotBlank`
+- `@Size(max = 100)`
+
+##### content
+- `@NotBlank`
+
+##### categoryId
+- `@NotNull`
+
+##### changeNote
+- `@Size(max = 100)`
+
+---
+
+### バリデーション責務整理
+責務を明確に整理した。
+
+#### DTO側
+形式チェック
+- 必須
+- 最大文字数
+- 空白不可
+
+#### Service側
+業務ルール依存
+- 複製時のみ必須
+- 差し戻し時のみ必須
+
+---
+
+### Controller 設計見直し
+ManualController の責務を再整理した。
+
+#### 方針
+- 画面表示系 = GET
+- 更新処理系 = POST
+
+#### Controller責務
+- 画面表示
+- DTO受け取り
+- Service呼び出し
+- redirect
+
+thin controller 方針を再確認した。
+
+---
+
+## 本日の学び
+- 件数のみ取得する場合は `countBy` が自然
+- `@ModelAttribute` と `@Valid` は役割が異なる
+- DTO と Service でバリデーション責務を分けると整理しやすい
+- Thymeleaf は候補一覧と現在値を分けると設計しやすい
+- GET / POST の責務分離で Controller が見やすくなる
+
+---
+
+## 次回着手予定
+- `index` 検索欄のカテゴリ / ステータス反映完成
+- `ManualController` の GET / POST / redirect 最終整理
+- 最近更新件数の画面反映

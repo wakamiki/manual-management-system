@@ -1,21 +1,23 @@
 package com.example.manual.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class ManualActionRequestDto {
   public ManualActionRequestDto() {
  
   }
-
+  @NotBlank
+  @Size(max = 100)
   private String changeNote;
 
-  //#region getter
+  //getter
   public String getChangeNote(){
-  //#endregion
     return this.changeNote;
   }
 
-  //#region setter
+  //setter
   public void setChangeNote(String changeNote){
-  //#endregion
     this.changeNote = changeNote;
   }
 }

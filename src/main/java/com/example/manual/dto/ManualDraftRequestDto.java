@@ -17,6 +17,7 @@ public class ManualDraftRequestDto {
     private Long categoryId;
     @Size(max=100)
     private String changeNote;
+    @NotNull
     private ManualStatus status;
 
   //#region getter

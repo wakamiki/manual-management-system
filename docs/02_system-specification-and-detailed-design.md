@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.08  
-更新日: 2026-04-13
+Version: 01.06.09  
+更新日: 2026-04-14
 
 ---
 
@@ -23,6 +23,12 @@ Version: 01.06.08
 - Controller は thin controller を維持する
 - 業務ロジックは Service に集約する
 - Entity は整合性を守る専用メソッドを持つ
+
+### 2-1. Controller 方針
+- 画面表示系は GET
+- 更新処理系は POST
+- Controller は thin controller 方針
+- DTO 受け取りと Service 呼び出しに責務を限定する
 
 ---
 
@@ -255,3 +261,6 @@ Version: 01.06.08
 - 業務ルール依存の必須判定は Service で行う
 - `changeNote` はケースごとに Service 側で必須判定してよい
 - 画面ラベルは `更新履歴` と表示してよいが、内部項目名は `changeNote` のままでよい
+
+## 11. クイックビュー件数取得方針
+- 件数のみ必要な場合は一覧取得ではなく `countBy...` 系 Repository メソッドを使用する

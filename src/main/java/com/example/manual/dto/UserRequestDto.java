@@ -8,12 +8,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class UserRequestDto {
-  public UserRequestDto() {
+public UserRequestDto() {
+}
 
-  }
-  private String id;
-
-@NotNull
+private String id;
+@NotBlank
 private String loginId;
 
 @NotBlank
@@ -27,7 +26,7 @@ private UserRole role;
 private Boolean isActive;
 
 
-  //#region getter
+  //getter
 public String getId() {
   return id;
 }
@@ -48,8 +47,7 @@ public Boolean getIsActive() {
 
   return this.isActive;
 }
-  //#endregion
-  //#region setter
+  //setter
 public void setId(String id) {
   this.id = id;
 }
@@ -62,5 +60,8 @@ public void setDisplayName(String displayName) {
 
   this.displayName = displayName;
 }
-  //#endregion
+
+public void setRole(UserRole role){
+  this.role = role;
+}
 }
