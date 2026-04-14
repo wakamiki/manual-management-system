@@ -7,59 +7,59 @@ public class MyPageDto {
 
   }
 
-  private List<ManualListDto> rollbackManualList;
+  private List<ManualResponseDto> rollbackManualList;
 
-  private List<ManualListDto> createdManualList;
+  private List<ManualResponseDto> createdManualList;
 
-  private List<ManualListDto> pendingManualList;
+  private List<ManualResponseDto> pendingManualList;
 
-  private int rollbackCount;
+  private Long rollbackCount;
 
-  private int pendingCount;
+  private Long pendingUnCreatedCount;
 
 
   //getter
-  public List<ManualListDto> getRollbackManualList() {
+  public List<ManualResponseDto> getRollbackManualList() {
     return this.rollbackManualList;
   }
 
-  public List<ManualListDto> getCreatedManualList() {
+  public List<ManualResponseDto> getCreatedManualList() {
     return this.createdManualList;
   }
 
-  public List<ManualListDto> getPendingManualList() {
+  public List<ManualResponseDto> getPendingManualList() {
     return this.pendingManualList;
   }
 
-  public int getRollbackCount(){
+  public Long getRollbackCount(){
     return this.rollbackCount;
   }
 
-  public int getPendingCount(){
-    return this.pendingCount;
+  public Long getPendingUnCreatedCount(){
+    return this.pendingUnCreatedCount;
   }
 
 
 
   //setter
-  public void setRollbackManualList(List<ManualListDto> rollbackManualList) {
+  public void setRollbackManualList(List<ManualResponseDto> rollbackManualList) {
     this.rollbackManualList = rollbackManualList;
   }
 
-  public void setCreatedManualList(List<ManualListDto> createdManualList) {
+  public void setCreatedManualList(List<ManualResponseDto> createdManualList) {
     this.createdManualList = createdManualList;
   }
 
-  public void setPendeingManualList(List<ManualListDto> pendingManualList) {
+  public void setPendingManualList(List<ManualResponseDto> pendingManualList) {
     this.pendingManualList = pendingManualList;
   }
 
-  public void setRollbackCount(int rollbackCount){
+  public void setRollbackCount(Long rollbackCount){
     this.rollbackCount = rollbackCount;
   }
 
-  public void setPendingCount(int pendingCount){
-    this.pendingCount = pendingCount;
+  public void setPendingUnCreatedCount(Long pendingUnCreatedCount){
+    this.pendingUnCreatedCount = pendingUnCreatedCount;
   }
 
 }

@@ -3,7 +3,7 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import com.example.manual.dto.ManualListDto;
+import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
@@ -21,41 +21,42 @@ public class MyPageService {
     this.manualService = manualService;
   }
 
-  public MyPageDto getMyPageData(Principal principal) {
+  public MyPageDto getMyPageViewData(Principal principal) {
     User user = userService.getUserByPrincipal(principal);
     if (!canGetMyPageData(user)) {
       throw new InvalidStateException("判定エラー");
     }
     MyPageDto pageDto = new MyPageDto();
     pageDto.setCreatedManualList(getUserCreatedManual(user));
-    pageDto.setPendeingManualList(getPendingManual(user));
+    pageDto.setPendingManualList(getPendingManual(user));
     pageDto.setRollbackManualList(getRollbackManual(user));
-    
-    pageDto.setPendingCount(pageDto.getPendingManualList().size());
-    pageDto.setRollbackCount(pageDto.getRollbackManualList().size());
+    pageDto.setRollbackCount(manualService.countMyRollBackManual(principal));
+    pageDto.setPendingUnCreatedCount(manualService.countNotUserCreatedPendingManualList(principal));
+
+    //数字数える
     return pageDto;
   }
 
-  public List<ManualListDto> getRollbackManual(User user) {
+  public List<ManualResponseDto> getRollbackManual(User user) {
     // 差し戻しマニュアルタブ
-    List<ManualListDto>listDto =
+    List<ManualResponseDto> responseDto =
       manualService.createdRollbackManualList(user);
-    return listDto;
+    return responseDto;
   }
 
-  public List<ManualListDto>  getUserCreatedManual(User user) {
+  public List<ManualResponseDto>  getUserCreatedManual(User user) {
     // 自分作成マニュアルタブ
-    List<ManualListDto> listDto =
+    List<ManualResponseDto> listDto =
         manualService.userCreatedManualList(user);
     return listDto;
   }
 
-  public List<ManualListDto> getPendingManual(User user) {
+  public List<ManualResponseDto> getPendingManual(User user) {
     // 承認待ちマニュアルタブ
     if (!canGetPendingManual(user)) {
       throw new InvalidStateException("判定エラー");
     }
-    List<ManualListDto> listDto =
+    List<ManualResponseDto> listDto =
       manualService.pendingManualList(user);
     return listDto;
   }

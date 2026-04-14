@@ -1,6 +1,6 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.06  
+Version: 01.00.07  
 更新日: 2026-04-13
 
 ---
@@ -611,6 +611,7 @@ Lombok 依存を減らしながら getter / setter の不安定さを解消し�
 - 通知タイプの命名候補（`ROLLBACK` / `PENDING_APPROVAL`）
 - 未読件数は `targetUser + isRead = false` で取得する方針
 - 承認待ち通知の対象取得は `APPROVER / ADMIN` を除外条件付きで取得する方針
+- 承認完了時に `PENDING_APPROVAL` 通知を全削除する方針を確定
 
 ### 次回着手予定
 - マイページ DTO への詰め替え完了

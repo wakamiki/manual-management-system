@@ -1,6 +1,7 @@
 package com.example.manual.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.manual.enums.UserRole;
 
@@ -37,7 +38,7 @@ public boolean getActivate(){
   return this.isActive;
 }
 
-public LocalDateTime getLastLoginAt(){
+public LocalDateTime getLastLoginAt() {
   return this.LastLoginAt;
 }
 

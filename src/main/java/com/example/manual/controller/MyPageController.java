@@ -24,7 +24,7 @@ public class MyPageController {
 
   @GetMapping
   public MyPageDto showMyPage(Principal principal) {
-  return myPageService.getMyPageData(principal);
+  return myPageService.getMyPageViewData(principal);
   }
 
   //差し戻し通知件数取得(byユーザーID)

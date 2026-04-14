@@ -55,7 +55,7 @@ public List<ManualHistory> getAllHistories(){
   return manualHistoryRepository.findAllByOrderByChangedAtDesc();
 }
 
-//一覧表示用
+//一覧表示用 manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistoryDto> getManualHistorySummaryDtoList(
     Long manualId){
   List<ManualHistory> manualHistories =
@@ -71,20 +71,17 @@ public List<ManualHistoryDto> getManualHistorySummaryDtoList(
 }
 //詳細表示用
 public List<ManualDetailHistoryDto> getManualHistoryDetailDtoList(
-    Long manualId){
-  List<ManualHistory> manualHistories =
-    this.getManualIdHistory(manualId);
-  List<ManualDetailHistoryDto> historyDetailDtoList =
-    new ArrayList<>();
-  for (ManualHistory history :  manualHistories) {
-    ManualDetailHistoryDto historyDetailDto =
-      new ManualDetailHistoryDto();
+    Long manualId) {
+  List<ManualHistory> manualHistories = this.getManualIdHistory(manualId);
+  List<ManualDetailHistoryDto> historyDetailDtoList = new ArrayList<>();
+  for (ManualHistory history : manualHistories) {
+    ManualDetailHistoryDto historyDetailDto = new ManualDetailHistoryDto();
     historyDetailDto.setChangeNote(history.getChangeNote());
     historyDetailDto.setChangedAt(history.getChangedAt());
     historyDetailDto.setChangedByUserName(
         history.getChangedByUser().getDisplayName());
     historyDetailDtoList.add(historyDetailDto);
   }
-  return  historyDetailDtoList;
+  return historyDetailDtoList;
 }
 }

@@ -6,13 +6,13 @@ public class ManualDetailHistoryDto {
         public ManualDetailHistoryDto() {
 
   }
-    
+
     private String changeNote;
     private LocalDateTime changedAt;
     private String changedByUserName;
 
 
-  //#region getter
+  //getter
     public String getChangeNote(){
         return this.changeNote;
     }
@@ -22,11 +22,10 @@ public class ManualDetailHistoryDto {
     }
 
     public String getChangedByUserName(){
-  //#endregion
         return this.changedByUserName;
     }
 
-  //#region setter
+  //setter
     public void setChangeNote(String changeNote){
         this.changeNote = changeNote;
     }
@@ -39,5 +38,4 @@ public class ManualDetailHistoryDto {
 
         this.changedByUserName = changedByUserName;
     }
-      //#endregion
 }

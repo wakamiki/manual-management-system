@@ -1,5 +1,6 @@
 package com.example.manual.dto;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.catalina.User;
 
@@ -15,7 +16,7 @@ private String title;
 private String content;
 private String categoryName;
 private String changeNote;
-private String displayName;
+private String createdName;
 private User changedByName;
 private ManualStatus status;
 private LocalDateTime createdAt;
@@ -23,6 +24,8 @@ private LocalDateTime updatedAt;
 private LocalDateTime approvedAt;
 private LocalDateTime changedAt;
 private Long categoryId;
+private List<ManualHistoryDto> histries;
+private boolean isRolledBack = false;
 
 
 public Long getManualId() {
@@ -49,8 +52,8 @@ public String getChangeNote() {
   return this.changeNote;
 }
 
-public String getDisplayName() {
-  return this.displayName;
+public String getCreatedName() {
+  return this.createdName;
 }
 
 public User getChangedByName() {
@@ -78,6 +81,17 @@ public LocalDateTime getChangedAt() {
   return this.changedAt;
 }
 
+public List<ManualHistoryDto> getHistries() {
+  return this.histries;
+}
+
+public boolean isRolledBack() {
+  return this.isRolledBack;
+}
+
+
+//setter
+
 public void setManualId(long manualId) {
   this.manualId = manualId;
 }
@@ -102,8 +116,8 @@ public void setChangeNote(String changeNote) {
   this.changeNote = changeNote;
 }
 
-public void setDysplayName(String displayName) {
-  this.displayName = displayName;
+public void setCreatedName(String createdName) {
+  this.createdName = createdName;
 }
 
 public void setChangedByName(User changedByName) {
@@ -130,4 +144,13 @@ public void setChangedAt(LocalDateTime changedAt) {
 
   this.changedAt = changedAt;
 }
+
+public void setHistories(List<ManualHistoryDto> histories) {
+  this.histries = histories;
+}
+
+public void setRolledBack(boolean isRolledBack) {
+  this.isRolledBack = isRolledBack;
+}
+
 }

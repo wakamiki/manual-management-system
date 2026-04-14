@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.manual.dto.UserResponseDto;
 import com.example.manual.service.UserService;
 
 @RestController
@@ -22,7 +23,8 @@ public class UserController {
   @GetMapping
   public void getAllUsers() {
     //ページ切り替え有
-    //ユーザーID　displayネーム　ロール　isActive 
+    //ユーザーID　displayネーム　ロール　isActive
+
   }
 
   @GetMapping("/{userId}")
@@ -40,8 +42,8 @@ public class UserController {
   public void updateUser() {
     //氏名変更対応・ロール変更想定　ユーザーID変更可能
     //adminのみ実行可　ログインID重複チェック
-    //DB DisplayName role 
-    //操作者　対象ユーザー　実行日時 loginId displayName Role 
+    //DB DisplayName role
+    //操作者　対象ユーザー　実行日時 loginId displayName Role
   }
 
   @PutMapping("/{userId}/deactivate")
@@ -72,5 +74,16 @@ public class UserController {
     //アクティブのみ　adminのみ実行可
     //操作者　実行日時
 
-      }
+  }
+
+//取得系
+
+  //ユーザー管理画面取得
+  public UserResponseDto showUserManegementUserManagementPege(
+      Principal principal) {
+
+  UserResponseDto userResponseDto = new UserResponseDto();
+
+  return userResponseDto;
+  }
 }

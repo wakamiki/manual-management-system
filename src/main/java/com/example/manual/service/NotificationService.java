@@ -4,7 +4,9 @@ import java.security.Principal;
 import java.util.List;
 
 import com.example.manual.entity.Manual;
+import com.example.manual.entity.Notification;
 import com.example.manual.entity.User;
+import com.example.manual.enums.NotificationType;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
@@ -19,7 +21,7 @@ public class NotificationService {
         UserService userService,
         NotificationRepository notificationRepository){
         this.userService=userService;
-        this.notificationRepository =notificationRepository;
+        this.notificationRepository = notificationRepository;
     }
 
 public void createSubmitNotifications(
@@ -32,13 +34,22 @@ public void createSubmitNotifications(
     }
     //通知先ユーザーリスト
     List<User>users = userService.findApproverAndAdminUsersExcept(manual.getId());
-
-    Notification saved = notificationRepository.save();
+    
+    for (User user : users) {
+    Notification notification = new Notification();
+    notification.setTargetUser(user);
+    notification.setManual(manual);
+    notification.setType(NotificationType.PENDING_APPROVAL);
+    notification.setUnread();
+    notification.markCreatedNow();
+    notificationRepository.save(notification);   
+    }
     }
 
 public void createRollbackNotification(Manual manual){
 //差し戻し時に作成者へ通知を作成する。
 //有効ユーザー　manualCreateUserに通知
+
 }
 
 public void getUnreadCount(User user){
@@ -54,6 +65,10 @@ public void markAsRead(Long notificationId, User user){
 public void markAllAsRead(User user){
 //まとめて既読にする。全既読ボタン用。
 //有効ユーザー
+}
+
+public void clearPendingNotifications(Long manualId){
+
 }
 
 // public void createApproveNotification(Manual manual){}

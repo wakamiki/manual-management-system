@@ -34,11 +34,11 @@ public ManualController(ManualService manualService) {
 
 
 @GetMapping
-public List<ManualListDto> searchManuals(
+public List<ManualResponseDto> searchManuals(
         @Valid ManualSearchConditionDto condition,
         Principal principal) {
 
-    List<ManualListDto> manualDtoList =
+    List<ManualResponseDto> manualDtoList =
             manualService.searchManuals(
             condition,
             principal);

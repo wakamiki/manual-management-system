@@ -99,8 +99,12 @@ public class Manual {
         this.content = content;
     }
 
-    public void setRolledBack(boolean isRolledBack) {
-        this.isRolledBack = isRolledBack;
+    public void markUnreadRolledBack() {
+        this.isRolledBack = false;
+    }
+
+    public void markReadRolledBack() {
+        this.isRolledBack = true;
     }
 
     public void markStatusDRAFT() {
