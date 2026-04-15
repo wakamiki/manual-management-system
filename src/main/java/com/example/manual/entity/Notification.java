@@ -29,8 +29,6 @@ public class Notification {
 
     private String message;
 
-    private boolean isRead = false;
-
     private LocalDateTime createdAt;
 
     //getter
@@ -49,9 +47,7 @@ public class Notification {
     public String getMessage(){
         return this.message;
     }
-    public boolean isRead(){
-        return this.isRead;
-    }
+
     public LocalDateTime getCreatedAt(){
         return this.createdAt;
     }
@@ -70,13 +66,6 @@ public class Notification {
     public void setMessage(String message){
         this.message=message;
     }
-    public void setRead(){
-        this.isRead = true;
-    }
-    public void setUnread(){
-        this.isRead = false;
-    }
-
     public void markCreatedNow(){
         this.createdAt = LocalDateTime.now();
     }

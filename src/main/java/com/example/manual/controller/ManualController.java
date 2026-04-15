@@ -1,9 +1,11 @@
 package com.example.manual.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,7 @@ import com.example.manual.dto.ManualListDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
+import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
 
 import jakarta.validation.Valid;
@@ -30,24 +33,27 @@ public class ManualController {
 private final ManualService manualService;
 
 public ManualController(ManualService manualService) {
-    this.manualService = manualService;
-    }
+        this.manualService = manualService;
+}
+
+// index表示
+public String showIndex(
+                @Valid @ModelAttribute ManualSearchConditionDto condition,
+                Principal principal,
+                Model model) {
+        // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
+        condition.setStatuses(defaultStatusCheck(condition));
+
+        ManualListDto listDto = manualService.showIndex(principal, condition);
+
+        model.addAttribute("listDto", listDto);
+        return "index";
+
+}
 
 //============================================
 //登録・更新
 //============================================
-
-    //**作業中**
-    //index表示
-    public String showIndex(
-                @Valid @ModelAttribute ManualSearchConditionDto condition,
-                Principal principal){
-        ManualListDto listDto =
-        manualService.showIndex(principal,condition);
-     
-        return "index";
-
-    }
 
     //対応ボタン　下書き保存
     @PostMapping("/{manualId}/actions/save-draft")
@@ -143,7 +149,7 @@ public ManualController(ManualService manualService) {
     public String goToNewCreatePage(Principal principal){
         manualService.goToNewCreatePage(principal);
 
-        return "redirect:/{manualId}/create";
+        return "/manual-create";
     }
 
      //対応ボタン　複製（新規タブ）
@@ -168,7 +174,7 @@ public ManualController(ManualService manualService) {
     }
 
 
-//============================================    
+//============================================
 //action
 //============================================
 
@@ -225,7 +231,7 @@ public ManualController(ManualService manualService) {
 
         manualService.rollbackEditManual(
                 manualId,
-                actionRequestDto.getChangeNote(),
+                actionRequestDto,
                 principal);
         redirectAttributes.addFlashAttribute(
                 "message", "マニュアルを差し戻しました。");
@@ -259,7 +265,7 @@ public ManualController(ManualService manualService) {
 
         manualService.restoreManual(
                 manualId,
-                actionRequestDto.getChangeNote(),
+                actionRequestDto,
                 principal);
         redirectAttributes.addFlashAttribute(
                 "message", "マニュアルをアーカイブから復帰しました。");
@@ -273,14 +279,30 @@ public ManualController(ManualService manualService) {
 @GetMapping
 public List<ManualResponseDto> searchManuals(
         @ModelAttribute ManualSearchConditionDto condition,
-        Principal principal) {
+                Principal principal) {
 
-    List<ManualResponseDto> manualDtoList =
-            manualService.searchManuals(
-            condition,
-            principal);
+        List<ManualResponseDto> manualDtoList = (List<ManualResponseDto>) manualService.searchManuals(
+                        condition,
+                        principal);
 
-    return manualDtoList;
+        return manualDtoList;
 }
 
+// ====================================
+// 判定
+// ====================================
+
+        //検索チェックボックス初期設定
+private List<ManualStatus> defaultStatusCheck(ManualSearchConditionDto condition) {
+        List<ManualStatus> statuses = condition.getStatuses();
+        if (statuses != null && !statuses.isEmpty()) {
+                List<ManualStatus> targetStatuses = new ArrayList<>(statuses);
+                targetStatuses.remove(ManualStatus.DRAFT);
+                return targetStatuses;
+        }
+        List<ManualStatus> defaultStatuses = new ArrayList<>();
+        defaultStatuses.add(ManualStatus.PENDING);
+        defaultStatuses.add(ManualStatus.APPROVED);
+        return defaultStatuses;
+}
 }

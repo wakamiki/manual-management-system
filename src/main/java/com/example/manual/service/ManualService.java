@@ -3,6 +3,7 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualHistoryDto;
@@ -53,13 +55,30 @@ public class ManualService {
     this.notificationService = notificationService;
   }
 
-  //**作業中**
-  //index表示 
+  //index表示
   public ManualListDto showIndex(
       Principal principal,
-      ManualSearchConditionDto conditio){
+      ManualSearchConditionDto condition
+    ){
+    //検索一覧リスト condition ページ毎に分ける必要有
+    List<ManualResponseDto> seachManuals =
+        searchManuals(condition,principal);
+    //カテゴリーリスト 検索欄用
+    List<CategoryResponseDto> categoryDtos =
+        categoryService.getCategoryDtos();
+    //ステータスリスト　検索欄用
+    List<ManualStatus> manualStatuses =
+        getDefaultStatuses();
+    //クイックビュー　通知
+    ManualResponseDto quickViewDtos=
+        getQuickViewData(principal);
 
-      ManualListDto listDto = new ManualListDto();
+    ManualListDto listDto = new ManualListDto();
+    listDto.setSearchManuals(seachManuals);
+    listDto.setCategoryDtos(categoryDtos);
+    listDto.setManualStatuses(manualStatuses);
+    listDto.setQuickView(quickViewDtos);
+
       return listDto;
   }
 
@@ -254,6 +273,7 @@ public class ManualService {
     manual.markUpdatedNow();
     manual.markApprovedNow();
     manualRepository.save(manual);
+    notificationService.deletePendingApprovalNotificationsByManualId(manualId);
   }
 
   // 対応ボタン 承認（チェンジノート有）
@@ -277,6 +297,7 @@ public class ManualService {
           changeNote,
           principal);
     }
+    notificationService.deletePendingApprovalNotificationsByManualId(manualId);
   }
 
   // 対応ボタン 差し戻し
@@ -372,6 +393,47 @@ public class ManualService {
       manualDtoList.add(manualDto);
     }
     return manualDtoList;
+  }
+
+  // index quickView表示取得
+  public ManualResponseDto getQuickViewData(Principal principal){
+    //通知欄２つの数字を取得
+    int unreadRollBackCount = notificationService.unreadRollBackCount(principal);
+    int unreadPendingCount = notificationService.unreadPendingCount(principal);
+    //count　自分の作成マニュアル
+    int countUserCreatedManual = countUserCreatedManual(principal);
+    //count　申請中
+    int countCreatedPendingManual = countCreatedPendingManual(principal);
+    //count　最近更新（７日間）
+    int countRecentWeeklyManual = countRecentWeeklyManuals();
+
+    ManualResponseDto responseDto = new ManualResponseDto();
+    responseDto.setCountUserCreatedManual(countUserCreatedManual);
+    responseDto.setCountCreatedPendingManual(countCreatedPendingManual);
+    responseDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
+    responseDto.setUnreadRollBackCount(unreadRollBackCount);
+    responseDto.setUnreadPendingCount(unreadPendingCount);
+  
+    return responseDto;
+  }
+
+  //status一覧を返す
+  public List<ManualStatus> getManualStatuses() {
+    List<ManualStatus> responseStatus = Arrays.asList(ManualStatus.values());
+
+    return responseStatus;
+  }
+  //status一覧(Draft以外)を返す
+  public List<ManualStatus> getDefaultStatuses() {
+    List<ManualStatus> responseStatus = new ArrayList<>();
+    ManualStatus status[] = ManualStatus.values();
+    for (ManualStatus manualStatus : status) {
+      if (manualStatus==ManualStatus.DRAFT) {
+        continue;
+      }
+      responseStatus.add(manualStatus);
+    }
+    return responseStatus;
   }
 
   //myPage 自分作成のデータを渡す
@@ -481,38 +543,52 @@ public class ManualService {
 }
 
    //index 自分作成PENDINGの数を返す。
-   public Long countCreatedPendingManualList(Principal principal) {
+   public int countCreatedPendingManual(Principal principal) {
      User targetUser = userService.getUserByPrincipal(principal);
-     Long pendingCount =
+     Long count =
          manualRepository.countByCreatedByUserAndStatus(
           targetUser,ManualStatus.PENDING);
-    return pendingCount;
+     int targetCount = Math.toIntExact(count);
+    return targetCount;
    }
 
    //index 最近7日間の更新の数を返す。
-   public Long countRecentWeeklyManuals() {
-    Long count = 
+   public int countRecentWeeklyManuals() {
+    Long count =
       manualRepository.countByUpdatedAtAfter(
         LocalDateTime.now().minusDays(7));
-    return  count;
+    int targetCount = Math.toIntExact(count);
+    return  targetCount;
    }
 
    //MyPage index通知 自分以外作成PENDINGの数を返す。
-   public Long countNotUserCreatedPendingManualList(Principal principal){
+   public int countNotUserCreatedPendingManualList(Principal principal){
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserNotAndStatus(
           targetUser,
           ManualStatus.PENDING);
-    return count;
+    int targetCount = Math.toIntExact(count);
+    return targetCount;
    }
 
    //MyPage index通知 作成者自分の差し戻しマニュアル数を返す。
-   public Long countMyRollBackManual(Principal principal){
-    User targetUser = userService.getUserByPrincipal(principal);
-    Long count = manualRepository.countByIsRolledBackTrueAndCreatedByUser(
-          targetUser);
-    return count;
+   public int countMyRollBackManual(Principal principal) {
+     User targetUser = userService.getUserByPrincipal(principal);
+     Long count = manualRepository.countByIsRolledBackTrueAndCreatedByUser(
+         targetUser);
+     int targetCount = Math.toIntExact(count);
+     return targetCount;
    }
+
+   //index 自分作成分の数を返す。
+   public int countUserCreatedManual(Principal principal){
+    User targetUser = userService.getUserByPrincipal(principal);
+    Long count =
+      manualRepository.countByCreatedByUser(targetUser);
+      int targetCount = Math.toIntExact(count);
+      return targetCount;
+   }
+
 
   // ============================
   // Dto詰替
@@ -541,7 +617,7 @@ public class ManualService {
     }
     return true;
   }
-  
+
   private boolean canArchiveManual(
       User user,
       Manual manual,

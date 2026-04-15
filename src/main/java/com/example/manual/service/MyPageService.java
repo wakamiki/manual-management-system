@@ -21,9 +21,14 @@ public class MyPageService {
     this.manualService = manualService;
   }
 
-  public MyPageDto getMyPageViewData(Principal principal) {
+// ================================================
+//画面表示
+// ================================================
+
+  // myPage表示
+  public MyPageDto showMyPage(Principal principal) {
     User user = userService.getUserByPrincipal(principal);
-    if (!canGetMyPageData(user)) {
+    if (!canShowMyPage(user)) {
       throw new InvalidStateException("判定エラー");
     }
     MyPageDto pageDto = new MyPageDto();
@@ -33,7 +38,6 @@ public class MyPageService {
     pageDto.setRollbackCount(manualService.countMyRollBackManual(principal));
     pageDto.setPendingUnCreatedCount(manualService.countNotUserCreatedPendingManualList(principal));
 
-    //数字数える
     return pageDto;
   }
 
@@ -61,10 +65,11 @@ public class MyPageService {
     return listDto;
   }
 
+//=================================================
+//権限判定
+// ================================================
 
-  //権限判定
-
-  public boolean canGetMyPageData(User user) {
+  public boolean canShowMyPage(User user) {
     //有効アカウント
     if(!user.isActive()){
       throw new UnauthorizedException("このアカウントは有効ではありません。");

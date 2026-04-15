@@ -14,5 +14,5 @@ Optional<User>findByLoginId(String id);
 //Status:admin/approver全取得(特定ユーザーを除く)
 List<User> findByRoleInAndIsActiveTrueAndIdNot(UserRole[] roles, Long excludedUserId);
 
-List<User> findAll();
+List<User> findAllByOrderByUpdatedAtDesc();
 }

@@ -1,7 +1,6 @@
 package com.example.manual.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.example.manual.enums.UserRole;
 
@@ -10,7 +9,6 @@ public class UserResponseDto {
 
   }
 private String loginId;
-private String password;
 private String displayName;
 private UserRole role;
 private boolean isActive;
@@ -19,10 +17,6 @@ private LocalDateTime LastLoginAt;
   //getter
 public  String getLoginId() {
 return this.loginId;
-}
-
-public String getPassword() {
-return this.password;
 }
 
 public String getDisplayName() {
@@ -34,7 +28,7 @@ public UserRole getRole() {
   return this.role;
 }
 
-public boolean getActivate(){
+public boolean isActive(){
   return this.isActive;
 }
 
@@ -47,10 +41,6 @@ public void setLoginId(String loginId) {
   this.loginId = loginId;
 }
 
-public String setPassword() {
-  return this.password;
-}
-
 public void setDisplayName(String displayName) {
   this.displayName = displayName;
 }
@@ -60,7 +50,7 @@ public void setRole(UserRole role) {
   this.role = role;
 }
 
-public void activate(boolean isActive){
+public void setActive(boolean isActive){
   this.isActive = isActive;
 }
 

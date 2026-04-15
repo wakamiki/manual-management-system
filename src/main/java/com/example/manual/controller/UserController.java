@@ -1,13 +1,16 @@
 package com.example.manual.controller;
 
 import java.security.Principal;
+import java.util.List;
 
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.manual.dto.ManualListDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.service.UserService;
 
@@ -18,8 +21,24 @@ public class UserController {
     private final UserService userService;
 
     public UserController(UserService userService) {
-        this.userService = userService;
+      this.userService = userService;
     }
+
+
+//==============================================
+// 取得系
+// =============================================
+
+    // user-management表示
+    public String showUserManagementPege(
+        Principal principal,Model model) {
+      List<UserResponseDto> userResponseDto =
+        userService.showUserManagementPege(principal);
+
+      model.addAttribute("manualListDto", userResponseDto);
+      return "user-management";
+    }
+
   @GetMapping
   public void getAllUsers() {
     //ページ切り替え有
@@ -74,16 +93,5 @@ public class UserController {
     //アクティブのみ　adminのみ実行可
     //操作者　実行日時
 
-  }
-
-//取得系
-
-  //ユーザー管理画面取得
-  public UserResponseDto showUserManegementUserManagementPege(
-      Principal principal) {
-
-  UserResponseDto userResponseDto = new UserResponseDto();
-
-  return userResponseDto;
   }
 }

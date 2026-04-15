@@ -8,14 +8,10 @@ public class MyPageDto {
   }
 
   private List<ManualResponseDto> rollbackManualList;
-
   private List<ManualResponseDto> createdManualList;
-
   private List<ManualResponseDto> pendingManualList;
-
-  private Long rollbackCount;
-
-  private Long pendingUnCreatedCount;
+  private int rollbackCount;
+  private int pendingUnCreatedCount;
 
 
   //getter
@@ -31,14 +27,13 @@ public class MyPageDto {
     return this.pendingManualList;
   }
 
-  public Long getRollbackCount(){
+  public int getRollbackCount(){
     return this.rollbackCount;
   }
 
-  public Long getPendingUnCreatedCount(){
+  public int getPendingUnCreatedCount() {
     return this.pendingUnCreatedCount;
   }
-
 
 
   //setter
@@ -54,12 +49,11 @@ public class MyPageDto {
     this.pendingManualList = pendingManualList;
   }
 
-  public void setRollbackCount(Long rollbackCount){
+  public void setRollbackCount(int rollbackCount){
     this.rollbackCount = rollbackCount;
   }
 
-  public void setPendingUnCreatedCount(Long pendingUnCreatedCount){
+  public void setPendingUnCreatedCount(int pendingUnCreatedCount) {
     this.pendingUnCreatedCount = pendingUnCreatedCount;
   }
-
 }

@@ -24,15 +24,35 @@ import jakarta.validation.Valid;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final User user;
 
-    public UserService(UserRepository userRepository, User user) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.user = user;
+    }
+
+    // user-management表示
+    public List<UserResponseDto> showUserManagementPege(
+            Principal principal) {
+        User targetUser = getUserByPrincipal(principal);
+        if (!canShowUserManagementPege(targetUser)) {
+            throw new InvalidStateException("判定エラー");
+        }
+        List<User> userList =
+                userRepository.findAllByOrderByUpdatedAtDesc();
+        List<UserResponseDto> userResponseDto = new ArrayList<>();
+        for (User user : userList) {
+            UserResponseDto responseDto = new UserResponseDto();
+            responseDto.setLoginId(user.getLoginId());
+            responseDto.setDisplayName(user.getDisplayName());
+            responseDto.setRole(user.getRole());
+            responseDto.setActive(user.isActive());
+            responseDto.setLastLoginAt(user.getLastLoginAt());
+            userResponseDto.add(responseDto);
+        }
+        return userResponseDto;
     }
 
     public UserResponseDto createUser(
-            @Valid UserRequestDto requestDto,
+            UserRequestDto requestDto,
             Principal principal) {
         if (!canCreateUser(requestDto, principal)) {
             throw new InvalidStateException("判定エラー");
@@ -42,7 +62,6 @@ public class UserService {
                 requestDto.getLoginId(),
                 requestDto.getDisplayName(),
                 requestDto.getRole());
-                
 
         User savedUser = userRepository.save(targetUser);
 
@@ -50,7 +69,7 @@ public class UserService {
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
-        responseDto.activate(savedUser.isActive());
+        responseDto.setActive(savedUser.isActive());
         return responseDto;
     }
 
@@ -73,7 +92,7 @@ public class UserService {
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
-        responseDto.activate(savedUser.isActive());
+        responseDto.setActive(savedUser.isActive());
         responseDto.setLastLoginAt(savedUser.getLastLoginAt());
         return responseDto;
     }
@@ -121,9 +140,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-//=============================================
-// 取得・検索系
-//=============================================
+    // =============================================
+    // 取得・検索系
+    // =============================================
 
     // ユーザー管理画面取得
     public UserListResponseDto getUserManagementViewDeta(Principal principal) {
@@ -132,8 +151,7 @@ public class UserService {
         }
         List<User> allUsers = findAllUser();
         List<UserResponseDto> allUserDto = toUserListDtoList(allUsers);
-        UserListResponseDto userListResponseDto =
-            new UserListResponseDto();
+        UserListResponseDto userListResponseDto = new UserListResponseDto();
         return userListResponseDto;
     }
 
@@ -169,27 +187,37 @@ public class UserService {
         return users;
     }
 
+    // Dto詰替
 
-// Dto詰替
+    // 画面表示用にDto変換
+    public List<UserResponseDto> toUserListDtoList(List<User> userList) {
+        List<UserResponseDto> userListDto = new ArrayList<>();
+        for (User targetUser : userList) {
+            UserResponseDto userDto = new UserResponseDto();
+            userDto.setLoginId(targetUser.getLoginId());
+            userDto.setDisplayName(targetUser.getDisplayName());
+            userDto.setRole(targetUser.getRole());
+            userDto.setLastLoginAt(targetUser.getLastLoginAt());
+            userDto.setActive(targetUser.isActive());
+            userListDto.add(userDto);
+        }
 
-    //画面表示用にDto変換
-    public List<UserResponseDto> toUserListDtoList(List<User>userList) {
-    List<UserResponseDto> userListDto = new ArrayList<>();
-    for (User targetUser : userList) {
-        UserResponseDto userDto = new UserResponseDto();
-        userDto.setLoginId(targetUser.getLoginId());
-        userDto.setDisplayName(targetUser.getDisplayName());
-        userDto.setRole(targetUser.getRole());
-        userDto.setLastLoginAt(targetUser.getLastLoginAt());
-        userDto.activate(targetUser.isActive());
-        userListDto.add(userDto);
+        return userListDto;
     }
 
-    return userListDto;
-}
+    // =========================================
+    // 権限判定
+    // =========================================
 
-
-// 権限判定
+    private boolean canShowUserManagementPege(User user) {
+        if (!user.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (user.getRole() != UserRole.ADMIN) {
+            throw new UnauthorizedException("権限が不足しています。");
+        }
+        return true;
+    }
 
     private boolean canCreateUser(
             UserRequestDto requestDto,
@@ -197,7 +225,7 @@ public class UserService {
 
         User playUser = getUserByPrincipal(principal);
         List<User> users = userRepository.findAll();
-        if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         if (playUser.getRole() != UserRole.ADMIN) {
@@ -217,7 +245,7 @@ public class UserService {
             Principal principal) {
 
         User playUser = getUserByPrincipal(principal);
-                if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;
@@ -227,7 +255,7 @@ public class UserService {
             UserRequestDto requestDto,
             Principal principal) {
         User playUser = getUserByPrincipal(principal);
-                        if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;
@@ -235,7 +263,7 @@ public class UserService {
 
     private boolean canDeactivateUser(Principal principal) {
         User playUser = getUserByPrincipal(principal);
-        if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;
@@ -243,7 +271,7 @@ public class UserService {
 
     private boolean canActivateUser(Principal principal) {
         User playUser = getUserByPrincipal(principal);
-        if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;
@@ -251,7 +279,7 @@ public class UserService {
 
     private boolean canResetPassword(Principal principal) {
         User playUser = getUserByPrincipal(principal);
-        if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;
@@ -261,7 +289,7 @@ public class UserService {
             User user,
             Principal principal) {
         User playUser = getUserByPrincipal(principal);
-                if(!playUser.isActive()){
+        if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         return true;

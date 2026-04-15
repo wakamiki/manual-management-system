@@ -2,6 +2,7 @@ package com.example.manual.controller;
 
 import java.security.Principal;
 
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,14 +21,19 @@ public class MyPageController {
   }
 
 
+// ================================================
 //取得系
+//=================================================
 
+  //myPage表示
   @GetMapping
-  public MyPageDto showMyPage(Principal principal) {
-  return myPageService.getMyPageViewData(principal);
+  public String showMyPage(Principal principal, Model model) {
+
+    MyPageDto myPageDto = myPageService.showMyPage(principal);
+    model.addAttribute("pageDto", myPageDto);
+    return "my-page";
+
+
+
   }
-
-  //差し戻し通知件数取得(byユーザーID)
-
-  //承認待ち通知件数取得(byユーザーID)
 }

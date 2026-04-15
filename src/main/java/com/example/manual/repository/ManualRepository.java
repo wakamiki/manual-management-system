@@ -62,5 +62,8 @@ public interface ManualRepository extends JpaRepository<Manual, Long>
 
   //数取得 　引数の日付より更新日時が後のマニュアル
   Long countByUpdatedAtAfter(LocalDateTime updatedAt);
-        // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
+  // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
+
+  //数取得　自分作成分のマニュアル全件
+  Long countByCreatedByUser(User createdByUser);
 }

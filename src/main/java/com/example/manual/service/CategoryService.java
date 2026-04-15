@@ -1,6 +1,7 @@
 package com.example.manual.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
+import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.NotFoundException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.CategoryRepository;
@@ -25,9 +27,35 @@ public CategoryService(
     CategoryRepository categoryRepository,
     UserService userService) {
 
-    this.categoryRepository = categoryRepository;
-    this.userService = userService;
+  this.categoryRepository = categoryRepository;
+  this.userService = userService;
+}
+
+  // category-management表示
+  public List<CategoryResponseDto> showCategoryManagement(
+    Principal principal) {
+      if (!canShowCategoryManagement(principal)) {
+        throw new InvalidStateException("判定エラー");
+      }
+  List<Category> categories =
+      categoryRepository.findAllByOrderByDisplayOrderAsc();
+  List<CategoryResponseDto>responseDtos =
+      new ArrayList<>();
+  for (Category category : categories) {
+    CategoryResponseDto responseDto = new CategoryResponseDto();
+    responseDto.setActive(category.isActive());
+    responseDto.setCategoryName(category.getCategoryName());
+    responseDto.setDisplayOrder(category.getDisplayOrder());
+    responseDto.setId(category.getId());
+    responseDto.setUpdatedAt(category.getUpdatedAt());
+    responseDtos.add(responseDto);
   }
+  return responseDtos;
+}
+
+// ============================================
+// 登録・更新
+// ============================================
 
   public void createCategory(
       CategoryRequestDto requestDto,
@@ -123,7 +151,9 @@ public void activateCategory(Principal principal){
 }
 
 
+//===============================================
 //取得系
+// ===============================================
 
 public List<Category> getAllCategories() {
     return categoryRepository.findAllByOrderByCategoryNameAsc();
@@ -136,6 +166,20 @@ Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
     }
     return categoryOpt.get();
   }
+
+  //index 検索欄のカテゴリーリスト取得
+public List<CategoryResponseDto> getCategoryDtos() {
+  List<Category> categoryAll = categoryRepository.findAllByOrderByDisplayOrderAsc();
+  List<CategoryResponseDto> responseDtos = new ArrayList<>();
+  for (Category category : categoryAll) {
+    CategoryResponseDto responseDto = new CategoryResponseDto();
+    responseDto.setActive(category.isActive());
+    responseDto.setId(category.getId());
+    responseDto.setCategoryName(category.getCategoryName());
+    responseDtos.add(responseDto);
+  }
+  return responseDtos;
+}
 
 //displayオーダー割り込み
 private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
@@ -167,13 +211,12 @@ private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
 
 //displayオーダー割り込み
 private void shiftUpOrderNumbers(Integer start, Integer end) {
- // new を挿入するために範囲をずらす
+  // new を挿入するために範囲をずらす
   if (start == null || end == null || end < start) {
     return;
   }
-  List<Category> targets =
-      categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
-          start, end);
+  List<Category> targets = categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
+      start, end);
 
   for (Category target : targets) {
     target.setDisplayOrder(target.getDisplayOrder() - 1);
@@ -181,34 +224,47 @@ private void shiftUpOrderNumbers(Integer start, Integer end) {
   categoryRepository.saveAll(targets);
 }
 
-  public void findAllActive(){
 
-}
-
+// ===============================================
 //権限判定
+// ===============================================
 
   //adminのみ
 private boolean isAdmin(Principal principal){
-  User user = userService.getUserByPrincipal(principal);
-  if(user.getRole()!=UserRole.ADMIN){
+  User targetUser = userService.getUserByPrincipal(principal);
+  if(targetUser.getRole()!=UserRole.ADMIN){
     throw new UnauthorizedException("権限が不足しています。");
   }
     return true;
   }
 
 //カテゴリー名同名チェック
-private boolean isCategoryNameTaken(String categoryName){
-  List<Category>categoryList = getAllCategories();
+private boolean isCategoryNameTaken(String categoryName) {
+  List<Category> categoryList = getAllCategories();
   for (Category category : categoryList) {
     if (categoryName.equals(category.getCategoryName())) {
       return true;
       //"分岐メッセージ:同名のカテゴリーがあります。そのまま登録しますか？";
+    }
   }
-}
   return false;
 }
 
+private boolean canShowCategoryManagement(Principal principal) {
+  User targetUser = userService.getUserByPrincipal(principal);
+  if (targetUser.getRole() != UserRole.ADMIN) {
+    throw new UnauthorizedException("権限が不足しています。");
+  }
+  if (targetUser.isActive() != true) {
+    throw new UnauthorizedException("有効なユーザーではありません。");
+  }
+  return true;
+}
+
+// ===============================================
 //共通処理
+// ===============================================
+
 private Category findCategoryOrThrow(Long categoryId) {
   Optional<Category> categoryOpt =
     categoryRepository.findById(categoryId);

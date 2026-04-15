@@ -12,7 +12,6 @@ private Long id;
 private String categoryName;
 private Integer displayOrder;
 private boolean isActive;
-private boolean  confirmOverwrite;
 private LocalDateTime updatedAt;
 
 //getter
@@ -34,10 +33,6 @@ public boolean isActive() {
   return this.isActive;
 }
 
-public boolean confirmOverwrite(){
-  return this.confirmOverwrite;
-}
-
 public LocalDateTime getUpdatedAt(){
   return this.updatedAt;
 }
@@ -57,10 +52,6 @@ public void setDisplayOrder(Integer displayOrder) {
 
 public void setActive(boolean active) {
   this.isActive = active;
-}
-
-public void confirmOverwrite(boolean confirmOverwrite){
-  this.confirmOverwrite=confirmOverwrite;
 }
 
 public void setUpdatedAt(LocalDateTime updatedAt){

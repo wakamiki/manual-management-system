@@ -17,6 +17,7 @@ private String content;
 private String categoryName;
 private String changeNote;
 private String createdName;
+private String displayName;
 private User changedByName;
 private ManualStatus status;
 private LocalDateTime createdAt;
@@ -24,8 +25,13 @@ private LocalDateTime updatedAt;
 private LocalDateTime approvedAt;
 private LocalDateTime changedAt;
 private Long categoryId;
-private List<ManualHistoryDto> histries;
+private List<ManualHistoryDto> histories;
 private boolean isRolledBack = false;
+private int countUserCreatedManual;
+private int countCreatedPendingManual;
+private int countRecentWeeklyManual;
+private int unreadRollBackCount;
+private int unreadPendingCount;
 
 
 public Long getManualId() {
@@ -60,6 +66,10 @@ public User getChangedByName() {
   return this.changedByName;
 }
 
+public String getDisplayName() {
+  return this.displayName;
+}
+
 public ManualStatus getStatus() {
   return this.status;
 }
@@ -81,12 +91,31 @@ public LocalDateTime getChangedAt() {
   return this.changedAt;
 }
 
-public List<ManualHistoryDto> getHistries() {
-  return this.histries;
+public List<ManualHistoryDto> getHistories() {
+  return this.histories;
 }
 
 public boolean isRolledBack() {
   return this.isRolledBack;
+}
+
+public int getCountUserCreatedManual() {
+  return this.countUserCreatedManual;
+}
+
+public int getCountCreatedPendingManual() {
+  return this.countCreatedPendingManual;
+}
+
+public int getCountRecentWeeklyManual() {
+  return this.countRecentWeeklyManual;
+}
+
+public int getUnreadRollBackCount(){
+  return this.unreadRollBackCount;
+}
+public int getUnreadPendingCount(){
+  return this.unreadPendingCount;
 }
 
 
@@ -124,6 +153,10 @@ public void setChangedByName(User changedByName) {
   this.changedByName = changedByName;
 }
 
+public void setDisplayName(String displayName) {
+  this.displayName = displayName;
+}
+
 public void setStatus(ManualStatus status) {
   this.status = status;
 }
@@ -146,11 +179,29 @@ public void setChangedAt(LocalDateTime changedAt) {
 }
 
 public void setHistories(List<ManualHistoryDto> histories) {
-  this.histries = histories;
+  this.histories = histories;
 }
 
 public void setRolledBack(boolean isRolledBack) {
   this.isRolledBack = isRolledBack;
+}
+
+public void setCountUserCreatedManual(int countUserCreatedManual) {
+  this.countUserCreatedManual = countUserCreatedManual;
+}
+
+public void setCountCreatedPendingManual(int countCreatedPendingManual) {
+  this.countCreatedPendingManual = countCreatedPendingManual;
+}
+
+public void setCountRecentWeeklyManual(int countRecentWeeklyManual) {
+  this.countRecentWeeklyManual = countRecentWeeklyManual;
+}
+public void setUnreadRollBackCount(int unreadRollBackCount){
+  this.unreadRollBackCount = unreadRollBackCount;
+}
+public void setUnreadPendingCount(int unreadPendingCount){
+  this.unreadPendingCount = unreadPendingCount;
 }
 
 }

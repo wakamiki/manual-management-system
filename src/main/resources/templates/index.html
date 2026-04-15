@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <main class="container index-page">
+  <main class="container index-page" th:object="${listDto}">
     <header class="page-header">
       <div>
         <h1 class="h4 mb-0">業務マニュアル管理システム</h1>
@@ -19,8 +19,8 @@
       <div class="page-actions">
         <form class="search-form">
           <details class="search-filter">
-            <summary th="">カテゴリ</summary>
-            <div class="search-filter-panel">
+            <summary>カテゴリ</summary>
+            <div class="search-filter-panel" th:each="category : *{categoryDtos.}">
               <label class="search-check"><input type="checkbox" checked> 営業部</label>
               <label class="search-check"><input type="checkbox"> 経理部</label>
               <label class="search-check"><input type="checkbox"> 総務部</label>
@@ -34,8 +34,7 @@
           </details>
           <details class="search-filter">
             <summary>ステータス</summary>
-            <div class="search-filter-panel">
-              <label class="search-check"><input type="checkbox" checked> 下書き</label>
+            <div class="search-filter-panel" th:object="$*{manualStatuses}">
               <label class="search-check"><input type="checkbox" checked> 申請中</label>
               <label class="search-check"><input type="checkbox" checked> 承認済</label>
               <label class="search-check"><input type="checkbox"> アーカイブ</label>
@@ -78,7 +77,7 @@
             </div>
             <div class="sidebar-section">
               <h2 class="h5">カテゴリ</h2>
-              <ul class="list-group list-group-flush">
+              <ul class="list-group list-group-flush" th:each="category : *{categoryDtos.}">
                 <li class="list-group-item">営業部</li>
                 <li class="list-group-item">経理部</li>
                 <li class="list-group-item">総務部</li>
@@ -91,7 +90,7 @@
                 <span class="stopped-toggle-icon">＋</span>
               </button>
               <div class="collapse" id="stoppedCategoryList">
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush" th:each="category : *{categoryDtos.}">
                   <li class="list-group-item">旧営業部</li>
                 </ul>
               </div>
@@ -114,7 +113,7 @@
         </div>
       </aside>
 
-      <section class="col-lg-10 col-md-9">
+      <section class="col-lg-10 col-md-9" th:each="manual : *{searchManuals}">
         <div class="accordion w-100" id="accordionExample">
           <div class="accordion-item">
             <div class="accordion-header">
@@ -122,20 +121,20 @@
                 aria-expanded="true" aria-controls="collapseOne">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center gap-2">
-                    <strong class="fw-semibold">マニュアルの作成手順</strong>
+                    <strong class="fw-semibold" th:text="$manual.title">マニュアルの作成手順</strong>
                     <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
                   </div>
                   <div class="align-items-center gap-2">
-                    <span class="text-muted"><small>マニュアルID: 1001</small></span>
-                    <span class="category">カテゴリ</span>
-                    <span class="badge bg-primary">申請待ち</span>
+                    <span class="text-muted"><small >マニュアルID: 1001</small></span>
+                    <span class="category"th:text="$manual.categoryName">カテゴリ</span>
+                    <span class="badge bg-primary" th:text="$manual.status">申請待ち</span>
                   </div>
                 </div>
               </button>
             </div>
             <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                <p>見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <p th:text="$manual.content">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
                   <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
                     class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -144,7 +143,7 @@
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
                     class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
-                <h2 class="history-title mb-2">更新履歴</h2>
+                <h2 class="history-title mb-2" th:each="manual : *{searchManuals}">更新履歴</h2>
                 <ul class="history-list mb-0">
                   <li>2026-04-05: 本文の修正</li>
                   <li>2026-04-04: 新規作成</li>
