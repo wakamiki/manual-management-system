@@ -11,9 +11,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 
 @Entity
+@Table(name = "manuals")
 public class Manual {
 
       public Manual() {
@@ -27,7 +29,7 @@ public class Manual {
     private Category category;
     @ManyToOne
     @JoinColumn(name = "operated_by_user_id")
-    private User user;
+    private User createdByUser;
     @Column(nullable = false, length = 100)
     private String title;
     @Column(nullable = false, length = 10000)
@@ -48,8 +50,8 @@ public class Manual {
         return this.category;
     }
 
-    public User getUser() {
-        return this.user;
+    public User getCreatedByUser() {
+        return this.createdByUser;
     }
 
     public String getTitle() {
@@ -86,8 +88,8 @@ public class Manual {
         this.category = category;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setCreatedByUser(User createdByUser) {
+        this.createdByUser = createdByUser;
     }
 
     public void setTitle(String title) {

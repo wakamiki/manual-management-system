@@ -3,6 +3,8 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.User;
@@ -10,6 +12,7 @@ import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 
+@Service
 public class MyPageService {
 
   private final UserService userService;

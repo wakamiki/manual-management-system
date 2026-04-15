@@ -37,6 +37,7 @@ public ManualController(ManualService manualService) {
 }
 
 // index表示
+@GetMapping
 public String showIndex(
                 @Valid @ModelAttribute ManualSearchConditionDto condition,
                 Principal principal,
@@ -276,7 +277,6 @@ public String showIndex(
 //検索・取得系
 //====================================
 
-@GetMapping
 public List<ManualResponseDto> searchManuals(
         @ModelAttribute ManualSearchConditionDto condition,
                 Principal principal) {

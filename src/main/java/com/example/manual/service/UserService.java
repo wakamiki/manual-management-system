@@ -180,6 +180,16 @@ public class UserService {
         return userList;
     }
 
+    public User getUserByloginId(String loginId){
+        Optional<User> userOpt = userRepository.findByLoginId(loginId);
+        if (userOpt.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+        }
+        User targetUser = userOpt.get();
+        return targetUser;        
+    }
+
     // Status:admin/approver全取得(特定ユーザーを除く)
     public List<User> findApproverAndAdminUsersExcept(Long excludedUserId) {
         UserRole[] roles = { UserRole.ADMIN, UserRole.APPROVER };
@@ -187,7 +197,10 @@ public class UserService {
         return users;
     }
 
+
+    // =========================================
     // Dto詰替
+    // =========================================
 
     // 画面表示用にDto変換
     public List<UserResponseDto> toUserListDtoList(List<User> userList) {

@@ -3,6 +3,8 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.Notification;
 import com.example.manual.entity.User;
@@ -12,6 +14,7 @@ import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.NotificationRepository;
 
+@Service
 public class NotificationService {
 
     private final UserService userService;
@@ -24,9 +27,7 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
-public void createSubmitNotifications(
-        Manual manual,
-        Principal principal){
+
 
 //========================================================
 //通知作成
@@ -34,15 +35,18 @@ public void createSubmitNotifications(
 
 //承認待ち申請時に承認者全員へ通知を作成する。
 //有効ユーザーのadmin/approverに通知を送る（作成者を除く）
+
+    public void createSubmitNotifications(Principal principal,Manual manual){
+    User user = userService.getUserByPrincipal(principal);
     if (!canCreateSubmitNotifications(principal)) {
         throw new UnauthorizedException("判定エラー");
     }
     //通知先ユーザーリスト
-    List<User>users = userService.findApproverAndAdminUsersExcept(manual.getId());
+    List<User>users = userService.findApproverAndAdminUsersExcept(user.getId());
 
-    for (User user : users) {
+    for (User targetUser : users) {
         Notification notification = new Notification();
-        notification.setTargetUser(user);
+        notification.setTargetUser(targetUser);
         notification.setManual(manual);
         notification.setType(NotificationType.PENDING_APPROVAL);
         notification.markCreatedNow();
@@ -52,8 +56,15 @@ public void createSubmitNotifications(
 
 public void createRollbackNotification(Manual manual){
 //差し戻し時に作成者へ通知を作成する。
-//有効ユーザー　manualCreateUserに通知
+User targetUser = userService.getUserByloginId(
+        manual.getCreatedByUser().getLoginId());
 
+        Notification notification = new Notification();
+        notification.setTargetUser(targetUser);
+        notification.setManual(manual);
+        notification.setType(NotificationType.ROLLBACK);
+        notification.markCreatedNow();
+        notificationRepository.save(notification);    
 }
 
 
@@ -68,14 +79,15 @@ public void createRollbackNotification(Manual manual){
 //マニュアル承認時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
 public void deletePendingApprovalNotificationsByManualId(
         Long manualId) {
-    notificationRepository.deleteByManualIdAndNotificationType(
+    notificationRepository.deleteByManualIdAndType(
             manualId, NotificationType.PENDING_APPROVAL);
 }
 
 //差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
 public void deleteRollBackNotification(Long manualId, User user) {
 //通知のあるユーザーがPENDINGしたときに実行
-
+    notificationRepository.deleteByManualIdAndType(
+        manualId, NotificationType.ROLLBACK);
 }
 
 public void deleteAsRead(Long notificationId, User user) {
@@ -103,7 +115,7 @@ public void getUnreadCount(User user){
 //ユーザー未読の差し戻し通知数を取得
 public int unreadRollBackCount(Principal principal){
     User targetUser = userService.getUserByPrincipal(principal);
-    Long count = notificationRepository.countByTargetUserAndNotificationType(targetUser, NotificationType.ROLLBACK);
+    Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.ROLLBACK);
     int notificationCount = Math.toIntExact(count);
     return notificationCount;
 }
@@ -111,7 +123,7 @@ public int unreadRollBackCount(Principal principal){
 //ユーザー未読の承認待ち通知数を取得
 public int unreadPendingCount(Principal principal){
    User targetUser = userService.getUserByPrincipal(principal);
-   Long count = notificationRepository.countByTargetUserAndNotificationType(targetUser, NotificationType.PENDING_APPROVAL);
+   Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.PENDING_APPROVAL);
    int notificationCount = Math.toIntExact(count);
     return notificationCount; 
 }

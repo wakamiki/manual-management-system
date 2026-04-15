@@ -116,7 +116,7 @@ public class ManualService {
     manual.markCreatedNow();
     manual.markStatusDRAFT();
     manual.setCategory(category);
-    manual.setUser(user);
+    manual.setCreatedByUser(user);
     manual.markUnreadRolledBack();
     manualRepository.save(manual);
   }
@@ -140,10 +140,10 @@ public class ManualService {
     manual.markUpdatedNow();
     manual.submitPENDING();
     manual.setCategory(category);
-    manual.setUser(user);
+    manual.setCreatedByUser(user);
     manual.markUnreadRolledBack();
     Manual savedManual = manualRepository.save(manual);
-    notificationService.createSubmitNotifications(savedManual, principal);
+    notificationService.createSubmitNotifications(principal,savedManual);
   }
 
   // 対応ボタン 編集（新規タブ）
@@ -196,7 +196,7 @@ public class ManualService {
     manual.markCreatedNow();
     manual.markStatusDRAFT();
     manual.setCategory(category);
-    manual.setUser(user);
+    manual.setCreatedByUser(user);
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
         savedManual,
@@ -223,13 +223,14 @@ public class ManualService {
     manual.markUpdatedNow();
     manual.submitPENDING();
     manual.setCategory(category);
-    manual.setUser(user);
+    manual.setCreatedByUser(user);
     manual.markUnreadRolledBack();
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
         savedManual,
         requestDto.getChangeNote(),
         principal);
+    notificationService.deleteRollBackNotification(manualId,user);
   }
 
   // 対応ボタン マニュアル詳細画面（新規タブ）
@@ -248,7 +249,7 @@ public class ManualService {
     detailDto.setCategoryName(manual.getCategory().getCategoryName());
     detailDto.setTitle(manual.getTitle());
     detailDto.setContent(manual.getContent());
-    detailDto.setCreatedByName(manual.getUser().getDisplayName());
+    detailDto.setCreatedByName(manual.getCreatedByUser().getDisplayName());
     detailDto.setStatus(manual.getStatus());
     detailDto.setCreatedAt(manual.getCreatedAt());
     detailDto.setUpdatedAt(manual.getUpdatedAt());
@@ -386,7 +387,7 @@ public class ManualService {
       manualDto.setManualId(manual.getId());
       manualDto.setStatus(manual.getStatus());
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getUser().getDisplayName());
+      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualDto.setHistories(
           manualHistoryService.getManualHistorySummaryDtoList(
               manual.getId()));
@@ -448,7 +449,7 @@ public class ManualService {
       manualDto.setCategoryId(manual.getCategory().getId());
       manualDto.setCategoryName(manual.getCategory().getCategoryName());
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getUser().getDisplayName());
+      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualDto.setRolledBack(manual.isRolledBack());
       manualDto.setCreatedAt(manual.getCreatedAt());
       userCreatedListDto.add(manualDto);
@@ -469,7 +470,7 @@ public class ManualService {
       manualDto.setCategoryId(manual.getCategory().getId());
       manualDto.setCategoryName(manual.getCategory().getCategoryName());
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getUser().getDisplayName());
+      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualDto.setRolledBack(manual.isRolledBack());
       rollBacklistDto.add(manualDto);
     }
@@ -489,7 +490,7 @@ public class ManualService {
       manualDto.setCategoryId(manual.getCategory().getId());
       manualDto.setCategoryName(manual.getCategory().getCategoryName());
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getUser().getDisplayName());
+      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualDto.setRolledBack(manual.isRolledBack());
       pendingListDto.add(manualDto);
     }
@@ -509,7 +510,7 @@ public class ManualService {
       manualResponseDto.setContent(manual.getContent());
       manualResponseDto.setStatus(manual.getStatus());
       manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      manualResponseDto.setCreatedName(manual.getUser().getDisplayName());
+      manualResponseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualResponseDto.setCategoryName(manual.getCategory().getCategoryName());
       manualResponseDto.setCategoryId(manual.getCategory().getId());
       List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
@@ -532,7 +533,7 @@ public class ManualService {
       manualResponseDto.setContent(manual.getContent());
       manualResponseDto.setStatus(manual.getStatus());
       manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      manualResponseDto.setCreatedName(manual.getUser().getDisplayName());
+      manualResponseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualResponseDto.setCategoryName(manual.getCategory().getCategoryName());
       manualResponseDto.setCategoryId(manual.getCategory().getId());
       List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
@@ -599,7 +600,7 @@ public class ManualService {
     responseDto.setManualId(manual.getId());
     responseDto.setCreatedAt(manual.getCreatedAt());
     responseDto.setUpdatedAt(manual.getUpdatedAt());
-    responseDto.setCreatedName(manual.getUser().getDisplayName());
+    responseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
     responseDto.setContent(manual.getContent());
     responseDto.setTitle(manual.getTitle());
     responseDto.setCategoryName(manual.getCategory().getCategoryName());
@@ -670,7 +671,7 @@ public class ManualService {
       throw new InvalidStateException(
           "承認ができるのはステータス:PENDINGのマニュアルのみです。");
     }
-    if (Objects.equals(manual.getUser().getId(), user.getId())) {
+    if (Objects.equals(manual.getCreatedByUser().getId(), user.getId())) {
       throw new InvalidStateException(
           "自分が作成したマニュアルの承認をすることは出来ません。");
     }
@@ -698,7 +699,7 @@ public class ManualService {
       throw new InvalidStateException(
           "差し戻しができるのはステータス:PENDINGのマニュアルのみです。");
     }
-    if (Objects.equals(manual.getUser().getId(), user.getId())) {
+    if (Objects.equals(manual.getCreatedByUser().getId(), user.getId())) {
       throw new InvalidStateException(
           "自分が作成したマニュアルを差し戻しすることは出来ません。");
     }
@@ -824,7 +825,7 @@ public class ManualService {
       throw new InvalidStateException(
           "編集ができるのはステータス:DRAFT/PENDINGのマニュアルのみです。");
     }
-    if (!Objects.equals(manual.getUser().getId(), user.getId())) {
+    if (!Objects.equals(manual.getCreatedByUser().getId(), user.getId())) {
       throw new InvalidStateException(
           "自分が作成したマニュアル以外を編集することはできません。");
     }

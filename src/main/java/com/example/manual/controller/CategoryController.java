@@ -3,13 +3,12 @@ package com.example.manual.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.CategoryRequestDto;
@@ -18,7 +17,7 @@ import com.example.manual.service.CategoryService;
 
 import jakarta.validation.Valid;
 
-@RestController
+@Controller
 @RequestMapping("/categories")
 public class CategoryController {
 
@@ -92,12 +91,12 @@ public String showCategoryManagement(
   }
 
 
-  @GetMapping
+
   public void getAllCategories() {
     //停止中もすべて取得 adminのみ実行可
   }
 
-    @GetMapping
+
   public void getAllActiveCategories() {
     //adminのみ実行可
   }

@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.08  
-更新日: 2026-04-14
+Version: 01.00.09  
+更新日: 2026-04-15
 
 ---
 
@@ -820,3 +820,54 @@ thin controller 方針を再確認した。
 - `index` 検索欄のカテゴリ / ステータス反映完成
 - `ManualController` の GET / POST / redirect 最終整理
 - 最近更新件数の画面反映
+
+
+作業記録（2026-04-15）
+
+## 本日の作業テーマ
+- index画面のThymeleaf表示確認
+- 通知機能関連のRepository / Service整理
+- Spring Boot起動エラーの解消
+- H2ファイルDB環境の確認
+- Spring Security設定追加
+- H2コンソール接続確認
+
+────────────────
+## 実施内容
+
+【Repository / JPA修正】
+- NotificationRepositoryのメソッド名をEntityフィールド名に合わせて修正
+  - notificationType → type
+- ManualRepositoryのプロパティ名不一致を修正
+- JPAのcountBy / deleteBy命名規則の理解を整理
+
+【DB / Entity修正】
+- User Entityのテーブル名を user → users に変更
+- H2で予約語によるDDLエラーを解消
+- H2ファイルDB接続確認
+  - jdbc:h2:file:./data/testdb
+
+【起動エラー対応】
+- ポート競合（8080使用中）を解消
+- Spring Boot起動成功
+- Tomcat起動確認
+- Whitelabel Error 500 の原因を切り分け
+
+【Security対応】
+- config配下に SecurityConfig.java を新規作成
+- H2コンソール用のSecurity設定追加
+  - /h2-console/** permitAll
+  - csrf除外
+  - frameOptions sameOrigin
+
+【画面確認】
+- index画面の表示成功
+- H2コンソールアクセス準備完了
+- DB未登録のため一覧未表示であることを確認
+
+────────────────
+## 現在の到達点
+- アプリ起動成功
+- index画面表示成功
+- H2コンソール確認フェーズ
+- 次は初期データ投入と一覧表示確認へ進行
