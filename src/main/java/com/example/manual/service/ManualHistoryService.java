@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.ManualDetailHistoryDto;
 import com.example.manual.dto.ManualHistoryDto;
@@ -17,13 +19,15 @@ import com.example.manual.repository.UserRepository;
 @Service
 public class ManualHistoryService {
 
+  private static final Logger log = LoggerFactory.getLogger(ManualHistoryService.class);
+
   public final ManualHistoryRepository manualHistoryRepository;
-  public final UserRepository userRepository;
+  public final UserService userRepository;
   public final UserService userService;
 
   public ManualHistoryService(
       ManualHistoryRepository manualHistoryRepository,
-      UserRepository userRepository,
+      UserService userRepository,
       UserService userService) {
 
       this.manualHistoryRepository = manualHistoryRepository;
@@ -35,7 +39,7 @@ public class ManualHistoryService {
       Manual manual,
       String changeNote,
       Principal principal) {
-
+    log.info("start");
   ManualHistory history = new ManualHistory();
   history.setChangeNote(changeNote);
   history.markChangedNow();
@@ -47,6 +51,7 @@ public class ManualHistoryService {
 
 //manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistory> getManualIdHistory(Long manualId) {
+  log.info("start");
   return manualHistoryRepository.findByManual_IdOrderByChangedAtDesc(
       manualId);
 }
@@ -57,8 +62,9 @@ public List<ManualHistory> getAllHistories(){
 
 //一覧表示用 manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistoryDto> getManualHistorySummaryDtoList(
-    Long manualId){
-  List<ManualHistory> manualHistories =
+    Long manualId) {
+  log.info("start");
+      List<ManualHistory> manualHistories =
       this.getManualIdHistory(manualId);
   List<ManualHistoryDto>historyDtoList = new ArrayList<>();
   for (ManualHistory history :  manualHistories) {
@@ -72,7 +78,8 @@ public List<ManualHistoryDto> getManualHistorySummaryDtoList(
 //詳細表示用
 public List<ManualDetailHistoryDto> getManualHistoryDetailDtoList(
     Long manualId) {
-  List<ManualHistory> manualHistories = this.getManualIdHistory(manualId);
+  log.info("start");
+      List<ManualHistory> manualHistories = this.getManualIdHistory(manualId);
   List<ManualDetailHistoryDto> historyDetailDtoList = new ArrayList<>();
   for (ManualHistory history : manualHistories) {
     ManualDetailHistoryDto historyDetailDto = new ManualDetailHistoryDto();

@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>category-management</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/common.css">
-  <link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
 <body>
   <main class="container admin-page">
@@ -55,7 +55,7 @@
             <table class="table table-hover align-middle">
               <thead>
                 <tr>
-                  <th scope="col">categoryId</th>                  
+                  <th scope="col">categoryId</th>
                   <th scope="col">categoryName</th>
                   <th scope="col">displayOrder</th>
                   <th scope="col">status</th>

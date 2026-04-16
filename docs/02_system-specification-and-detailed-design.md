@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.09  
-更新日: 2026-04-14
+Version: 01.06.10
+更新日: 2026-04-16
 
 ---
 
@@ -9,8 +9,10 @@ Version: 01.06.09
 - マニュアル一覧
 - マニュアル詳細
 - マニュアル入力
+- マニュアル編集
 - 申請 / 承認 / 差し戻し / アーカイブ / 復帰
 - マニュアル複製
+- マニュアル更新履歴
 - ユーザー管理
 - カテゴリ管理
 - 通知機能
@@ -41,14 +43,14 @@ Version: 01.06.09
 
 ### 3-2. 権限ルール
 - USER: 作成 / 更新 / 申請
-- APPROVER: 承認 / 差し戻し / アーカイブ
+- APPROVER: 承認 / 差し戻し / 復帰 / アーカイブ
 - ADMIN: ユーザー管理 / カテゴリ管理
 
 ### 3-3. 制約
 - 作成者本人による承認は禁止
+- マニュアル編集は作成者本人のみ
 - 停止中ユーザーは操作不可
 - 使用停止カテゴリは新規選択不可
-
 ---
 
 ## 4. ステータス仕様
@@ -88,7 +90,7 @@ Version: 01.06.09
   - updatedAt
   - approvedAt
 - 複製後の値
-  - status = DRAFT
+  - status = DRAFT/PENDING
   - operatedByUser = current user
   - category = selected category
   - changeNote = required
@@ -96,7 +98,7 @@ Version: 01.06.09
 
 ### 5-2. 入力画面
 - 新規作成は専用画面で行う
-- 編集 / 複製は共通入力画面 `manual-form` を使う
+- 編集 / 複製は共通入力画面 `manual-Editer` を使う
 - 共通入力画面は `edit` / `copy` の mode で切り替える
 - 編集 / 複製では `マニュアルID / 作成日時 / 更新日時 / 作成者` を表示する
 - 新規作成では changeNote を必須としない
@@ -151,12 +153,18 @@ Version: 01.06.09
 - `isActive`
 - `lastLoginAt`
 
-### 6-4A. Category 補足
+### 6-5. Category
+- 部署名
+- `displayOrder`
+- `categoryName`
+- `createdAt`
+- `isActive`
+- `updatedAt`
 - 同名カテゴリは原則確認対象とする
 - カテゴリコードを導入して同名の区別に使う
 - 名前更新時にマニュアル全文チェックは行わない
 
-### 6-5. Notification
+### 6-6. Notification
 - 通知データ本体
 - `targetUser`
 - `manual`
@@ -166,7 +174,7 @@ Version: 01.06.09
 - `createdAt`
 - 現時点では Entity は空実装で、今後拡張対象とする
 
-### 6-6. UserOperationHistory
+### 6-7. UserOperationHistory
 - 管理操作や監査用の履歴
 - `targetUser`
 - `operatedByUser`
@@ -182,10 +190,12 @@ Version: 01.06.09
 
 ### 7-1. ManualService
 - 一覧取得
+- マニュアル検索
 - 詳細取得
 - 履歴取得の窓口
 - 新規作成
 - 更新
+- 編集
 - 複製
 - 申請
 - 承認

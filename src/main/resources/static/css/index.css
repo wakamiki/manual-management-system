@@ -259,6 +259,10 @@
 }
 
 /* Sidebar */
+.sidebar {
+  min-height: 1000px;
+}
+
 .sidebar .card,
 .sidebar .card-body,
 .sidebar .list-group,

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
@@ -20,6 +22,8 @@ import com.example.manual.repository.CategoryRepository;
 @Service
 public class CategoryService {
 
+  private static final Logger log = LoggerFactory.getLogger(CategoryService.class);
+
 public final CategoryRepository categoryRepository;
 public final UserService userService;
 
@@ -33,7 +37,8 @@ public CategoryService(
 
   // category-management表示
   public List<CategoryResponseDto> showCategoryManagement(
-    Principal principal) {
+      Principal principal) {
+    log.info("start");
       if (!canShowCategoryManagement(principal)) {
         throw new InvalidStateException("判定エラー");
       }
@@ -60,7 +65,7 @@ public CategoryService(
   public void createCategory(
       CategoryRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     int targetOrder = requestDto.getDisplayOrder();
     shiftUpOrderNumbers(targetOrder, null);
     if(!isAdmin(principal)){
@@ -91,7 +96,7 @@ public CategoryService(
       Long categoryId,
       CategoryRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Category category = findCategoryOrThrow(categoryId);
     int currentOrder = category.getDisplayOrder();
     int targetOrder = requestDto.getDisplayOrder();
@@ -120,10 +125,12 @@ public CategoryService(
     // responseDto.setActive(savedCategory.isActive());
   }
 
-public void deactivateCategory(Principal principal){
-    if(!isAdmin(principal)){
-      throw new  UnauthorizedException("権限が不足しています。");
-    }
+  public void deactivateCategory(Principal principal) {
+    log.info("start");
+  if (!isAdmin(principal)) {
+    throw new UnauthorizedException("権限が不足しています。");
+  }
+
     Category category = new Category();
 
     category.markInactive();
@@ -135,8 +142,9 @@ public void deactivateCategory(Principal principal){
     // responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
   }
 
-public void activateCategory(Principal principal){
-    if(!isAdmin(principal)){
+  public void activateCategory(Principal principal) {
+    log.info("start");
+  if(!isAdmin(principal)){
       throw new  UnauthorizedException("権限が不足しています。");
     }
     Category category = new Category();
@@ -156,11 +164,13 @@ public void activateCategory(Principal principal){
 // ===============================================
 
 public List<Category> getAllCategories() {
-    return categoryRepository.findAllByOrderByCategoryNameAsc();
+  log.info("start");
+  return categoryRepository.findAllByOrderByCategoryNameAsc();
   }
 
-public Category getCategoryById(Long categoryId) {
-Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
+  public Category getCategoryById(Long categoryId) {
+    log.info("start");
+  Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
  if (categoryOpt.isEmpty()) {
       throw new RuntimeException("指定されたカテゴリーは存在しません");
     }
@@ -168,7 +178,8 @@ Optional<Category>categoryOpt = categoryRepository.findById(categoryId);
   }
 
   //index 検索欄のカテゴリーリスト取得
-public List<CategoryResponseDto> getCategoryDtos() {
+  public List<CategoryResponseDto> getCategoryDtos() {
+    log.info("start");
   List<Category> categoryAll = categoryRepository.findAllByOrderByDisplayOrderAsc();
   List<CategoryResponseDto> responseDtos = new ArrayList<>();
   for (Category category : categoryAll) {
@@ -183,8 +194,9 @@ public List<CategoryResponseDto> getCategoryDtos() {
 
 //displayオーダー割り込み
 private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
- // new を挿入するために範囲をずらす
-  if (start == null) {
+  // new を挿入するために範囲をずらす
+  log.info("start");
+ if (start == null) {
     return;
   }
   Integer end = endInclusive;
@@ -212,6 +224,7 @@ private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
 //displayオーダー割り込み
 private void shiftUpOrderNumbers(Integer start, Integer end) {
   // new を挿入するために範囲をずらす
+  log.info("start");
   if (start == null || end == null || end < start) {
     return;
   }
@@ -230,7 +243,8 @@ private void shiftUpOrderNumbers(Integer start, Integer end) {
 // ===============================================
 
   //adminのみ
-private boolean isAdmin(Principal principal){
+  private boolean isAdmin(Principal principal) {
+    log.info("start");
   User targetUser = userService.getUserByPrincipal(principal);
   if(targetUser.getRole()!=UserRole.ADMIN){
     throw new UnauthorizedException("権限が不足しています。");
@@ -240,6 +254,7 @@ private boolean isAdmin(Principal principal){
 
 //カテゴリー名同名チェック
 private boolean isCategoryNameTaken(String categoryName) {
+  log.info("start");
   List<Category> categoryList = getAllCategories();
   for (Category category : categoryList) {
     if (categoryName.equals(category.getCategoryName())) {
@@ -251,6 +266,7 @@ private boolean isCategoryNameTaken(String categoryName) {
 }
 
 private boolean canShowCategoryManagement(Principal principal) {
+  log.info("start");
   User targetUser = userService.getUserByPrincipal(principal);
   if (targetUser.getRole() != UserRole.ADMIN) {
     throw new UnauthorizedException("権限が不足しています。");
@@ -266,6 +282,7 @@ private boolean canShowCategoryManagement(Principal principal) {
 // ===============================================
 
 private Category findCategoryOrThrow(Long categoryId) {
+  log.info("start");
   Optional<Category> categoryOpt =
     categoryRepository.findById(categoryId);
   if (categoryOpt.isEmpty()) {

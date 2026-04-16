@@ -11,6 +11,8 @@ import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.ManualActionRequestDto;
@@ -35,6 +37,8 @@ import com.example.manual.repository.ManualSpecification;
 @Service
 public class ManualService {
 
+  private static final Logger log = LoggerFactory.getLogger(ManualService.class);
+
   private final ManualRepository manualRepository;
   private final ManualHistoryService manualHistoryService;
   private final UserService userService;
@@ -55,11 +59,18 @@ public class ManualService {
     this.notificationService = notificationService;
   }
 
+
+
   //index表示
   public ManualListDto showIndex(
       Principal principal,
       ManualSearchConditionDto condition
-    ){
+  ) {
+    log.info("start");
+    //コンソール確認用
+    System.out.println("manualService.showIndex start");
+    System.out.println("principal name = " + principal.getName());
+
     //検索一覧リスト condition ページ毎に分ける必要有
     List<ManualResponseDto> seachManuals =
         searchManuals(condition,principal);
@@ -83,7 +94,8 @@ public class ManualService {
   }
 
   // 対応ボタン 新規作成(新規タブ)
-  public void goToNewCreatePage(Principal principal){
+  public void goToNewCreatePage(Principal principal) {
+    log.info("start");
     if(!canGoToNewCreatePage(principal)){
       throw new InvalidStateException("判定エラー");
     }
@@ -91,6 +103,7 @@ public class ManualService {
 
   // 対応ボタン 新規作成
   public void submitManual(Long manualId) {
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     manual.markUpdatedNow();
     manual.submitPENDING();
@@ -102,7 +115,7 @@ public class ManualService {
       Long manualId,
       ManualRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
 
@@ -126,7 +139,7 @@ public class ManualService {
       Long manualId,
       ManualRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
 
@@ -150,7 +163,7 @@ public class ManualService {
   public ManualResponseDto goToEditPage(
       Long manualId,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
 
     if (!canGoToEditPage(
@@ -166,7 +179,7 @@ public class ManualService {
   public ManualResponseDto goToCopyPage(
       Long manualId,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     if (!canGoToCopyPage(principal)) {
       throw new UnauthorizedException("判定エラー");
@@ -179,7 +192,7 @@ public class ManualService {
       Long manualId,
       ManualRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
 
@@ -209,7 +222,7 @@ public class ManualService {
       Long manualId,
       ManualRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(requestDto.getCategoryId());
 
@@ -237,7 +250,7 @@ public class ManualService {
   public ManualDetailDto goToDetailPage(
       Long manualId,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     List<ManualHistory> history = manualHistoryService.getManualIdHistory(manualId);
 
@@ -262,7 +275,8 @@ public class ManualService {
   public void approveManual(
       Long manualId,
       Principal principal) {
-    Manual manual = findManualOrThrow(manualId);
+    log.info("start");
+        Manual manual = findManualOrThrow(manualId);
     if (!canApproveManual(
         manual,
         manual.getCategory(),
@@ -282,7 +296,7 @@ public class ManualService {
       Long manualId,
       String changeNote,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     if (!canApproveManual(manual, manual.getCategory(), principal)) {
       throw new UnauthorizedException("判定エラー");
@@ -306,7 +320,7 @@ public class ManualService {
       Long manualId,
       ManualActionRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     if (!canRollbackManual(manual, principal, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
@@ -324,7 +338,7 @@ public class ManualService {
       Long manualId,
       ManualActionRequestDto actionRequestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     User user = userService.getUserByPrincipal(principal);
     Category category = categoryService.getCategoryById(manual.getCategory().getId());
@@ -345,7 +359,7 @@ public class ManualService {
       Long manualId,
       ManualActionRequestDto requestDto,
       Principal principal) {
-
+    log.info("start");
     Manual manual = findManualOrThrow(manualId);
     if (!canRestoreManual(manual, principal, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
@@ -365,14 +379,26 @@ public class ManualService {
   public List<ManualResponseDto> searchManuals(
       ManualSearchConditionDto condition,
       Principal principal) {
-
+    log.info("start");
     if (!canSearchManuals(principal)) {
       throw new UnauthorizedException("判定エラー");
     }
-    Specification<Manual> specification = Specification
-        .where(ManualSpecification.containsKeyword(condition.getKeyword()))
-        .and(ManualSpecification.hasCategoryIds(condition.getCategoryIds()))
-        .and(ManualSpecification.hasStatuses(condition.getStatuses()));
+    Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
+
+    Specification<Manual> keywordSpec = ManualSpecification.containsKeyword(condition.getKeyword());
+    if (keywordSpec != null) {
+      specification = specification.and(keywordSpec);
+    }
+
+    Specification<Manual> categorySpec = ManualSpecification.hasCategoryIds(condition.getCategoryIds());
+    if (categorySpec != null) {
+      specification = specification.and(categorySpec);
+    }
+
+    Specification<Manual> statusSpec = ManualSpecification.hasStatuses(condition.getStatuses());
+    if (statusSpec != null) {
+      specification = specification.and(statusSpec);
+    }
 
     List<Manual> manualList = manualRepository.findAll(
         specification,
@@ -397,7 +423,8 @@ public class ManualService {
   }
 
   // index quickView表示取得
-  public ManualResponseDto getQuickViewData(Principal principal){
+  public ManualResponseDto getQuickViewData(Principal principal) {
+    log.info("start");
     //通知欄２つの数字を取得
     int unreadRollBackCount = notificationService.unreadRollBackCount(principal);
     int unreadPendingCount = notificationService.unreadPendingCount(principal);
@@ -414,18 +441,20 @@ public class ManualService {
     responseDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
     responseDto.setUnreadRollBackCount(unreadRollBackCount);
     responseDto.setUnreadPendingCount(unreadPendingCount);
-  
+
     return responseDto;
   }
 
   //status一覧を返す
   public List<ManualStatus> getManualStatuses() {
+    log.info("start");
     List<ManualStatus> responseStatus = Arrays.asList(ManualStatus.values());
 
     return responseStatus;
   }
   //status一覧(Draft以外)を返す
   public List<ManualStatus> getDefaultStatuses() {
+    log.info("start");
     List<ManualStatus> responseStatus = new ArrayList<>();
     ManualStatus status[] = ManualStatus.values();
     for (ManualStatus manualStatus : status) {
@@ -459,6 +488,7 @@ public class ManualService {
 
   //MyPege 差し戻し（自分作成）のデータを渡す。
   public List<ManualResponseDto> createdRollbackManualList(User user) {
+    log.info("start");
     List<Manual> rollBackList = manualRepository.findByIsRolledBackTrueAndCreatedByUserOrderByUpdatedAtDesc(
         user);
     List<ManualResponseDto> rollBacklistDto = new ArrayList<>();
@@ -479,6 +509,7 @@ public class ManualService {
 
   //MyPege PENDINGの全マニュアル（自分作成以外）のデータを渡す。
   public List<ManualResponseDto> pendingManualList(User user) {
+    log.info("start");
     List<Manual> pendingManualList = manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
         user, ManualStatus.PENDING);
     List<ManualResponseDto> pendingListDto = new ArrayList<>();
@@ -499,6 +530,7 @@ public class ManualService {
 
   //index 自分作成PENDINGのデータ一覧を返す。
   public List<ManualResponseDto> createdPendingManualList(Principal principal) {
+    log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     List<Manual> manualList = manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
         targetUser, ManualStatus.PENDING);
@@ -522,6 +554,7 @@ public class ManualService {
 
    //index 最近７日間の更新のデータ一覧を返す。
    public List<ManualResponseDto> getRecentWeeklyManuals() {
+     log.info("start");
     List<Manual> manualList =
         manualRepository.findByUpdatedAtAfterOrderByUpdatedAtDesc(
             LocalDateTime.now().minusDays(7));
@@ -545,7 +578,8 @@ public class ManualService {
 
    //index 自分作成PENDINGの数を返す。
    public int countCreatedPendingManual(Principal principal) {
-     User targetUser = userService.getUserByPrincipal(principal);
+     log.info("start");
+    User targetUser = userService.getUserByPrincipal(principal);
      Long count =
          manualRepository.countByCreatedByUserAndStatus(
           targetUser,ManualStatus.PENDING);
@@ -555,6 +589,7 @@ public class ManualService {
 
    //index 最近7日間の更新の数を返す。
    public int countRecentWeeklyManuals() {
+     log.info("start");
     Long count =
       manualRepository.countByUpdatedAtAfter(
         LocalDateTime.now().minusDays(7));
@@ -563,7 +598,8 @@ public class ManualService {
    }
 
    //MyPage index通知 自分以外作成PENDINGの数を返す。
-   public int countNotUserCreatedPendingManualList(Principal principal){
+   public int countNotUserCreatedPendingManualList(Principal principal) {
+     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserNotAndStatus(
           targetUser,
@@ -574,7 +610,8 @@ public class ManualService {
 
    //MyPage index通知 作成者自分の差し戻しマニュアル数を返す。
    public int countMyRollBackManual(Principal principal) {
-     User targetUser = userService.getUserByPrincipal(principal);
+     log.info("start");
+    User targetUser = userService.getUserByPrincipal(principal);
      Long count = manualRepository.countByIsRolledBackTrueAndCreatedByUser(
          targetUser);
      int targetCount = Math.toIntExact(count);
@@ -582,7 +619,8 @@ public class ManualService {
    }
 
    //index 自分作成分の数を返す。
-   public int countUserCreatedManual(Principal principal){
+   public int countUserCreatedManual(Principal principal) {
+     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     Long count =
       manualRepository.countByCreatedByUser(targetUser);
@@ -596,6 +634,7 @@ public class ManualService {
   // ============================
 
   private ManualResponseDto toManualFormInputDto(Manual manual) {
+    log.info("start");
     ManualResponseDto responseDto = new ManualResponseDto();
     responseDto.setManualId(manual.getId());
     responseDto.setCreatedAt(manual.getCreatedAt());
@@ -611,7 +650,8 @@ public class ManualService {
   // ロール判定
   // ============================
 
-  private boolean canGoToNewCreatePage(Principal principal){
+  private boolean canGoToNewCreatePage(Principal principal) {
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
@@ -624,7 +664,7 @@ public class ManualService {
       Manual manual,
       Category category,
       String changeNote) {
-
+    log.info("start");
     if (user.getRole() != UserRole.ADMIN &&
         user.getRole() != UserRole.APPROVER) {
       throw new UnauthorizedException("権限が不足しています。");
@@ -658,7 +698,7 @@ public class ManualService {
       Manual manual,
       Category category,
       Principal principal) {
-
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (user.getRole() != UserRole.ADMIN &&
         user.getRole() != UserRole.APPROVER) {
@@ -686,7 +726,7 @@ public class ManualService {
       Manual manual,
       Principal principal,
       String changeNote) {
-
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (user.getRole() != UserRole.ADMIN &&
         user.getRole() != UserRole.APPROVER) {
@@ -713,7 +753,7 @@ public class ManualService {
       Manual manual,
       Principal principal,
       String changeNote) {
-
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (user.getRole() != UserRole.ADMIN &&
         user.getRole() != UserRole.APPROVER) {
@@ -739,7 +779,8 @@ public class ManualService {
   private boolean canSaveDraftForCreate(
       Principal principal,
       Category category) {
-    User user = userService.getUserByPrincipal(principal);
+    log.info("start");
+        User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
@@ -753,7 +794,7 @@ public class ManualService {
   private boolean canSubmitToPending(
       Principal principal,
       Category category) {
-
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
@@ -769,7 +810,7 @@ public class ManualService {
       Principal principal,
       Category category,
       ManualStatus status) {
-
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
 
     if (!user.isActive()) {
@@ -790,7 +831,7 @@ public class ManualService {
       Principal principal,
       Category category,
       String changeNote) {
-
+    log.info("start");
     // アクティブユーザー アクティブカテゴリー チェンジノート必須
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
@@ -810,7 +851,7 @@ public class ManualService {
       Principal principal,
       Category category,
       Manual manual) {
-
+    log.info("start");
     // アクティブユーザー ステータスドラフト・ペンディングのみ 作成者のみ編集可 アクティブカテゴリ
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
@@ -833,6 +874,7 @@ public class ManualService {
   }
 
   private boolean canGoToDetailPage(Principal principal) {
+    log.info("start");
     // アクティブユーザー
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
@@ -842,6 +884,7 @@ public class ManualService {
   }
 
   private boolean canGoToCopyPage(Principal principal) {
+    log.info("start");
     // アクティブユーザー
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
@@ -851,6 +894,7 @@ public class ManualService {
   }
 
   private boolean canSearchManuals(Principal principal) {
+    log.info("start");
     // アクティブユーザー
     User user = userService.getUserByPrincipal(principal);
     if (!user.isActive()) {
@@ -864,6 +908,7 @@ public class ManualService {
   // ============================
 
   private Manual findManualOrThrow(Long id) {
+    log.info("start");
     Optional<Manual> manualOpt = manualRepository.findById(id);
     if (manualOpt.isEmpty()) {
       throw new RuntimeException("");

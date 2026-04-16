@@ -3,6 +3,8 @@ package com.example.manual.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.entity.ManualHistory;
 
@@ -15,4 +17,3 @@ public interface ManualHistoryRepository extends JpaRepository<ManualHistory, Lo
   List<ManualHistory> findAllByOrderByChangedAtDesc();
 
 }
-

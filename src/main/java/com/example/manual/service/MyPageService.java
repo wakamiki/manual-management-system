@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
@@ -14,6 +16,8 @@ import com.example.manual.exception.UnauthorizedException;
 
 @Service
 public class MyPageService {
+
+  private static final Logger log = LoggerFactory.getLogger(MyPageService.class);
 
   private final UserService userService;
   private final ManualService manualService;
@@ -30,6 +34,7 @@ public class MyPageService {
 
   // myPage表示
   public MyPageDto showMyPage(Principal principal) {
+    log.info("start");
     User user = userService.getUserByPrincipal(principal);
     if (!canShowMyPage(user)) {
       throw new InvalidStateException("判定エラー");
@@ -45,13 +50,15 @@ public class MyPageService {
   }
 
   public List<ManualResponseDto> getRollbackManual(User user) {
+    log.info("start");
     // 差し戻しマニュアルタブ
     List<ManualResponseDto> responseDto =
       manualService.createdRollbackManualList(user);
     return responseDto;
   }
 
-  public List<ManualResponseDto>  getUserCreatedManual(User user) {
+  public List<ManualResponseDto> getUserCreatedManual(User user) {
+    log.info("start");
     // 自分作成マニュアルタブ
     List<ManualResponseDto> listDto =
         manualService.userCreatedManualList(user);
@@ -59,6 +66,7 @@ public class MyPageService {
   }
 
   public List<ManualResponseDto> getPendingManual(User user) {
+    log.info("start");
     // 承認待ちマニュアルタブ
     if (!canGetPendingManual(user)) {
       throw new InvalidStateException("判定エラー");
@@ -72,7 +80,8 @@ public class MyPageService {
 //権限判定
 // ================================================
 
-  public boolean canShowMyPage(User user) {
+public boolean canShowMyPage(User user) {
+  log.info("start");
     //有効アカウント
     if(!user.isActive()){
       throw new UnauthorizedException("このアカウントは有効ではありません。");
@@ -81,6 +90,7 @@ public class MyPageService {
   }
 
   public boolean canGetPendingManual(User user) {
+    log.info("start");
     //admin/approver
     if(user.getRole()!=UserRole.APPROVER&&user.getRole()!=UserRole.ADMIN){
       throw new UnauthorizedException("承認権限がありません。");

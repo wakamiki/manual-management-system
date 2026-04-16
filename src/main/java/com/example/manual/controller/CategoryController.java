@@ -10,16 +10,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.service.CategoryService;
+import com.example.manual.service.ManualService;
 
 import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/categories")
 public class CategoryController {
+
+private static final Logger log =
+        LoggerFactory.getLogger(CategoryController.class);
 
   public final CategoryService categoryService;
 
@@ -30,8 +35,9 @@ public class CategoryController {
   // category-management表示
 @GetMapping("/category-management")
 public String showCategoryManagement(
-      Principal principal,Model model){
-      List<CategoryResponseDto>responseDto =
+    Principal principal, Model model) {
+  log.info("start");
+        List<CategoryResponseDto>responseDto =
         categoryService.showCategoryManagement(principal);
       model.addAttribute("responseDto",responseDto);
       return "category-management";
@@ -42,7 +48,8 @@ public String showCategoryManagement(
       @Valid CategoryRequestDto requestDto,
       Principal principal,
       RedirectAttributes redirectAttributes) {
-    categoryService.createCategory(requestDto, principal);
+    log.info("start");
+        categoryService.createCategory(requestDto, principal);
     redirectAttributes.addFlashAttribute(
         "message", "新しいカテゴリーを作成しました。");
       return "redirect:/categories";
@@ -55,7 +62,8 @@ public String showCategoryManagement(
       @Valid CategoryRequestDto requestDto,
       Principal principal,
       RedirectAttributes redirectAttributes) {
-      categoryService.updateCategory(
+    log.info("start");
+        categoryService.updateCategory(
           requestDto.getId(),
           requestDto,
           principal);
@@ -71,7 +79,8 @@ public String showCategoryManagement(
   public String deactivateCategory(
       Principal principal,
       RedirectAttributes redirectAttributes) {
-    categoryService.deactivateCategory(principal);
+    log.info("start");
+        categoryService.deactivateCategory(principal);
     redirectAttributes.addFlashAttribute(
         "message", "選択カテゴリーを使用停止にしました。");
 
@@ -82,7 +91,7 @@ public String showCategoryManagement(
   public String activateCategory(
       Principal principal,
       RedirectAttributes redirectAttributes) {
-
+    log.info("start");
     categoryService.activateCategory(principal);
     redirectAttributes.addFlashAttribute(
         "message", "選択カテゴリーを有効にしました。");
@@ -94,11 +103,13 @@ public String showCategoryManagement(
 
   public void getAllCategories() {
     //停止中もすべて取得 adminのみ実行可
+    log.info("start");
   }
 
 
   public void getAllActiveCategories() {
     //adminのみ実行可
+    log.info("start");
   }
 
 }

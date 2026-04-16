@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -29,6 +31,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/manuals")
 public class ManualController {
 
+        private static final Logger log = LoggerFactory.getLogger(ManualController.class);
 
 private final ManualService manualService;
 
@@ -37,16 +40,16 @@ public ManualController(ManualService manualService) {
 }
 
 // index表示
-@GetMapping
+@GetMapping("/index")
 public String showIndex(
                 @Valid @ModelAttribute ManualSearchConditionDto condition,
                 Principal principal,
                 Model model) {
+        log.info("start");
         // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
         condition.setStatuses(defaultStatusCheck(condition));
 
         ManualListDto listDto = manualService.showIndex(principal, condition);
-
         model.addAttribute("listDto", listDto);
         return "index";
 
@@ -63,7 +66,7 @@ public String showIndex(
             Principal principal,
             @Valid @ModelAttribute ManualRequestDto requestDto,
             RedirectAttributes redirectAttributes) {
-
+            log.info("start");
         manualService.saveDraftForCreate(
                 manualId,
                 requestDto,
@@ -82,7 +85,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualRequestDto requestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+        log.info("start");
         manualService.saveDraftForCopy(
                 manualId,
                 requestDto,
@@ -101,7 +104,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualRequestDto requestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.submitToPending(
                 manualId,
                 requestDto,
@@ -118,7 +121,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualRequestDto requestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.editToPending(
                 manualId,
                 requestDto,
@@ -139,7 +142,7 @@ public String showIndex(
     public ManualDetailDto goToDetailPage(
             @PathVariable Long manualId,
             Principal principal) {
-
+            log.info("start");
         ManualDetailDto detailDto = manualService.goToDetailPage(
                                     manualId,principal);
         return detailDto;
@@ -149,7 +152,7 @@ public String showIndex(
     @GetMapping("/{manualId}/create")
     public String goToNewCreatePage(Principal principal){
         manualService.goToNewCreatePage(principal);
-
+        log.info("start");
         return "/manual-create";
     }
 
@@ -158,7 +161,7 @@ public String showIndex(
     public ManualResponseDto goToCopyPage(
             @PathVariable Long manualId,
             Principal principal) {
-
+            log.info("start");
         ManualResponseDto responseDto = manualService.goToCopyPage(
                                         manualId, principal);
         return responseDto;
@@ -168,7 +171,7 @@ public String showIndex(
     public ManualResponseDto goToEditPage(
             @PathVariable Long manualId,
             Principal principal) {
-
+            log.info("start");
         ManualResponseDto responseDto = manualService.goToEditPage(
                                         manualId, principal);
         return responseDto;
@@ -184,7 +187,7 @@ public String showIndex(
     public String submitManual(
             @PathVariable Long manualId,
             RedirectAttributes redirectAttributes) {
-
+            log.info("start");
         manualService.submitManual(manualId);
         redirectAttributes.addFlashAttribute(
                 "message", "マニュアルを公開しました。");
@@ -198,7 +201,7 @@ public String showIndex(
             @PathVariable Long manualId,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.approveManual(manualId, principal);
         redirectAttributes.addFlashAttribute(
                 "message", "マニュアルを承認しました。");
@@ -211,7 +214,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.approveManualWithComment(
                 manualId,
                 actionRequestDto.getChangeNote(),
@@ -229,7 +232,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.rollbackEditManual(
                 manualId,
                 actionRequestDto,
@@ -247,7 +250,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.archiveManual(manualId,
                 actionRequestDto,
                 principal);
@@ -263,7 +266,7 @@ public String showIndex(
             @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
             RedirectAttributes redirectAttributes,
             Principal principal) {
-
+            log.info("start");
         manualService.restoreManual(
                 manualId,
                 actionRequestDto,
@@ -280,7 +283,7 @@ public String showIndex(
 public List<ManualResponseDto> searchManuals(
         @ModelAttribute ManualSearchConditionDto condition,
                 Principal principal) {
-
+        log.info("start");
         List<ManualResponseDto> manualDtoList = (List<ManualResponseDto>) manualService.searchManuals(
                         condition,
                         principal);
@@ -295,6 +298,7 @@ public List<ManualResponseDto> searchManuals(
         //検索チェックボックス初期設定
 private List<ManualStatus> defaultStatusCheck(ManualSearchConditionDto condition) {
         List<ManualStatus> statuses = condition.getStatuses();
+        log.info("start");
         if (statuses != null && !statuses.isEmpty()) {
                 List<ManualStatus> targetStatuses = new ArrayList<>(statuses);
                 targetStatuses.remove(ManualStatus.DRAFT);

@@ -4,6 +4,8 @@ package com.example.manual.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
@@ -53,4 +55,3 @@ public class ManualSpecification {
 
     }
 }
-

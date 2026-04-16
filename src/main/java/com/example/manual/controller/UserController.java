@@ -9,13 +9,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.UserResponseDto;
+import com.example.manual.service.ManualService;
 import com.example.manual.service.UserService;
 
 @Controller
 @RequestMapping("/users")
 public class UserController {
+
+  private static final Logger log =
+        LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -30,7 +36,8 @@ public class UserController {
 
     // user-management表示
     public String showUserManagementPege(
-        Principal principal,Model model) {
+        Principal principal, Model model) {
+      log.info("showUserManagementPege start");
       List<UserResponseDto> userResponseDto =
         userService.showUserManagementPege(principal);
 
@@ -40,6 +47,7 @@ public class UserController {
 
   @GetMapping
   public void getAllUsers() {
+    log.info("start");
     //ページ切り替え有
     //ユーザーID　displayネーム　ロール　isActive
 
@@ -47,17 +55,20 @@ public class UserController {
 
   @GetMapping("/{userId}")
   public void getUserById(Principal principal) {
+    log.info("start");
     //ユーザーID　displayネーム　ロール　isActive
   }
 
   @PostMapping
   public void createUser() {
+    log.info("start");
     //初期状態はアクティブ　loginID・displayNAME・ロール必須　adminのみ実行可　ログインID重複チェック
     //操作者　対象ユーザー　実行日時
   }
 
   @PutMapping("/{userId}")
   public void updateUser() {
+    log.info("start");
     //氏名変更対応・ロール変更想定　ユーザーID変更可能
     //adminのみ実行可　ログインID重複チェック
     //DB DisplayName role
@@ -66,18 +77,21 @@ public class UserController {
 
   @PutMapping("/{userId}/deactivate")
   public void deactivateUser() {
+    log.info("start");
     //adminのみ実行可
     //操作者　対象ユーザー　実行日時
   }
 
   @PutMapping("/{userId}/activate")
   public void activateUser() {
+    log.info("start");
     //adminのみ実行可
     //操作者　対象ユーザー　実行日時
   }
 
   @PutMapping("/{userId}/reset-password")
   public void resetPassword() {
+    log.info("start");
     //アクティブのみ　adminのみ実行可
     //自分自身のリセット禁止　一時パスを通知で渡す
     //初回ログインで強制パスワード変更要請
@@ -89,6 +103,7 @@ public class UserController {
 
   @GetMapping("/{userId}/operation-histories")
   public void getOperationHistories() {
+    log.info("start");
     //アクティブのみ　adminのみ実行可
     //操作者　実行日時
 

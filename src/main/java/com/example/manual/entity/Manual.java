@@ -6,6 +6,8 @@ import com.example.manual.enums.ManualStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,6 +37,7 @@ public class Manual {
     @Column(nullable = false, length = 10000)
     private String content;
     // 業務上の公開状態を表す    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private ManualStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -11,5 +11,3 @@ public class ManualApplication {
 	}
 
 }
-  //#region この分け方をすると分かりやすい
-  //#endregion
