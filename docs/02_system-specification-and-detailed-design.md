@@ -1,6 +1,6 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.11
+Version: 01.06.12
 更新日: 2026-04-17
 
 ---
@@ -261,6 +261,11 @@ Version: 01.06.11
 - Request DTO と Response DTO を分ける
 - List DTO / Detail DTO / Action DTO を使い分ける
 - 一覧検索条件は `ManualSearchConditionDto` へまとめてよい
+- DTO の null 設計は以下で統一する
+  - List 項目: null を使わず空 List で返す
+  - 件数項目: `int` を基本とし 0 を初期値にする
+  - 必須項目: null を許可しない（不整合は早期検知する）
+  - 任意項目: null を許可してよい
 - Notification 表示用に以下を持つ
   - NotificationBadgeDto
   - NotificationItemDto

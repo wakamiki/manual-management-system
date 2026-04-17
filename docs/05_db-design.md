@@ -1,25 +1,24 @@
 # 05_db-design.md
 
-Version: 01.03.02  
+Version: 01.03.03  
 更新日: 2026-04-17
 
 ---
 
 ## 1. DB設計方針
 
-### 1-1. 使用DB
+### 1-1. 利用DB
 - 開発DB: H2 file DB
 - 接続先: `jdbc:h2:file:./data/testdb`
 - 本番移行候補: PostgreSQL
 
-### 1-2. 命名方針
-- テーブル名は複数形で統一する
-- 主キーは `id`
-- 外部キーは `<参照先>_id`
+### 1-2. 命名規約
+- 主キーは `id` に統一
+- 外部キーは `<対象>_id` 形式を基本とする
 
-### 1-3. 補足（予約語対応）
-- `user` は予約語競合の原因になるため採用しない
-- ユーザーテーブル名は `users` で統一する
+### 1-3. 予約語回避
+- `user` は予約語競合リスクがあるため使用しない
+- ユーザーテーブル名は `users` に統一する
 
 ---
 
@@ -31,6 +30,8 @@ users                    1 --- N manuals
 manuals                  1 --- N manual_histories
 users                    1 --- N manual_histories
 users                    1 --- N user_operation_histories (target)
+users                    1 --- N notifications (target)
+manuals                  1 --- N notifications
 ```
 
 ---
@@ -41,7 +42,7 @@ users                    1 --- N user_operation_histories (target)
 - manuals
 - manual_histories
 - user_operation_histories
-- notifications（実装中）
+- notifications（運用中）
 
 ---
 
@@ -64,7 +65,7 @@ users                    1 --- N user_operation_histories (target)
 | --- | --- | --- | --- |
 | id | BIGINT | PK / NOT NULL | ユーザーID |
 | login_id | VARCHAR(50) | NOT NULL | ログインID |
-| password | VARCHAR(255) | NOT NULL | パスワード |
+| password | VARCHAR(255) | NOT NULL | パスワード（ハッシュ） |
 | display_name | VARCHAR(50) | NOT NULL | 表示名 |
 | role | VARCHAR(20) | NOT NULL | USER / APPROVER / ADMIN / GUEST |
 | is_active | BOOLEAN | NOT NULL | 有効フラグ |
@@ -80,7 +81,7 @@ users                    1 --- N user_operation_histories (target)
 | --- | --- | --- | --- |
 | id | BIGINT | PK / NOT NULL | マニュアルID |
 | category_id | BIGINT | FK | カテゴリ |
-| operated_by_user_id | BIGINT | FK | 作成者 / 更新者 |
+| operated_by_user_id | BIGINT | FK | 作成/更新ユーザー |
 | title | VARCHAR(100) | NOT NULL | タイトル |
 | content | VARCHAR(10000) | NOT NULL | 本文 |
 | status | VARCHAR(20) | NOT NULL | DRAFT / PENDING / APPROVED / ARCHIVED |
@@ -88,6 +89,11 @@ users                    1 --- N user_operation_histories (target)
 | updated_at | TIMESTAMP | NULL | 更新日時 |
 | approved_at | TIMESTAMP | NULL | 承認日時 |
 | is_rolled_back | BOOLEAN | NOT NULL | 差し戻しフラグ |
+
+### 6-1. 命名差異メモ（実装整合用）
+- DBカラム名は `is_rolled_back`
+- Entity プロパティ名は `isRolledBack`
+- 旧記法 `IS_ROLLEDBACK` は使用しない
 
 ---
 
@@ -116,5 +122,14 @@ users                    1 --- N user_operation_histories (target)
 
 ---
 
-## 9. notifications（実装中）
-- 通知機能は実装中のため、最終カラム構成は確定後に更新する
+## 9. notifications
+
+| カラム名 | 型 | 制約 | 説明 |
+| --- | --- | --- | --- |
+| id | BIGINT | PK / NOT NULL | 通知ID |
+| target_user_id | BIGINT | FK / NOT NULL | 通知先ユーザー |
+| manual_id | BIGINT | FK / NOT NULL | 対象マニュアル |
+| type | VARCHAR(30) | NOT NULL | 通知種別 |
+| is_read | BOOLEAN | NOT NULL | 既読フラグ（初期値 false） |
+| created_at | TIMESTAMP | NOT NULL | 通知作成日時 |
+

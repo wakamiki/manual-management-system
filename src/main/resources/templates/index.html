@@ -18,20 +18,22 @@
       </div>
 
       <div class="page-actions">
-        <form class="search-form">
+        <form class="search-form" th:action="@{/manuals/index}" method="get">
           <details class="search-filter">
             <summary>カテゴリ</summary>
             <div class="search-filter-panel">
               <div class="search-check" th:each="activeCategories:${listDto.activeCategories}">
                 <span th:text="${activeCategories.categoryName}">カテゴリ名</span>
-                <label><input type="checkbox"></label>
+                <label><input type="checkbox" name="categoryIds" th:value="${activeCategories.id}"
+                    th:checked="${manualSearchConditionDto.categoryIds != null and #lists.contains(manualSearchConditionDto.categoryIds, activeCategories.id)}"></label>
               </div>
               <details class="search-subfilter">
                 <summary>使用停止中</summary>
                 <div class="search-subfilter-panel">
                   <div class="search-check search-check-sub" th:each="inactiveCategories:${listDto.inactiveCategories}">
                     <span th:text="${inactiveCategories.categoryName}">カテゴリ名</span>
-                    <label><input type="checkbox"></label>
+                    <label><input type="checkbox" name="categoryIds" th:value="${inactiveCategories.id}"
+                        th:checked="${manualSearchConditionDto.categoryIds != null and #lists.contains(manualSearchConditionDto.categoryIds, inactiveCategories.id)}"></label>
                   </div>
                 </div>
               </details>
@@ -43,12 +45,13 @@
               <div class="search-check" th:each="status:${listDto.defaultStatuses}">
                 <span th:text="${status.statusLabel}">ステータス名</span>
                 <label><input type="checkbox" name="statuses" th:value="${status.status}"
-                    th:checked="${status.status != null and (status.status.name() == 'PENDING' or status.status.name() == 'APPROVED')}">
+                    th:checked="${status.status != null and manualSearchConditionDto.statuses != null and #lists.contains(manualSearchConditionDto.statuses, status.status)}">
                 </label>
               </div>
             </div>
           </details>
-          <input type="search" class="form-control" placeholder="キーワード検索">
+          <input type="search" class="form-control" name="keyword" th:value="${manualSearchConditionDto.keyword}"
+            placeholder="キーワード検索">
           <button type="submit" class="btn btn-outline-primary">検索</button>
         </form>
         <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
@@ -71,41 +74,42 @@
               <ul class="list-group list-group-flush">
                 <li class="list-group-item active d-flex justify-content-between align-items-center">
                   <span>自分の作成分</span>
-                  <span class="sidebar-count">8</span>
+                  <span class="sidebar-count" th:text="${listDto.summaryDto.countUserCreatedManual}">
+                    8</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <span>申請中</span>
-                  <span class="sidebar-count">3</span>
+                  <span class="sidebar-count" th:text="${listDto.summaryDto.countCreatedPendingManual}">
+                    3</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <span>最近更新</span>
-                  <span class="sidebar-count">5</span>
+                  <span class="sidebar-count" th:text="${listDto.summaryDto.countRecentWeeklyManual}">5</span>
                 </li>
               </ul>
             </div>
             <div class="sidebar-section">
               <h2 class="h5">カテゴリ</h2>
               <div>
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">カテゴリ名</li>
+                <ul class="list-group list-group-flush" th:each="activeCategories:${listDto.activeCategories}">
+                  <li class="list-group-item" th:text="${activeCategories.categoryName}">カテゴリ名</li>
                 </ul>
               </div>
             </div>
             <div class="stopedCategory">
               <button class="stopped-toggle" type="button" data-bs-toggle="collapse"
-                data-bs-target="#stoppedCategorylist" aria-expanded="false" aria-controls="stoppedCategoryList">
+                data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
                 <span>使用停止中</span>
                 <span class="stopped-toggle-icon">＋</span>
               </button>
               <div class="collapse" id="stoppedCategoryList">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">カテゴリ名</li>
+                <ul class="list-group list-group-flush" th:each="inactiveCategories:${listDto.inactiveCategories}">
+                  <li class="list-group-item" th:text="${inactiveCategories.categoryName}">カテゴリ名</li>
                 </ul>
               </div>
             </div>
             <div class="sidebar-home">
-              <a href="./my-page.html" class="sidebar-home-link" target="_blank" rel="noopener noreferrer"
-                aria-label="マイページ">
+              <a th:href="@{/my-page}" class="sidebar-home-link" aria-label="マイページ">
                 <span class="sidebar-home-icon-wrap">
                   <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
                   <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
@@ -113,7 +117,7 @@
                 </span>
                 <span class="sidebar-home-user">
                   <span class="sidebar-home-user-label">ログイン中</span>
-                  <span class="sidebar-home-user-name"></span>
+                  <span class="sidebar-home-user-name" th:text="${listDto.userDto.displayName}"></span>
                 </span>
               </a>
             </div>
@@ -123,26 +127,30 @@
 
       <section class="col-lg-10 col-md-9">
         <div class="accordion w-100" id="accordionExample">
-          <div class="accordion-item">
+          <div class="accordion-item" th:each="manual,stat:${listDto.searchManuals}">
             <div class="accordion-header">
-              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                aria-expanded="true" aria-controls="collapseOne">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                th:data-bs-target="|#collapse-${stat.index}|" th:attrappend="aria-controls=|collapse-${stat.index}|"
+                aria-expanded="false">
                 <div class="w-100">
                   <div class="d-flex justify-content-between align-items-center gap-2">
-                    <strong class="fw-semibold">マニュアルの作成手順</strong>
-                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 山田 花子</small></span>
+                    <strong class="fw-semibold" th:text="${manual.title}">マニュアルの作成手順</strong>
+                    <span class="text-muted"><small class="pe-5"
+                        th:text="|最終更新${#temporals.format(manual.updatedAt, 'yyyy-MM-dd HH:mm')} /作成者:${manual.createdUserDto.displayName}|">更新日
+                        / 作成者: 山田 花子</small></span>
                   </div>
                   <div class="align-items-center gap-2">
-                    <span class="text-muted"><small>マニュアルID: 1001</small></span>
-                    <span class="category">カテゴリ</span>
-                    <span class="badge bg-primary">申請待ち</span>
+                    <span class="text-muted"><small th:text="|マニュアルID:${manual.manualId}|">マニュアルID: 1001</small></span>
+                    <span class="category" th:text="${manual.categoryDto.categoryName}">カテゴリ</span>
+                    <span class="badge bg-primary" th:text="${manual.statusLabel}">申請待ち</span>
                   </div>
                 </div>
               </button>
             </div>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+            <div class="accordion-collapse collapse" th:id="|collapse-${stat.index}|"
+              data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                <p th:text="${listDto != null ? 'OK' : 'NG'}">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <p th:text="${manual.content}">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
                   <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
                     class="btn btn-outline-primary btn-sm">詳細を見る</a>

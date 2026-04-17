@@ -1,6 +1,6 @@
 ﻿# 03_screen-design.md
 
-Version: 01.06.10  
+Version: 01.06.11  
 更新日: 2026-04-17
 
 ---
@@ -77,7 +77,7 @@ Version: 01.06.10
 ### 4-1. 表示内容
 - 検索フォーム
 - カテゴリ絞り込みフィルタ
-- ステータス絞り込みフィルタ(PENDING/APPROVER/ARCHIVE)
+- ステータス絞り込みフィルタ(PENDING/APPROVED/ARCHIVED)
 - 新規作成ボタン
 - ホームアイコン
 - ログイン中ユーザー名
@@ -124,6 +124,35 @@ Version: 01.06.10
 - 複数項目を同時にチェックして一括検索できる
 - 初期表示では `申請中 / 承認済` を選択済みにし、`アーカイブ` は未選択とする
 - 使用停止カテゴリはカテゴリフィルタ内で `使用停止中` のミニ開閉にまとめる
+- 検索フォーム送信は `GET /manuals/index` とする
+- 検索条件は以下の name で送る
+  - `keyword`
+  - `categoryIds`（複数）
+  - `statuses`（複数）
+- 検索後は keyword/category/statuses の選択状態を保持する
+
+### 4-5A. Thymeleaf 連携ルール（index）
+- 一覧表示の参照起点は `listDto` とする
+  - `listDto.searchManuals`
+  - `listDto.activeCategories`
+  - `listDto.inactiveCategories`
+  - `listDto.summaryDto`
+- 検索条件表示の参照起点は `manualSearchConditionDto` とする
+  - `manualSearchConditionDto.keyword`
+  - `manualSearchConditionDto.categoryIds`
+  - `manualSearchConditionDto.statuses`
+- `th:each` は「1データ = 1 UI ブロック」に付与する
+  - マニュアル一覧は `accordion-item` 単位
+  - カテゴリ一覧は 1カテゴリ1行単位
+
+### 4-5B. アコーディオン実装ルール
+- 行ごとにユニークな id を使う
+  - 例: `collapse-${stat.index}`
+- `id` / `data-bs-target` / `aria-controls` は必ず一致させる
+- 初期閉で表示する場合は以下を明示する
+  - `accordion-button collapsed`
+  - `aria-expanded="false"`
+  - `accordion-collapse collapse`
 
 ### 4-6. 左サイドバー
 - 左サイドバーは検索条件入力ではなく、クイックビューと補助ナビゲーションとして扱う
@@ -134,6 +163,7 @@ Version: 01.06.10
 - 各クイックビュー項目には件数を表示してよい
 - カテゴリ一覧はサイドバー下段の補助ナビとして残す
 - 使用停止中カテゴリはサイドバー内でも折りたたみ表示とする
+- サイドバーは補助ナビ用途とし、検索条件の主入力は上部検索フォームで行う
 
 ### 4-6A. クイックビュー（最近更新）
 - 最近更新: 直近7日以内に更新されたマニュアル件数を表示
@@ -161,7 +191,7 @@ Version: 01.06.10
 - 本文
 - 更新履歴
 - 履歴日時
-- チェンジノート
+- 更新履歴（内部項目名: changeNote）
 - 更新者名
 
 ### 5-2. 更新履歴表示
@@ -211,6 +241,12 @@ Version: 01.06.10
 - updatedAt
 - createdAt
 - createdByUser
+
+### 6-3A. モード切替情報
+- mode: `edit` / `copy`
+- モードバッジ文言を切り替える
+- submit 先 URL と保存ボタン文言を mode で切り替える
+- `copy` は changeNote 必須、`edit` は任意（業務ルールによる）
 
 ### 6-4. ボタン
 - 下書きに保存
@@ -312,3 +348,10 @@ Version: 01.06.10
 ### 9-6. 取得方式
 - 初回表示時に必要データをすべて取得する
 - タブ切り替えは画面内表示切替のみとし、再リクエストは行わない
+
+---
+
+## 11. 画面エラー切り分けメモ（運用）
+- `EL1007E ... cannot be found on null` はテンプレート記法より先に `model.addAttribute` と DTO 中身を確認する
+- `/manuals/index` と `/` で再現差がある場合はルーティング設定起因を疑う
+- 表示件数 0 は `th:each` 不具合ではなく、検索初期条件（status）で除外されている可能性を先に確認する

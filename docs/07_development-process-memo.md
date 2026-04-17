@@ -1,7 +1,59 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.11  
+Version: 01.00.13  
 更新日: 2026-04-17
+
+---
+
+## 2026-04-17
+
+### 作業概要
+index 画面の Thymeleaf 反映を進め、DTO の null 設計方針を明確化した。あわせて、SpEL エラーや Controller 経路競合など、表示エラーの根本原因を切り分けた。
+
+### 実施内容
+- index 一覧画面の SpEL エラーを修正
+- `listDto` 起点の参照へ統一
+- `th:object` と `${}` / `*{}` の使い分けを整理
+- カテゴリ表示を「1データ = 1行」に修正
+- Thymeleaf タグを最小構成から段階的に復元する進め方へ変更
+- `summaryDto` / `activeCategories` の null 参照エラーを解消
+- HomeController / ManualController の経路競合を整理
+- `IS_ROLLEDBACK` 列不一致を特定し、DB と Entity のズレを把握
+- index 検索フォームの送信名を DTO と一致させる方針を明確化
+  - `keyword`
+  - `categoryIds`
+  - `statuses`
+- アコーディオンの開閉不具合を切り分け
+  - `th:each` 行ごとの collapse id 一意化が必要
+  - `data-bs-target` / `aria-controls` / `id` の一致が必須
+- `/` と `/manuals/index` の到達差で再現有無を確認し、ルーティング起因の不具合を切り分け
+
+### DTO 設計の方針確定
+- List 項目は null を使わず空 List で返す
+- Service + DTO 初期化の二重防御を採用
+- 件数項目は `int` を基本とし、初期値 0 で扱う
+- 値の扱いを以下で統一
+  - 必須項目: null 禁止
+  - 件数: 0
+  - List: 空 List
+  - 任意項目: null 許可
+- Category DTO は `categoryId` を持つ方針
+- User DTO は `id` + `displayName` を持つ方針
+- DTO は「用途ごとの最小構成」で運用
+
+### 学び
+- Thymeleaf エラーは View 側だけでなく Controller やデータ構造起因が多い
+- DTO の null 設計は画面安定性に直結する
+- `th:each` は「1データ = 1 UI ブロック」で設計すると崩れにくい
+- 画面が真っ白になる現象でも、まずはデータ件数（0件除外）を確認すると原因特定が速い
+- Thymeleaf の不具合に見えても、Controller の Model 詰め替え不足や URL 経路が原因になりやすい
+
+### 次回着手予定
+- `index.html` の Thymeleaf タグを段階復元
+  - `listDto -> summary -> category -> manual -> history`
+- カテゴリチェックボックスと検索条件の連携実装
+- 一覧カード UI の仕上げ
+- `docs/02` への設計方針反映
 
 ---
 
