@@ -3,8 +3,6 @@ package com.example.manual.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.manual.enums.ManualStatus;
-
 
 public class ManualIndexDto {
   public ManualIndexDto() {
@@ -14,7 +12,7 @@ public class ManualIndexDto {
   private List<ManualResponseDto> searchManuals= new ArrayList<>();
   private List<CategoryResponseDto> activeCategories = new ArrayList<>();
   private List<CategoryResponseDto> inactiveCategories= new ArrayList<>();
-  private List<ManualStatus> defaultStatuses= new ArrayList<>();
+  private List<ManualResponseDto> defaultStatuses= new ArrayList<>();
   private IndexSummaryDto summaryDto;
   private UserResponseDto userDto;
 
@@ -32,7 +30,7 @@ public class ManualIndexDto {
    return this.inactiveCategories;
  }
 
- public List<ManualStatus> getDefaultStatuses() {
+ public List<ManualResponseDto> getDefaultStatuses() {
    return this.defaultStatuses;
  }
 
@@ -61,7 +59,7 @@ public class ManualIndexDto {
     this.inactiveCategories = inactiveCategories;
   }
 
-  public void setDefaultStatuses(List<ManualStatus> defaultStatuses) {
+  public void setDefaultStatuses(List<ManualResponseDto> defaultStatuses) {
     this.defaultStatuses = defaultStatuses;
   }
 

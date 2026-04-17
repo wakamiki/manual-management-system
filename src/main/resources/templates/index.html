@@ -16,25 +16,22 @@
       <div>
         <h1 class="h4 mb-0">業務マニュアル管理システム</h1>
       </div>
-      <p th:text="${listDto != null ? 'OK' : 'NG'}"></p>
-      <p th:text="${#ctx.containsVariable('listDto')}"></p>
-
 
       <div class="page-actions">
         <form class="search-form">
           <details class="search-filter">
             <summary>カテゴリ</summary>
             <div class="search-filter-panel">
-              <div>
-                <div>カテゴリ名
-                  <label class="search-check"><input type="checkbox"></label>
-                </div>
+              <div class="search-check" th:each="activeCategories:${listDto.activeCategories}">
+                <span th:text="${activeCategories.categoryName}">カテゴリ名</span>
+                <label><input type="checkbox"></label>
               </div>
               <details class="search-subfilter">
                 <summary>使用停止中</summary>
                 <div class="search-subfilter-panel">
-                  <div>カテゴリ名
-                    <label class="search-check search-check-sub"><input type="checkbox"></label>
+                  <div class="search-check search-check-sub" th:each="inactiveCategories:${listDto.inactiveCategories}">
+                    <span th:text="${inactiveCategories.categoryName}">カテゴリ名</span>
+                    <label><input type="checkbox"></label>
                   </div>
                 </div>
               </details>
@@ -43,8 +40,11 @@
           <details class="search-filter">
             <summary>ステータス</summary>
             <div class="search-filter-panel">
-              <div class="search-check">ステータス名
-                <label><input type="checkbox" checked></label>
+              <div class="search-check" th:each="status:${listDto.defaultStatuses}">
+                <span th:text="${status.statusLabel}">ステータス名</span>
+                <label><input type="checkbox" name="statuses" th:value="${status.status}"
+                    th:checked="${status.status != null and (status.status.name() == 'PENDING' or status.status.name() == 'APPROVED')}">
+                </label>
               </div>
             </div>
           </details>

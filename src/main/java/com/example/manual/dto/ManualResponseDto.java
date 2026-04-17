@@ -15,6 +15,7 @@ private String title="";
 private String content="";
 private UserResponseDto createdUserDto;
 private ManualStatus status;
+private String statusLabel;
 private LocalDateTime createdAt;
 private LocalDateTime updatedAt;
 private CategoryResponseDto categoryDto;
@@ -58,6 +59,10 @@ public CategoryResponseDto getCategoryDto(){
   return this.categoryDto;
 }
 
+public String getStatusLabel(){
+  return this.statusLabel;
+}
+
 
 //setter
 
@@ -96,4 +101,9 @@ public void setCreatedUserDto(UserResponseDto createdUserDto) {
 public void setCategoryDto(CategoryResponseDto categoryDto) {
   this.categoryDto = categoryDto;
 }
+
+public void setStatusLabel(String statusLabel){
+  this.statusLabel=statusLabel;
+}
+
 }

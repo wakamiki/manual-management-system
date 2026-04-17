@@ -78,7 +78,7 @@ public class ManualService {
     List<CategoryResponseDto> inactiveCategoriesDto =
         categoryService.getInactiveCategoryDtos();
     //ステータスリスト　検索欄用
-    List<ManualStatus> defaultStatuses =
+    List<ManualResponseDto> defaultStatuses =
         getDefaultStatuses();
     //クイックビュー　通知
     IndexSummaryDto summaryDto=
@@ -465,15 +465,30 @@ public class ManualService {
     return responseStatus;
   }
   //status一覧(Draft以外)を返す
-  public List<ManualStatus> getDefaultStatuses() {
+  public List<ManualResponseDto> getDefaultStatuses() {
     log.info("start");
-    List<ManualStatus> responseStatus = new ArrayList<>();
+    List<ManualResponseDto> responseStatus = new ArrayList<>();
     ManualStatus status[] = ManualStatus.values();
     for (ManualStatus manualStatus : status) {
-      if (manualStatus==ManualStatus.DRAFT) {
-        continue;
+      ManualResponseDto defaultStatus = new ManualResponseDto();
+      defaultStatus.setStatus(manualStatus);
+      switch(manualStatus) {
+          case DRAFT:
+              continue;
+          case PENDING:
+            defaultStatus.setStatusLabel("申請中");
+              break; 
+          case APPROVED:
+            defaultStatus.setStatusLabel("承認済");
+              break; 
+          case ARCHIVED:
+            defaultStatus.setStatusLabel("アーカイブ");
+              break;  
+
+          default:
+              throw new AssertionError("不明なステータスです。");
       }
-      responseStatus.add(manualStatus);
+      responseStatus.add(defaultStatus);
     }
     return responseStatus;
   }
