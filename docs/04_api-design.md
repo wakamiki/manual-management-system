@@ -1,27 +1,31 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.09  
-更新日: 2026-04-13
+Version: 01.03.10  
+更新日: 2026-04-16
 
 ---
 
 ## 1. API 一覧
 
 ### 1-1. Manual API
-- GET `/api/manuals`
-- GET `/api/manuals/{manualId}`
-- GET `/api/manuals/{manualId}/histories`
-- POST `/api/manuals`
-- PUT `/api/manuals/{manualId}`
+- GET `/api/manuals/index`
+- GET `/api/manuals/{manualId}/edit`
+- GET `/api/manuals/{manualId}/actions/edit`
+- PUT `/api/manuals/{manualId}/create`
 - POST `/api/manuals/{manualId}/actions/copy`
 - POST `/api/manuals/{manualId}/actions/submit`
 - POST `/api/manuals/{manualId}/actions/approve`
+- POST `/api/manuals/{manualId}/actions/approve-with-comment`
 - POST `/api/manuals/{manualId}/actions/rollback`
+- POST `/api/manuals/{manualId}/actions/save-draft`
+- POST `/api/manuals/{manualId}/actions/save-draft-copy`
+- POST `/api/manuals/{manualId}/actions/submit-pending`
+- POST `/api/manuals/{manualId}/actions/edit-to-pending`
 - POST `/api/manuals/{manualId}/actions/archive`
 - POST `/api/manuals/{manualId}/actions/restore`
 
 ### 1-2. Category API
-- GET `/api/categories`
+- GET `/api/categories/category-management`
 - POST `/api/categories`
 - PUT `/api/categories/{categoryId}`
 - PUT `/api/categories/{categoryId}/deactivate`

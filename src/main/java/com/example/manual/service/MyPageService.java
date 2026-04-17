@@ -43,7 +43,7 @@ public class MyPageService {
     pageDto.setCreatedManualList(getUserCreatedManual(user));
     pageDto.setPendingManualList(getPendingManual(user));
     pageDto.setRollbackManualList(getRollbackManual(user));
-    pageDto.setRollbackCount(manualService.countMyRollBackManual(principal));
+    pageDto.setRollbackCount(manualService.countMyRollbackManual(principal));
     pageDto.setPendingUnCreatedCount(manualService.countNotUserCreatedPendingManualList(principal));
 
     return pageDto;

@@ -5,8 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.manual.entity.Category;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public interface CategoryRepository extends JpaRepository<Category, Long>{
 
@@ -14,6 +12,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long>{
   List<Category> findAllByOrderByCategoryNameAsc();
   //全件取得(displayOrder昇順)
   List<Category> findAllByOrderByDisplayOrderAsc();
+  //active==trueのカテゴリ全件取得(displayOrder昇順)
+  List<Category> findByIsActiveTrueOrderByDisplayOrderAsc();
+  // active==falseのカテゴリ全件取得(displayOrder昇順)
+  List<Category> findByIsActiveFalseOrderByDisplayOrderAsc();
   //表示順の最大値
   java.util.Optional<Category> findTopByOrderByDisplayOrderDesc();
   //表示順の範囲取得

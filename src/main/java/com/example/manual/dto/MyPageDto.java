@@ -1,5 +1,6 @@
 package com.example.manual.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyPageDto {
@@ -7,11 +8,11 @@ public class MyPageDto {
 
   }
 
-  private List<ManualResponseDto> rollbackManualList;
-  private List<ManualResponseDto> createdManualList;
-  private List<ManualResponseDto> pendingManualList;
-  private int rollbackCount;
-  private int pendingUnCreatedCount;
+  private List<ManualResponseDto> rollbackManualList = new ArrayList<>();
+  private List<ManualResponseDto> createdManualList= new ArrayList<>();
+  private List<ManualResponseDto> pendingManualList = new ArrayList<>();
+  private int rollbackCount=0;
+  private int pendingUnCreatedCount=0;
 
 
   //getter

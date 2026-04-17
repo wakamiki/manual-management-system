@@ -3,6 +3,8 @@ package com.example.manual.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.service.CategoryService;
-import com.example.manual.service.ManualService;
 
 import jakarta.validation.Valid;
 
@@ -37,7 +38,7 @@ private static final Logger log =
 public String showCategoryManagement(
     Principal principal, Model model) {
   log.info("start");
-        List<CategoryResponseDto>responseDto =
+        List<CategoryDetailDto>responseDto =
         categoryService.showCategoryManagement(principal);
       model.addAttribute("responseDto",responseDto);
       return "category-management";

@@ -1,5 +1,6 @@
 package com.example.manual.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.manual.enums.ManualStatus;
@@ -11,8 +12,8 @@ public class ManualSearchConditionDto {
   }
 
   private String keyword;
-  private List<Long> categoryIds;
-  private List<ManualStatus> statuses;
+  private List<Long> categoryIds = new ArrayList<>();
+  private List<ManualStatus> statuses = new ArrayList<>();
 
   //#region getter
   public String getKeyword() {

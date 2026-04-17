@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
-import com.example.manual.dto.ManualListDto;
+import com.example.manual.dto.ManualIndexDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
@@ -49,8 +49,11 @@ public String showIndex(
         // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
         condition.setStatuses(defaultStatusCheck(condition));
 
-        ManualListDto listDto = manualService.showIndex(principal, condition);
+        ManualIndexDto listDto = manualService.showIndex(principal, condition);
+        log.info("listDto null? {}", listDto == null);
+        log.info("activeCategories null? {}", listDto != null ? listDto.getActiveCategories() == null : null);
         model.addAttribute("listDto", listDto);
+        log.info("listDto added to model");
         return "index";
 
 }

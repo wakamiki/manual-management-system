@@ -91,7 +91,7 @@ public void deletePendingApprovalNotificationsByManualId(
 }
 
 //差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
-public void deleteRollBackNotification(Long manualId, User user) {
+public void deleteRollbackNotification(Long manualId, User user) {
     log.info("start");
     //通知のあるユーザーがPENDINGしたときに実行
     notificationRepository.deleteByManualIdAndType(
@@ -124,7 +124,7 @@ public void getUnreadCount(User user) {
 }
 
 //ユーザー未読の差し戻し通知数を取得
-public int unreadRollBackCount(Principal principal) {
+public int unreadRollbackCount(Principal principal) {
     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.ROLLBACK);

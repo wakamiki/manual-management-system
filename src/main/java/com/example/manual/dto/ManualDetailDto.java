@@ -22,10 +22,10 @@ public class ManualDetailDto {
   private String createdByName;
   private String content;
   private ManualHistory history;
-  private List<ManualHistory> histories;
+  private List<ManualHistoryDto> histories;
 
 
-  //#region getter
+  //getter
   public Long getManualId() {
     return this.manualId;
   }
@@ -70,11 +70,11 @@ public class ManualDetailDto {
     return this.history;
   }
 
-  public List<ManualHistory> getHistories() {
+  public List<ManualHistoryDto> getHistories() {
     return this.histories;
   }
 
-
+//setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
   }
@@ -119,9 +119,8 @@ public class ManualDetailDto {
     this.history = history;
   }
 
-  public void setHistories(List<ManualHistory> histories) {
+  public void setHistories(List<ManualHistoryDto> histories) {
 
     this.histories = histories;
   }
-    //#endregion
 }

@@ -36,15 +36,16 @@ public class Manual {
     private String title;
     @Column(nullable = false, length = 10000)
     private String content;
-    // 業務上の公開状態を表す    @Enumerated(EnumType.STRING)
+    // 業務上の公開状態を表す
     @Enumerated(EnumType.STRING)
     private ManualStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime approvedAt;
-    private boolean isRolledBack=false;
+    @Column(name = "is_rolled_back", nullable = false)
+    private boolean isRolledback=false;
 
-  //#region getter
+  //getter
     public Long getId() {
         return this.id;
     }
@@ -82,8 +83,8 @@ public class Manual {
         return this.approvedAt;
     }
 
-    public boolean isRolledBack() {
-        return this.isRolledBack;
+    public boolean isRolledback() {
+        return this.isRolledback;
     }
 
   // setter
@@ -104,12 +105,12 @@ public class Manual {
         this.content = content;
     }
 
-    public void markUnreadRolledBack() {
-        this.isRolledBack = false;
+    public void markUnreadRolledback() {
+        this.isRolledback = false;
     }
 
-    public void markReadRolledBack() {
-        this.isRolledBack = true;
+    public void markReadRolledback() {
+        this.isRolledback = true;
     }
 
     public void markStatusDRAFT() {

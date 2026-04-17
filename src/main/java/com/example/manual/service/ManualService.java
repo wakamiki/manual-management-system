@@ -8,20 +8,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.CategoryResponseDto;
+import com.example.manual.dto.IndexSummaryDto;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
 import com.example.manual.dto.ManualHistoryDto;
-import com.example.manual.dto.ManualListDto;
+import com.example.manual.dto.ManualIndexDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
+import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
@@ -62,33 +64,35 @@ public class ManualService {
 
 
   //index表示
-  public ManualListDto showIndex(
+  public ManualIndexDto showIndex(
       Principal principal,
       ManualSearchConditionDto condition
   ) {
     log.info("start");
-    //コンソール確認用
-    System.out.println("manualService.showIndex start");
-    System.out.println("principal name = " + principal.getName());
-
     //検索一覧リスト condition ページ毎に分ける必要有
-    List<ManualResponseDto> seachManuals =
+    List<ManualResponseDto> searchManuals =
         searchManuals(condition,principal);
-    //カテゴリーリスト 検索欄用
-    List<CategoryResponseDto> categoryDtos =
-        categoryService.getCategoryDtos();
+    //カテゴリーリスト 検索欄用 active inactive
+    List<CategoryResponseDto> activeCategoriesDto =
+        categoryService.getActiveCategoryDtos();
+    List<CategoryResponseDto> inactiveCategoriesDto =
+        categoryService.getInactiveCategoryDtos();
     //ステータスリスト　検索欄用
-    List<ManualStatus> manualStatuses =
+    List<ManualStatus> defaultStatuses =
         getDefaultStatuses();
     //クイックビュー　通知
-    ManualResponseDto quickViewDtos=
-        getQuickViewData(principal);
+    IndexSummaryDto summaryDto=
+        getIndexSummary(principal);
+    //ログインユーザー情報　DisplayName
+    UserResponseDto userDto = userService.toUserIndexViewDto(principal);
 
-    ManualListDto listDto = new ManualListDto();
-    listDto.setSearchManuals(seachManuals);
-    listDto.setCategoryDtos(categoryDtos);
-    listDto.setManualStatuses(manualStatuses);
-    listDto.setQuickView(quickViewDtos);
+    ManualIndexDto listDto = new ManualIndexDto();
+    listDto.setSearchManuals(searchManuals);
+    listDto.setActiveCategories(activeCategoriesDto);
+    listDto.setInactiveCategories(inactiveCategoriesDto);
+    listDto.setDefaultStatuses(defaultStatuses);
+    listDto.setSummaryDto(summaryDto);
+    listDto.setUserDto(userDto);
 
       return listDto;
   }
@@ -107,6 +111,7 @@ public class ManualService {
     Manual manual = findManualOrThrow(manualId);
     manual.markUpdatedNow();
     manual.submitPENDING();
+    manual.markUnreadRolledback();
     manualRepository.save(manual);
   }
 
@@ -130,7 +135,7 @@ public class ManualService {
     manual.markStatusDRAFT();
     manual.setCategory(category);
     manual.setCreatedByUser(user);
-    manual.markUnreadRolledBack();
+    manual.markUnreadRolledback();
     manualRepository.save(manual);
   }
 
@@ -154,7 +159,7 @@ public class ManualService {
     manual.submitPENDING();
     manual.setCategory(category);
     manual.setCreatedByUser(user);
-    manual.markUnreadRolledBack();
+    manual.markUnreadRolledback();
     Manual savedManual = manualRepository.save(manual);
     notificationService.createSubmitNotifications(principal,savedManual);
   }
@@ -210,6 +215,7 @@ public class ManualService {
     manual.markStatusDRAFT();
     manual.setCategory(category);
     manual.setCreatedByUser(user);
+    manual.markUnreadRolledback();
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
         savedManual,
@@ -237,13 +243,13 @@ public class ManualService {
     manual.submitPENDING();
     manual.setCategory(category);
     manual.setCreatedByUser(user);
-    manual.markUnreadRolledBack();
+    manual.markUnreadRolledback();
     Manual savedManual = manualRepository.save(manual);
     manualHistoryService.createHistory(
         savedManual,
         requestDto.getChangeNote(),
         principal);
-    notificationService.deleteRollBackNotification(manualId,user);
+    notificationService.deleteRollbackNotification(manualId,user);
   }
 
   // 対応ボタン マニュアル詳細画面（新規タブ）
@@ -266,7 +272,9 @@ public class ManualService {
     detailDto.setStatus(manual.getStatus());
     detailDto.setCreatedAt(manual.getCreatedAt());
     detailDto.setUpdatedAt(manual.getUpdatedAt());
-    detailDto.setHistories(history);
+    List<ManualHistoryDto> historiesDto =
+      manualHistoryService.toHistoriesDto(history);
+    detailDto.setHistories(historiesDto);
     return detailDto;
   }
 
@@ -325,7 +333,7 @@ public class ManualService {
     if (!canRollbackManual(manual, principal, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
-    manual.markReadRolledBack();
+    manual.markReadRolledback();
     manual.markUpdatedNow();
     manual.rollbackToDraft();
     Manual savedManual = manualRepository.save(manual);
@@ -407,13 +415,17 @@ public class ManualService {
     List<ManualResponseDto> manualDtoList = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto manualDto = new ManualResponseDto();
+      CategoryResponseDto categoryDto = 
+          categoryService.toCategoryDto(manual.getCategory());
+      manualDto.setCategoryDto(categoryDto);
+      UserResponseDto userDto =
+          userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualDto.setCreatedUserDto(userDto);
       manualDto.setTitle(manual.getTitle());
       manualDto.setContent(manual.getContent());
-      manualDto.setCategoryName(manual.getCategory().getCategoryName());
       manualDto.setManualId(manual.getId());
       manualDto.setStatus(manual.getStatus());
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
       manualDto.setHistories(
           manualHistoryService.getManualHistorySummaryDtoList(
               manual.getId()));
@@ -423,10 +435,10 @@ public class ManualService {
   }
 
   // index quickView表示取得
-  public ManualResponseDto getQuickViewData(Principal principal) {
+  public IndexSummaryDto getIndexSummary(Principal principal) {
     log.info("start");
     //通知欄２つの数字を取得
-    int unreadRollBackCount = notificationService.unreadRollBackCount(principal);
+    int unreadRollbackCount = notificationService.unreadRollbackCount(principal);
     int unreadPendingCount = notificationService.unreadPendingCount(principal);
     //count　自分の作成マニュアル
     int countUserCreatedManual = countUserCreatedManual(principal);
@@ -435,14 +447,14 @@ public class ManualService {
     //count　最近更新（７日間）
     int countRecentWeeklyManual = countRecentWeeklyManuals();
 
-    ManualResponseDto responseDto = new ManualResponseDto();
-    responseDto.setCountUserCreatedManual(countUserCreatedManual);
-    responseDto.setCountCreatedPendingManual(countCreatedPendingManual);
-    responseDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
-    responseDto.setUnreadRollBackCount(unreadRollBackCount);
-    responseDto.setUnreadPendingCount(unreadPendingCount);
+    IndexSummaryDto summaryDto = new IndexSummaryDto();
+    summaryDto.setCountUserCreatedManual(countUserCreatedManual);
+    summaryDto.setCountCreatedPendingManual(countCreatedPendingManual);
+    summaryDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
+    summaryDto.setUnreadRollbackCount(unreadRollbackCount);
+    summaryDto.setUnreadPendingCount(unreadPendingCount);
 
-    return responseDto;
+    return summaryDto;
   }
 
   //status一覧を返す
@@ -475,12 +487,19 @@ public class ManualService {
       manualDto.setManualId(manual.getId());
       manualDto.setTitle(manual.getTitle());
       manualDto.setStatus(manual.getStatus());
-      manualDto.setCategoryId(manual.getCategory().getId());
-      manualDto.setCategoryName(manual.getCategory().getCategoryName());
+      CategoryResponseDto categoryDto =
+        categoryService.toCategoryDto(manual.getCategory());
+      manualDto.setCategoryDto(categoryDto);
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
-      manualDto.setRolledBack(manual.isRolledBack());
+      UserResponseDto userDto =
+        userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualDto.setCreatedUserDto(userDto);
       manualDto.setCreatedAt(manual.getCreatedAt());
+      List<ManualHistory> histories =
+        manualHistoryService.getManualIdHistory(manual.getId());
+      List<ManualHistoryDto> historiesDto =
+       manualHistoryService.toHistoriesDto(histories);
+      manualDto.setHistories(historiesDto);
       userCreatedListDto.add(manualDto);
     }
     return userCreatedListDto;
@@ -489,22 +508,24 @@ public class ManualService {
   //MyPege 差し戻し（自分作成）のデータを渡す。
   public List<ManualResponseDto> createdRollbackManualList(User user) {
     log.info("start");
-    List<Manual> rollBackList = manualRepository.findByIsRolledBackTrueAndCreatedByUserOrderByUpdatedAtDesc(
+    List<Manual> rollbackList = manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
         user);
-    List<ManualResponseDto> rollBacklistDto = new ArrayList<>();
-    for (Manual manual : rollBackList) {
+    List<ManualResponseDto> rollbacklistDto = new ArrayList<>();
+    for (Manual manual : rollbackList) {
       ManualResponseDto manualDto = new ManualResponseDto();
       manualDto.setManualId(manual.getId());
       manualDto.setTitle(manual.getTitle());
       manualDto.setStatus(manual.getStatus());
-      manualDto.setCategoryId(manual.getCategory().getId());
-      manualDto.setCategoryName(manual.getCategory().getCategoryName());
+      CategoryResponseDto categoryDto =
+        categoryService.toCategoryDto(manual.getCategory());
+      manualDto.setCategoryDto(categoryDto);
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
-      manualDto.setRolledBack(manual.isRolledBack());
-      rollBacklistDto.add(manualDto);
+      UserResponseDto userResponseDto =
+        userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualDto.setCreatedUserDto(userResponseDto);
+      rollbacklistDto.add(manualDto);
     }
-    return rollBacklistDto;
+    return rollbacklistDto;
   }
 
   //MyPege PENDINGの全マニュアル（自分作成以外）のデータを渡す。
@@ -518,11 +539,13 @@ public class ManualService {
       manualDto.setManualId(manual.getId());
       manualDto.setTitle(manual.getTitle());
       manualDto.setStatus(manual.getStatus());
-      manualDto.setCategoryId(manual.getCategory().getId());
-      manualDto.setCategoryName(manual.getCategory().getCategoryName());
+      CategoryResponseDto categoryDto =
+        categoryService.toCategoryDto(manual.getCategory());
+      manualDto.setCategoryDto(categoryDto);
       manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
-      manualDto.setRolledBack(manual.isRolledBack());
+      UserResponseDto userDto =
+        userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualDto.setCreatedUserDto(userDto);
       pendingListDto.add(manualDto);
     }
     return pendingListDto;
@@ -542,9 +565,12 @@ public class ManualService {
       manualResponseDto.setContent(manual.getContent());
       manualResponseDto.setStatus(manual.getStatus());
       manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      manualResponseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
-      manualResponseDto.setCategoryName(manual.getCategory().getCategoryName());
-      manualResponseDto.setCategoryId(manual.getCategory().getId());
+      UserResponseDto userResponseDto =
+        userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualResponseDto.setCreatedUserDto(userResponseDto);
+      CategoryResponseDto categoryDto =
+        categoryService.toCategoryDto(manual.getCategory());
+      manualResponseDto.setCategoryDto(categoryDto);
       List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
       manualResponseDto.setHistories(historyDto);
       manualDto.add(manualResponseDto);
@@ -566,9 +592,12 @@ public class ManualService {
       manualResponseDto.setContent(manual.getContent());
       manualResponseDto.setStatus(manual.getStatus());
       manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      manualResponseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
-      manualResponseDto.setCategoryName(manual.getCategory().getCategoryName());
-      manualResponseDto.setCategoryId(manual.getCategory().getId());
+      CategoryResponseDto categoryDto =
+        categoryService.toCategoryDto(manual.getCategory());
+      UserResponseDto userDto =
+        userService.toCreatedUserDto(manual.getCreatedByUser());
+      manualResponseDto.setCategoryDto(categoryDto);
+      manualResponseDto.setCreatedUserDto(userDto);
       List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
       manualResponseDto.setHistories(historyDto);
       manualDto.add(manualResponseDto);
@@ -609,10 +638,10 @@ public class ManualService {
    }
 
    //MyPage index通知 作成者自分の差し戻しマニュアル数を返す。
-   public int countMyRollBackManual(Principal principal) {
+   public int countMyRollbackManual(Principal principal) {
      log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
-     Long count = manualRepository.countByIsRolledBackTrueAndCreatedByUser(
+     Long count = manualRepository.countByIsRolledbackTrueAndCreatedByUser(
          targetUser);
      int targetCount = Math.toIntExact(count);
      return targetCount;
@@ -639,10 +668,14 @@ public class ManualService {
     responseDto.setManualId(manual.getId());
     responseDto.setCreatedAt(manual.getCreatedAt());
     responseDto.setUpdatedAt(manual.getUpdatedAt());
-    responseDto.setCreatedName(manual.getCreatedByUser().getDisplayName());
+    CategoryResponseDto categoryDto =
+      categoryService.toCategoryDto(manual.getCategory());
+    responseDto.setCategoryDto(categoryDto);
+    UserResponseDto userResponseDto =
+      userService.toCreatedUserDto(manual.getCreatedByUser());
+    responseDto.setCreatedUserDto(userResponseDto);
     responseDto.setContent(manual.getContent());
     responseDto.setTitle(manual.getTitle());
-    responseDto.setCategoryName(manual.getCategory().getCategoryName());
     return responseDto;
   }
 

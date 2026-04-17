@@ -1,7 +1,7 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.09  
-更新日: 2026-04-15
+Version: 01.00.11  
+更新日: 2026-04-17
 
 ---
 
@@ -871,3 +871,131 @@ thin controller 方針を再確認した。
 - index画面表示成功
 - H2コンソール確認フェーズ
 - 次は初期データ投入と一覧表示確認へ進行
+
+---
+
+## 作業記録（2026-04-16）
+
+### 1. 本日の作業テーマ
+
+* Spring Security 認証機能の安定化
+* ログイン後画面表示の不具合修正
+* DB確認環境の強化
+* 初期データ投入
+* Thymeleaf 一覧表示の着手
+
+---
+
+### 2. 実施内容
+
+#### 認証・ログイン
+
+* `CustomUserDetailsService` の実装を完了
+* DBの `USERS` テーブルを参照したログイン認証に成功
+* ログイン成功後 `/manuals/index` へ遷移確認
+* `SecurityConfig` のログイン / ログアウト設定を調整
+* `ROLE` / `STATUS` の取り扱いを確認
+
+---
+
+#### 画面表示・CSS
+
+* `index.html` の CSS 読み込み不具合を調査
+* `th:href` 記述ミスを修正
+* `config` 配下の旧CSS配信設定が `static/css` 配信を阻害していたことを特定
+* 旧設定削除により CSS 正常反映を確認
+* 静的リソースの標準構成を再確認
+
+  * `resources/static/css`
+  * `resources/templates`
+
+---
+
+#### DB / 開発環境
+
+* H2 コンソールで重複テーブルを確認
+* 単数形テーブル群が旧試作時の残骸であることを確認
+* 重複テーブルを整理し、複数形テーブルへ統一
+* `STATUS` 列を `STRING` 保存に修正
+* 初期データ投入
+
+  * `CATEGORIES`
+  * `MANUALS`
+  * `MANUAL_HISTORIES`
+* `CURRENT_TIMESTAMP` を用いた日時投入方法を整理
+* DBeaver 接続環境を構築し、今後の主力DBツールとして運用開始
+
+---
+
+#### トラブルシュート
+
+* `Port 8080 was already in use` の原因を調査
+* `httpd.exe` によるポート競合を特定
+* 起動環境確認とポート競合時の切り分け方法を整理
+* Thymeleaf テンプレートエラーを調査
+* `ManualStatus` enum に対する `.status` 二重参照ミスを修正
+
+---
+
+### 3. 学習・理解できたこと
+
+* Thymeleaf の参照起点は DTO名ではなく `model.addAttribute()` の名前
+* `th:each` は「1件分のまとまり」に付与する
+* enum 型は Thymeleaf 上で二重プロパティ参照しない
+* Spring Boot の静的リソースは `static` 配下が標準
+* `ddl-auto=update` では不要テーブルは自動削除されない
+* DBeaver によるテーブル確認・初期データ投入の効率が高い
+
+---
+
+### 4. 現在地
+
+* 認証機能：基本動作完了
+* DB初期データ：投入完了
+* 一覧画面：Thymeleaf 反映着手
+* 次工程：index画面の一覧表示完成
+
+---
+
+### 5. 次回予定
+
+* `index.html` の Thymeleaf 対応継続
+* `th:each` による一覧カード表示
+* `title / category / updatedAt / status` 表示
+* 状態別ラベル表示
+* 検索条件の値保持対応
+
+---
+
+## 2026-04-15
+
+### 作業概要
+index画面のThymeleaf表示確認、通知機能関連のRepository/Service整理、起動エラー対応、H2 file DB確認、Security設定追加を実施した。
+
+### 実施内容
+- NotificationRepository のメソッド名を Entity フィールド名に合わせて修正
+  - `notificationType` -> `type`
+- ManualRepository のプロパティ名不一致を修正
+- JPA の `countBy` / `deleteBy` 命名規則を整理
+- User Entity のテーブル名を `user` -> `users` に変更
+- H2 の予約語由来DDLエラーを解消
+- H2 file DB 接続確認
+  - `jdbc:h2:file:./data/testdb`
+- ポート競合（8080）を解消し、Spring Boot 起動成功
+- Tomcat 起動確認
+- Whitelabel Error 500 の原因切り分け
+- `SecurityConfig.java` を追加
+  - `/h2-console/**` を `permitAll`
+  - CSRF 対象外設定
+  - `frameOptions().sameOrigin()`
+- index 画面表示確認
+- H2 コンソールアクセス準備完了
+- DB未登録状態では一覧未表示となることを確認
+
+### 現在地
+- アプリ起動成功
+- index 画面表示成功
+- H2 コンソール確認フェーズ
+- 次工程は初期データ投入と一覧表示確認
+
+---

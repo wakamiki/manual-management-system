@@ -1,7 +1,7 @@
 ﻿# 01_project-overview-and-basic-design.md
 
-Version: 01.03.03
-更新日: 2026-04-16
+Version: 01.03.04
+更新日: 2026-04-17
 
 ---
 
@@ -18,6 +18,7 @@ Manual Management System
 - USER(一般利用者)
 - APPROVER（マニュアル承認者）
 - ADMIN（管理者）
+- GUEST（閲覧専用）
 
 ### 1-4. 解決したい課題
 - 業務知識の属人化
@@ -62,6 +63,7 @@ Manual Management System
 - マイページ
 - 自分作成のマニュアル確認
 - 承認待ちマニュアル確認
+- 閲覧専用ログイン（GUEST）
 
 ---
 
@@ -93,6 +95,13 @@ Manual Management System
 - Bootstrap
 - H2 Database
 - Git / GitHub
+
+### 6-1. 開発環境補足
+- 開発DBは H2 file DB を使用
+- 接続先: `jdbc:h2:file:./data/testdb`
+- H2コンソール: `/h2-console`
+- 本番移行候補: PostgreSQL
+- SecurityConfig を導入し、開発時の H2 コンソールアクセスを許可
 
 ---
 

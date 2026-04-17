@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.entity.Category;
@@ -36,7 +37,7 @@ public CategoryService(
 }
 
   // category-management表示
-  public List<CategoryResponseDto> showCategoryManagement(
+  public List<CategoryDetailDto> showCategoryManagement(
       Principal principal) {
     log.info("start");
       if (!canShowCategoryManagement(principal)) {
@@ -44,10 +45,10 @@ public CategoryService(
       }
   List<Category> categories =
       categoryRepository.findAllByOrderByDisplayOrderAsc();
-  List<CategoryResponseDto>responseDtos =
+  List<CategoryDetailDto>responseDtos =
       new ArrayList<>();
   for (Category category : categories) {
-    CategoryResponseDto responseDto = new CategoryResponseDto();
+    CategoryDetailDto responseDto = new CategoryDetailDto();
     responseDto.setActive(category.isActive());
     responseDto.setCategoryName(category.getCategoryName());
     responseDto.setDisplayOrder(category.getDisplayOrder());
@@ -84,7 +85,7 @@ public CategoryService(
     categoryRepository.save(category);
 
     //情報書き換え対応時に使用。
-    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // CategoryDetailDto responseDto = new CategoryDetailDto();
     // responseDto.setId(savedCategory.getId());
     // responseDto.setCategoryName(savedCategory.getCategoryName());
     // responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
@@ -118,7 +119,7 @@ public CategoryService(
     category.markUpdatedNow();
     categoryRepository.save(category);
     // 情報書き換え対応時に使用。
-    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // CategoryDetailDto responseDto = new CategoryDetailDto();
     // responseDto.setId(savedCategory.getId());
     // responseDto.setCategoryName(savedCategory.getCategoryName());
     // responseDto.setDisplayOrder(savedCategory.getDisplayOrder());
@@ -137,7 +138,7 @@ public CategoryService(
     category.markUpdatedNow();
     categoryRepository.save(category);
     // 情報書き換え対応時に使用。
-    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // CategoryDetailDto responseDto = new CategoryDetailDto();
     // responseDto.setActive(savedCategory.isActive());
     // responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
   }
@@ -152,7 +153,7 @@ public CategoryService(
     category.markUpdatedNow();
     categoryRepository.save(category);
     // 情報書き換え対応時に使用。
-    // CategoryResponseDto responseDto = new CategoryResponseDto();
+    // CategoryDetailDto responseDto = new CategoryDetailDto();
     // responseDto.setActive(savedCategory.isActive());
     // responseDto.setUpdatedAt(savedCategory.getUpdatedAt());
     // return responseDto;
@@ -177,20 +178,34 @@ public List<Category> getAllCategories() {
     return categoryOpt.get();
   }
 
-  //index 検索欄のカテゴリーリスト取得
-  public List<CategoryResponseDto> getCategoryDtos() {
+  //index 検索欄のカテゴリーリスト(active)取得
+  public List<CategoryResponseDto> getActiveCategoryDtos() {
     log.info("start");
-  List<Category> categoryAll = categoryRepository.findAllByOrderByDisplayOrderAsc();
-  List<CategoryResponseDto> responseDtos = new ArrayList<>();
-  for (Category category : categoryAll) {
-    CategoryResponseDto responseDto = new CategoryResponseDto();
-    responseDto.setActive(category.isActive());
-    responseDto.setId(category.getId());
-    responseDto.setCategoryName(category.getCategoryName());
-    responseDtos.add(responseDto);
+    List<Category> activeCategories = categoryRepository.findByIsActiveTrueOrderByDisplayOrderAsc();
+    List<CategoryResponseDto> activeCategoriesDto = new ArrayList<>();
+    for (Category category : activeCategories) {
+      CategoryResponseDto activeCategoryDto= new CategoryResponseDto();
+      activeCategoryDto.setId(category.getId());
+      activeCategoryDto.setCategoryName(category.getCategoryName());
+      activeCategoriesDto.add(activeCategoryDto);
+    }
+    return activeCategoriesDto;
   }
-  return responseDtos;
-}
+
+  // index 検索欄のカテゴリーリスト(inactive)取得
+  public List<CategoryResponseDto> getInactiveCategoryDtos() {
+    log.info("start");
+    List<Category> inactiveCategories =
+        categoryRepository.findByIsActiveFalseOrderByDisplayOrderAsc();
+    List<CategoryResponseDto> inactiveCategoriesDto = new ArrayList<>();
+    for (Category category : inactiveCategories) {
+      CategoryResponseDto inactiveCategoryDto = new CategoryResponseDto();
+      inactiveCategoryDto.setId(category.getId());
+      inactiveCategoryDto.setCategoryName(category.getCategoryName());
+      inactiveCategoriesDto.add(inactiveCategoryDto);
+    }
+    return inactiveCategoriesDto;
+  }
 
 //displayオーダー割り込み
 private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
@@ -237,6 +252,16 @@ private void shiftUpOrderNumbers(Integer start, Integer end) {
   categoryRepository.saveAll(targets);
 }
 
+// ===============================================
+//Dto詰め替え
+// ===============================================
+public CategoryResponseDto toCategoryDto(Category category){
+  CategoryResponseDto categoryDto = new CategoryResponseDto();
+  categoryDto.setId(category.getId());
+  categoryDto.setCategoryName(category.getCategoryName());
+
+  return categoryDto;
+}
 
 // ===============================================
 //権限判定

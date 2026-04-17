@@ -4,9 +4,9 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.example.manual.dto.ManualDetailHistoryDto;
 import com.example.manual.dto.ManualHistoryDto;
@@ -14,7 +14,6 @@ import com.example.manual.entity.Manual;
 import com.example.manual.entity.ManualHistory;
 import com.example.manual.entity.User;
 import com.example.manual.repository.ManualHistoryRepository;
-import com.example.manual.repository.UserRepository;
 
 @Service
 public class ManualHistoryService {
@@ -48,6 +47,11 @@ public class ManualHistoryService {
   history.setManual(manual);
   return manualHistoryRepository.save(history);
 }
+
+
+//===========================================
+//検索・取得
+//===========================================
 
 //manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistory> getManualIdHistory(Long manualId) {
@@ -91,4 +95,23 @@ public List<ManualDetailHistoryDto> getManualHistoryDetailDtoList(
   }
   return historyDetailDtoList;
 }
+
+
+//===========================================
+//Dto詰め替え
+//===========================================
+
+  public List<ManualHistoryDto> toHistoriesDto(List<ManualHistory> histories){
+
+    List<ManualHistoryDto>historiesDto = new ArrayList<>();
+
+    for (ManualHistory history : histories) {
+      ManualHistoryDto historyDto = new ManualHistoryDto(); 
+      historyDto.setChangedAt(history.getChangedAt());
+      historyDto.setChangeNote(history.getChangeNote());
+      historiesDto.add(historyDto);
+    }
+   return historiesDto;
+  } 
+
 }

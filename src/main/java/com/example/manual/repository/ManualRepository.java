@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
@@ -26,7 +24,7 @@ public interface ManualRepository extends JpaRepository<Manual, Long>
     ManualStatus status);
 
   //作成者が自分の差し戻しマニュアル取得（更新昇順）
-  List<Manual> findByIsRolledBackTrueAndCreatedByUserOrderByUpdatedAtDesc(
+  List<Manual> findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
       User createdByUser);
 
   //作成者が自分のマニュアル（作成日新しい順）
@@ -49,7 +47,7 @@ public interface ManualRepository extends JpaRepository<Manual, Long>
           // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
 
   //数取得  作成者が自分の差し戻しマニュアル取得
-  Long countByIsRolledBackTrueAndCreatedByUser(
+  Long countByIsRolledbackTrueAndCreatedByUser(
       User createdByUser);
 
   //数取得  作成者が自分ではない任意ステータスマニュアル

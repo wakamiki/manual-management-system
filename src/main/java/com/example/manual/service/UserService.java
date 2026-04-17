@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.example.manual.dto.UserListResponseDto;
+
+import com.example.manual.dto.UserDetailDto;
 import com.example.manual.dto.UserRequestDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.User;
@@ -33,7 +34,7 @@ public class UserService {
     }
 
     // user-management表示
-    public List<UserResponseDto> showUserManagementPege(
+    public List<UserDetailDto> showUserManagementPege(
             Principal principal) {
         log.info("start");
                 User targetUser = getUserByPrincipal(principal);
@@ -42,9 +43,9 @@ public class UserService {
         }
         List<User> userList =
                 userRepository.findAllByOrderByUpdatedAtDesc();
-        List<UserResponseDto> userResponseDto = new ArrayList<>();
+        List<UserDetailDto> userResponseDto = new ArrayList<>();
         for (User user : userList) {
-            UserResponseDto responseDto = new UserResponseDto();
+            UserDetailDto responseDto = new UserDetailDto();
             responseDto.setLoginId(user.getLoginId());
             responseDto.setDisplayName(user.getDisplayName());
             responseDto.setRole(user.getRole());
@@ -55,7 +56,7 @@ public class UserService {
         return userResponseDto;
     }
 
-    public UserResponseDto createUser(
+    public UserDetailDto createUser(
             UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
@@ -70,7 +71,7 @@ public class UserService {
 
         User savedUser = userRepository.save(targetUser);
 
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
@@ -78,7 +79,7 @@ public class UserService {
         return responseDto;
     }
 
-    public UserResponseDto updateUser(
+    public UserDetailDto updateUser(
             @Valid UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
@@ -93,7 +94,7 @@ public class UserService {
         targetUser.markUpdatedNow();
         User savedUser = userRepository.save(targetUser);
 
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
@@ -102,41 +103,41 @@ public class UserService {
         return responseDto;
     }
 
-    public UserResponseDto changeRole(
+    public UserDetailDto changeRole(
             @Valid UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
         if (!canChangeRole(requestDto, principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         return responseDto;
     }
 
-    public UserResponseDto deactivateUser(Principal principal) {
+    public UserDetailDto deactivateUser(Principal principal) {
         log.info("start");
         if (!canDeactivateUser(principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         return responseDto;
     }
 
-    public UserResponseDto activateUser(Principal principal) {
+    public UserDetailDto activateUser(Principal principal) {
         log.info("start");
         if (!canActivateUser(principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         return responseDto;
     }
 
-    public UserResponseDto resetPassword(Principal principal) {
+    public UserDetailDto resetPassword(Principal principal) {
         log.info("start");
         if (!canResetPassword(principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         return responseDto;
     }
 
@@ -145,7 +146,7 @@ public class UserService {
         if (!canUserSaved(user, principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserResponseDto responseDto = new UserResponseDto();
+        UserDetailDto responseDto = new UserDetailDto();
         return userRepository.save(user);
     }
 
@@ -154,15 +155,14 @@ public class UserService {
     // =============================================
 
     // ユーザー管理画面取得
-    public UserListResponseDto getUserManagementViewDeta(Principal principal) {
+    public List<UserDetailDto> getUserManagementViewDeta(Principal principal) {
         log.info("start");
         if (!canGetUserManagementViewDeta(principal)) {
             throw new InvalidStateException("判定エラー");
         }
         List<User> allUsers = findAllUser();
-        List<UserResponseDto> allUserDto = toUserListDtoList(allUsers);
-        UserListResponseDto userListResponseDto = new UserListResponseDto();
-        return userListResponseDto;
+        List<UserDetailDto> allUserDto = toUserListDtoList(allUsers);
+        return allUserDto;
     }
 
     public User getUserByPrincipal(Principal principal) {
@@ -218,14 +218,18 @@ public class UserService {
     // =========================================
 
     // 画面表示用にDto変換
-    public List<UserResponseDto> toUserListDtoList(List<User> userList) {
+    public List<UserDetailDto> toUserListDtoList(List<User> userList) {
         log.info("start");
-        List<UserResponseDto> userListDto = new ArrayList<>();
+        List<UserDetailDto> userListDto = new ArrayList<>();
         for (User targetUser : userList) {
-            UserResponseDto userDto = new UserResponseDto();
-            userDto.setLoginId(targetUser.getLoginId());
-            userDto.setDisplayName(targetUser.getDisplayName());
-            userDto.setRole(targetUser.getRole());
+            UserDetailDto userDto = new UserDetailDto();
+            userDto.setLoginId(
+                    targetUser.getLoginId());
+            userDto.setDisplayName(
+                    targetUser.getDisplayName() != null
+                    ?targetUser.getDisplayName():"");
+            userDto.setRole(
+                    targetUser.getRole());
             userDto.setLastLoginAt(targetUser.getLastLoginAt());
             userDto.setActive(targetUser.isActive());
             userListDto.add(userDto);
@@ -234,6 +238,26 @@ public class UserService {
         return userListDto;
     }
 
+    // index表示用にDto変換
+    public UserResponseDto toUserIndexViewDto(Principal principal) {
+        User targetUser = getUserByPrincipal(principal);
+        UserResponseDto userDto = new UserResponseDto();
+        userDto.setDisplayName(
+                targetUser.getDisplayName() != null
+                ? targetUser.getDisplayName():"");
+        userDto.setId(targetUser.getId());
+        return userDto;
+    }
+
+    //検索一覧画面表示用にDto変換
+    public UserResponseDto toCreatedUserDto(User targetUser) {
+        UserResponseDto userDto = new UserResponseDto();
+        userDto.setDisplayName(
+                targetUser.getDisplayName() != null
+                ? targetUser.getDisplayName():"");
+        userDto.setId(targetUser.getId());
+        return userDto;
+    }
     // =========================================
     // 権限判定
     // =========================================

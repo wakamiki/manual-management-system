@@ -11,23 +11,31 @@
 </head>
 
 <body>
-  <main class="container index-page" th:object="${listDto}">
+  <main class="container index-page">
     <header class="page-header">
       <div>
         <h1 class="h4 mb-0">業務マニュアル管理システム</h1>
       </div>
+      <p th:text="${listDto != null ? 'OK' : 'NG'}"></p>
+      <p th:text="${#ctx.containsVariable('listDto')}"></p>
+
+
       <div class="page-actions">
         <form class="search-form">
           <details class="search-filter">
             <summary>カテゴリ</summary>
             <div class="search-filter-panel">
-              <label class="search-check"><input type="checkbox" checked> 営業部</label>
-              <label class="search-check"><input type="checkbox"> 経理部</label>
-              <label class="search-check"><input type="checkbox"> 総務部</label>
+              <div>
+                <div>カテゴリ名
+                  <label class="search-check"><input type="checkbox"></label>
+                </div>
+              </div>
               <details class="search-subfilter">
                 <summary>使用停止中</summary>
                 <div class="search-subfilter-panel">
-                  <label class="search-check search-check-sub"><input type="checkbox"> 旧営業部</label>
+                  <div>カテゴリ名
+                    <label class="search-check search-check-sub"><input type="checkbox"></label>
+                  </div>
                 </div>
               </details>
             </div>
@@ -35,9 +43,9 @@
           <details class="search-filter">
             <summary>ステータス</summary>
             <div class="search-filter-panel">
-              <label class="search-check"><input type="checkbox" checked> 申請中</label>
-              <label class="search-check"><input type="checkbox" checked> 承認済</label>
-              <label class="search-check"><input type="checkbox"> アーカイブ</label>
+              <div class="search-check">ステータス名
+                <label><input type="checkbox" checked></label>
+              </div>
             </div>
           </details>
           <input type="search" class="form-control" placeholder="キーワード検索">
@@ -77,21 +85,21 @@
             </div>
             <div class="sidebar-section">
               <h2 class="h5">カテゴリ</h2>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">営業部</li>
-                <li class="list-group-item">経理部</li>
-                <li class="list-group-item">総務部</li>
-              </ul>
+              <div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">カテゴリ名</li>
+                </ul>
+              </div>
             </div>
             <div class="stopedCategory">
               <button class="stopped-toggle" type="button" data-bs-toggle="collapse"
-                data-bs-target="#stoppedCategoryList" aria-expanded="false" aria-controls="stoppedCategoryList">
+                data-bs-target="#stoppedCategorylist" aria-expanded="false" aria-controls="stoppedCategoryList">
                 <span>使用停止中</span>
                 <span class="stopped-toggle-icon">＋</span>
               </button>
               <div class="collapse" id="stoppedCategoryList">
                 <ul class="list-group list-group-flush">
-                  <li class="list-group-item">旧営業部</li>
+                  <li class="list-group-item">カテゴリ名</li>
                 </ul>
               </div>
             </div>
@@ -105,7 +113,7 @@
                 </span>
                 <span class="sidebar-home-user">
                   <span class="sidebar-home-user-label">ログイン中</span>
-                  <span class="sidebar-home-user-name">山田 花子</span>
+                  <span class="sidebar-home-user-name"></span>
                 </span>
               </a>
             </div>
@@ -134,7 +142,7 @@
             </div>
             <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                <p>見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <p th:text="${listDto != null ? 'OK' : 'NG'}">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
                   <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
                     class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -147,43 +155,6 @@
                 <ul class="history-list mb-0">
                   <li>2026-04-05: 本文の修正</li>
                   <li>2026-04-04: 新規作成</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item">
-            <div class="accordion-header">
-              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                <div class="w-100">
-                  <div class="d-flex justify-content-between align-items-center gap-2">
-                    <strong class="fw-semibold">発注処理フロー</strong>
-                    <span class="text-muted"><small class="pe-5">更新日 / 作成者: 佐藤 次郎</small></span>
-                  </div>
-                  <div class="align-items-center gap-2">
-                    <span class="text-muted"><small>マニュアルID: 1002</small></span>
-                    <span class="category">カテゴリ</span>
-                    <span class="badge bg-success">承認済</span>
-                  </div>
-                </div>
-              </button>
-            </div>
-            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <p>発注依頼から納品確認までの確認事項をまとめています。</p>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                  <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
-                    class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
-                    class="btn btn-outline-secondary btn-sm">編集</a>
-                  <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
-                    class="btn btn-outline-secondary btn-sm">複製</a>
-                </div>
-                <h2 class="history-title mb-2">更新履歴</h2>
-                <ul class="history-list mb-0">
-                  <li>2026-04-03: 承認済へ変更</li>
-                  <li>2026-04-01: 初回公開</li>
                 </ul>
               </div>
             </div>

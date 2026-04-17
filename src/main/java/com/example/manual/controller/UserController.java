@@ -3,17 +3,16 @@ package com.example.manual.controller;
 import java.security.Principal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.example.manual.dto.UserResponseDto;
-import com.example.manual.service.ManualService;
+import com.example.manual.dto.UserDetailDto;
 import com.example.manual.service.UserService;
 
 @Controller
@@ -38,7 +37,7 @@ public class UserController {
     public String showUserManagementPege(
         Principal principal, Model model) {
       log.info("showUserManagementPege start");
-      List<UserResponseDto> userResponseDto =
+      List<UserDetailDto> userResponseDto =
         userService.showUserManagementPege(principal);
 
       model.addAttribute("manualListDto", userResponseDto);
