@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.MyPageDto;
-import com.example.manual.service.ManualService;
 import com.example.manual.service.MyPageService;
 
 @Controller

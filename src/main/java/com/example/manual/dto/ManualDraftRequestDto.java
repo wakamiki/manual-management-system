@@ -17,8 +17,6 @@ public class ManualDraftRequestDto {
     private Long categoryId;
     @Size(max=100)
     private String changeNote;
-    @NotNull
-    private ManualStatus status;
 
   //#region getter
     public String getTitle() {
@@ -37,12 +35,7 @@ public class ManualDraftRequestDto {
         return this.changeNote;
     }
 
-    public ManualStatus getStatus() {
-  //#endregion
-        return this.status;
-    }
-
-  //#region setter
+  //setter
     public void setTitle(String title) {
         this.title = title;
     }
@@ -57,10 +50,5 @@ public class ManualDraftRequestDto {
 
     public void setChangeNote(String changeNote) {
         this.changeNote = changeNote;
-    }
-
-    public void setStatus(ManualStatus status) {
-  //#endregion
-        this.status = status;
     }
 }

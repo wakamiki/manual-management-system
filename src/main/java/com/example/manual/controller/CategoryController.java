@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryRequestDto;
-import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -34,70 +33,103 @@ private static final Logger log =
   }
 
   // category-management表示
-@GetMapping("/category-management")
+@GetMapping
 public String showCategoryManagement(
-    Principal principal, Model model) {
+    Principal principal, Model model,
+  RedirectAttributes message) {
   log.info("start");
+  try {
         List<CategoryDetailDto>responseDto =
         categoryService.showCategoryManagement(principal);
       model.addAttribute("responseDto",responseDto);
       return "category-management";
+   } catch (Exception e) {
+    message.addFlashAttribute("message", "画面取得に失敗しました。");
+    message.addFlashAttribute("messageType", "error");
+    return "redirect:/categories";
+  }
   }
 
-  @PostMapping
+  @PostMapping("/categories/create")
   public String createCategory(
       @Valid CategoryRequestDto requestDto,
       Principal principal,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes message) {
     log.info("start");
-        categoryService.createCategory(requestDto, principal);
-    redirectAttributes.addFlashAttribute(
+    try {
+    categoryService.createCategory(requestDto, principal);
+
+    message.addFlashAttribute(
         "message", "新しいカテゴリーを作成しました。");
-      return "redirect:/categories";
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
+    } catch (Exception e) {
+    message.addFlashAttribute("message", "カテゴリー作成に失敗しました。");
+    message.addFlashAttribute("messageType", "error");
+    return "redirect:/categories";
+  }
   }
 
 
 
-  @PutMapping("/{categoryId}")
+  @PutMapping("/categories/{categoryId}")
   public String updateCategory(
       @Valid CategoryRequestDto requestDto,
       Principal principal,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes message) {
     log.info("start");
+  try {
         categoryService.updateCategory(
           requestDto.getId(),
           requestDto,
           principal);
-      redirectAttributes.addFlashAttribute(
+      message.addFlashAttribute(
           "message", "カテゴリーを更新しました。");
-
-      return "redirect:/categories/{categoryId}";
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/categories";
+  } catch (Exception e) {
+    message.addFlashAttribute("message", "更新に失敗しました。");
+    message.addFlashAttribute("messageType", "error");
+    return "redirect:/categories";
+  }
 
   }
 
 
-  @PutMapping("/{categoryId}/deactivate")
+  @PutMapping("/categories/{categoryId}/deactivate")
   public String deactivateCategory(
       Principal principal,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes message) {
     log.info("start");
+    try {
         categoryService.deactivateCategory(principal);
-    redirectAttributes.addFlashAttribute(
+    message.addFlashAttribute(
         "message", "選択カテゴリーを使用停止にしました。");
-
-    return "redirect:/categories/{categoryId}/deactivate";
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
+  } catch (Exception e) {
+    message.addFlashAttribute("message", "使用停止に失敗しました。");
+    message.addFlashAttribute("messageType", "error");
+    return "redirect:/categories";
+  } 
   }
 
-  @PutMapping("/{categoryId}/activate")
+  @PutMapping("/categories/{categoryId}/activate")
   public String activateCategory(
       Principal principal,
-      RedirectAttributes redirectAttributes) {
+      RedirectAttributes message) {
     log.info("start");
+  try {
     categoryService.activateCategory(principal);
-    redirectAttributes.addFlashAttribute(
+    message.addFlashAttribute(
         "message", "選択カテゴリーを有効にしました。");
-
-    return "redirect:/categories/{categoryId}/activate";
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
+    } catch (Exception e) {
+    message.addFlashAttribute("message", "カテゴリー有効に失敗しました。");
+    message.addFlashAttribute("messageType", "error");
+    return "redirect:/categories";
+  }
   }
 
 

@@ -24,19 +24,23 @@
             <div class="search-filter-panel">
               <div class="search-check" th:each="activeCategories:${listDto.activeCategories}">
                 <span th:text="${activeCategories.categoryName}">カテゴリ名</span>
-                <label><input type="checkbox" name="categoryIds" th:value="${activeCategories.id}"
-                    th:checked="${manualSearchConditionDto.categoryIds != null and #lists.contains(manualSearchConditionDto.categoryIds, activeCategories.id)}"></label>
+                <label><input type="checkbox" class="category-filter-item" name="categoryIds"
+                    th:value="${activeCategories.id}" th:checked="${manualSearchConditionDto.categoryIds != null and 
+                      #lists.contains(manualSearchConditionDto.categoryIds, 
+                      activeCategories.id)}"></label>
               </div>
               <details class="search-subfilter">
                 <summary>使用停止中</summary>
                 <div class="search-subfilter-panel">
                   <div class="search-check search-check-sub" th:each="inactiveCategories:${listDto.inactiveCategories}">
                     <span th:text="${inactiveCategories.categoryName}">カテゴリ名</span>
-                    <label><input type="checkbox" name="categoryIds" th:value="${inactiveCategories.id}"
+                    <label><input type="checkbox" class="category-filter-item" name="categoryIds"
+                        th:value="${inactiveCategories.id}"
                         th:checked="${manualSearchConditionDto.categoryIds != null and #lists.contains(manualSearchConditionDto.categoryIds, inactiveCategories.id)}"></label>
                   </div>
                 </div>
               </details>
+              <p id="categoryFilterError" class="mb-0 text-danger small" hidden>カテゴリは1つ以上選択してください</p>
             </div>
           </details>
           <details class="search-filter">
@@ -54,12 +58,12 @@
             placeholder="キーワード検索">
           <button type="submit" class="btn btn-outline-primary">検索</button>
         </form>
-        <a href="@{/manuals/create}" target="_blank" rel="noopener noreferrer"
+        <a th:href="@{/manuals/create}" target="_blank" rel="noopener noreferrer"
           class="btn btn-primary create-button">新規作成</a>
       </div>
     </header>
 
-    <div class="alert mock-alert index-alert mb-0" role="alert" th:if="${message != null}" th:classappend="${
+    <div class="alert index-alert mb-0" role="alert" th:if="${message != null}" th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'
@@ -76,18 +80,18 @@
             </div>
             <div>
               <ul class="list-group list-group-flush">
-                <li class="list-group-item active d-flex justify-content-between align-items-center">
-                  <span>自分の作成分</span>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a th:href="@{/manuals/index/my-created}" class="list-group-item-action">自分の作成分</a>
                   <span class="sidebar-count" th:text="${listDto.summaryDto.countUserCreatedManual}">
                     8</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>申請中</span>
+                  <a th:href="@{/manuals/index/my-pending}" class="list-group-item-action">申請中</a>
                   <span class="sidebar-count" th:text="${listDto.summaryDto.countCreatedPendingManual}">
                     3</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>最近更新</span>
+                  <a th:href="@{/manuals/index/new-updatedAt}" class="list-group-item-action">最近更新</a>
                   <span class="sidebar-count" th:text="${listDto.summaryDto.countRecentWeeklyManual}">5</span>
                 </li>
               </ul>
@@ -96,7 +100,11 @@
               <h2 class="h5">カテゴリ</h2>
               <div>
                 <ul class="list-group list-group-flush" th:each="activeCategories:${listDto.activeCategories}">
-                  <li class="list-group-item" th:text="${activeCategories.categoryName}">カテゴリ名</li>
+                  <li class="list-group-item">
+                    <a th:text="${activeCategories.categoryName}"
+                      th:href="@{/manuals/index(categoryIds=${activeCategories.id})}">
+                      カテゴリ名</a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -108,7 +116,11 @@
               </button>
               <div class="collapse" id="stoppedCategoryList">
                 <ul class="list-group list-group-flush" th:each="inactiveCategories:${listDto.inactiveCategories}">
-                  <li class="list-group-item" th:text="${inactiveCategories.categoryName}">カテゴリ名</li>
+                  <li class="list-group-item">
+                    <a th:text="${inactiveCategories.categoryName}"
+                      th:href="@{/manuals/index(categoryIds=${inactiveCategories.id})}">
+                      カテゴリ名</a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -203,6 +215,40 @@
     </div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (() => {
+      const categoryItems = Array.from(document.querySelectorAll(".category-filter-item"));
+      const categoryFilterError = document.getElementById("categoryFilterError");
+      if (categoryItems.length === 0) {
+        return;
+      }
+
+      const countCheckedItems = () => categoryItems.filter((item) => item.checked).length;
+
+      if (countCheckedItems() === 0) {
+        categoryItems[0].checked = true;
+      }
+
+      const showReasonMessage = () => {
+        if (!categoryFilterError) {
+          return;
+        }
+        categoryFilterError.hidden = false;
+        window.setTimeout(() => {
+          categoryFilterError.hidden = true;
+        }, 2000);
+      };
+
+      categoryItems.forEach((item) => {
+        item.addEventListener("change", () => {
+          if (!item.checked && countCheckedItems() === 0) {
+            item.checked = true;
+            showReasonMessage();
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 
 </html>

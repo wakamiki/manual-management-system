@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/admin.css}">
 </head>
+
 <body>
   <main class="container admin-page">
     <header class="page-title-bar">
@@ -18,7 +20,11 @@
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
 
-    <div class="alert admin-alert mb-4" role="alert">
+    <div class="alert user-manegement-alert mb-4" role="alert" th:if="${message != null}" th:classappend="${
+       messageType == 'success' ? ' alert-success' :
+       messageType == 'error'   ? ' alert-danger'  :
+       messageType == 'warning' ? ' alert-warning' : ' alert-info'
+     }" th:text="${message != null and !#strings.isEmpty(message) ? message : ''}">
       ユーザーを新規作成しました。
     </div>
 
@@ -141,5 +147,17 @@
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const alertEl = document.getElementById("flashMessage");
+      if (!alertEl) return;
+      setTimeout(() => {
+        alertEl.style.transition = "opacity .4s";
+        alertEl.style.opacity = "0";
+        setTimeout(() => alertEl.remove(), 400);
+      }, 3000);
+    });
+  </script>
 </body>
+
 </html>
