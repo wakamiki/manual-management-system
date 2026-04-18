@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.12
-更新日: 2026-04-17
+Version: 01.06.13
+更新日: 2026-04-18
 
 ---
 
@@ -31,6 +31,8 @@ Version: 01.06.12
 - 更新処理系は POST
 - Controller は thin controller 方針
 - DTO 受け取りと Service 呼び出しに責務を限定する
+- 保存系の戻り値メッセージは FlashAttribute で渡す
+- 保存系は `try-catch` で成功/失敗メッセージを分岐して扱う
 
 ---
 
@@ -205,6 +207,12 @@ Version: 01.06.12
 - 差し戻し
 - アーカイブ
 - 復帰
+- 詳細画面の権限フラグ組み立て
+  - `buildDetailPermissions(manual, currentUser)` を起点に扱う
+- 権限共通処理
+  - `isUserActive`
+  - `isOwner`
+  - `isApproverOrAdmin`
 
 ---
 
@@ -261,6 +269,14 @@ Version: 01.06.12
 - Request DTO と Response DTO を分ける
 - List DTO / Detail DTO / Action DTO を使い分ける
 - 一覧検索条件は `ManualSearchConditionDto` へまとめてよい
+- `ManualDetailDto` は画面制御フラグを保持してよい
+  - `canEdit`
+  - `canPending`
+  - `canApprove`
+  - `canRollback`
+  - `canArchive`
+  - `canRestore`
+  - `canCopy`
 - DTO の null 設計は以下で統一する
   - List 項目: null を使わず空 List で返す
   - 件数項目: `int` を基本とし 0 を初期値にする
