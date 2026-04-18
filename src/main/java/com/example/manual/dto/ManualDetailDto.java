@@ -14,7 +14,7 @@ public class ManualDetailDto {
   private Long manualId;
   private String title;
   private ManualStatus status;
-  private Long  categoryId;
+  private Long categoryId;
   private String categoryName;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -23,9 +23,15 @@ public class ManualDetailDto {
   private String content;
   private ManualHistory history;
   private List<ManualHistoryDto> histories;
+  private boolean canEdit;
+  private boolean canPending;
+  private boolean canApprove;
+  private boolean canRollback;
+  private boolean canArchive;
+  private boolean canRestore;
+  private boolean canCopy;
 
-
-  //getter
+  // getter
   public Long getManualId() {
     return this.manualId;
   }
@@ -38,7 +44,7 @@ public class ManualDetailDto {
     return this.status;
   }
 
-  public Long getCategoryId(){
+  public Long getCategoryId() {
     return this.categoryId;
   }
 
@@ -74,7 +80,35 @@ public class ManualDetailDto {
     return this.histories;
   }
 
-//setter
+  public boolean isCanEdit() {
+    return this.canEdit;
+  }
+
+  public boolean isCanPending() {
+    return this.canPending;
+  }
+
+  public boolean isCanApprove() {
+    return this.canApprove;
+  }
+
+  public boolean isCanRollback() {
+    return this.canRollback;
+  }
+
+  public boolean isCanRestore() {
+    return this.canRestore;
+  }
+
+  public boolean isCanArchive() {
+    return canArchive;
+  }
+
+  public boolean isCanCopy() {
+    return canCopy;
+  }
+
+  // setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
   }
@@ -87,8 +121,8 @@ public class ManualDetailDto {
     this.status = status;
   }
 
-  public void setCategoryId(Long categoryId){
-    this.categoryId= categoryId;
+  public void setCategoryId(Long categoryId) {
+    this.categoryId = categoryId;
   }
 
   public void setCategoryName(String categoryName) {
@@ -122,5 +156,33 @@ public class ManualDetailDto {
   public void setHistories(List<ManualHistoryDto> histories) {
 
     this.histories = histories;
+  }
+
+  public void setCanCopy(boolean canCopy) {
+    this.canCopy = canCopy;
+  }
+
+  public void setCanRestore(boolean canRestore) {
+    this.canRestore = canRestore;
+  }
+
+  public void setCanRollback(boolean canRollback) {
+    this.canRollback = canRollback;
+  }
+
+  public void setCanApprove(boolean canApprove) {
+    this.canApprove = canApprove;
+  }
+
+  public void setCanPending(boolean canPending) {
+    this.canPending = canPending;
+  }
+
+  public void setCanEdit(boolean canEdit) {
+    this.canEdit = canEdit;
+  }
+
+  public void setCanArchive(boolean canArchive) {
+    this.canArchive = canArchive;
   }
 }
