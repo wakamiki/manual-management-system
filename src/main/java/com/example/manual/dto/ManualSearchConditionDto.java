@@ -15,7 +15,7 @@ public class ManualSearchConditionDto {
   private List<Long> categoryIds = new ArrayList<>();
   private List<ManualStatus> statuses = new ArrayList<>();
 
-  //#region getter
+  //getter
   public String getKeyword() {
     return this.keyword;
   }
@@ -25,11 +25,10 @@ public class ManualSearchConditionDto {
   }
 
   public List<ManualStatus> getStatuses() {
-  //#endregion
     return this.statuses;
   }
 
-  //#region setter
+  //setter
   public void setKeyword(String keyword) {
     this.keyword = keyword;
   }
@@ -39,7 +38,6 @@ public class ManualSearchConditionDto {
   }
 
   public void setStatuses(List<ManualStatus> statuses) {
-  //#endregion
     this.statuses = statuses;
-  }
+  } 
 }

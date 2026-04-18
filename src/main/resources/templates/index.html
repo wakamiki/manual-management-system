@@ -54,12 +54,16 @@
             placeholder="キーワード検索">
           <button type="submit" class="btn btn-outline-primary">検索</button>
         </form>
-        <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+        <a href="@{/manuals/create}" target="_blank" rel="noopener noreferrer"
           class="btn btn-primary create-button">新規作成</a>
       </div>
     </header>
 
-    <div class="alert mock-alert index-alert mb-0" role="alert">
+    <div class="alert mock-alert index-alert mb-0" role="alert" th:if="${message != null}" th:classappend="${
+       messageType == 'success' ? ' alert-success' :
+       messageType == 'error'   ? ' alert-danger'  :
+       messageType == 'warning' ? ' alert-warning' : ' alert-info'
+     }" th:text="${message != null and !#strings.isEmpty(message) ? message : ''}">
       マニュアルを更新しました。
     </div>
 
@@ -112,11 +116,26 @@
               <a th:href="@{/my-page}" class="sidebar-home-link" aria-label="マイページ">
                 <span class="sidebar-home-icon-wrap">
                   <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
-                  <span class="sidebar-home-badge sidebar-home-badge-rollback">2</span>
-                  <span class="sidebar-home-badge sidebar-home-badge-pending">4</span>
+                  <span class="sidebar-home-badge sidebar-home-badge-rollback" th:if="${(
+                    listDto.userDto != null and listDto.userDto.userRole != null) and 
+                    listDto.summaryDto.unreadRollbackCount!=0}"
+                    th:text="${listDto.summaryDto.unreadRollbackCount}">2</span>
+                  <span class="sidebar-home-badge sidebar-home-badge-pending" th:if="${
+                   listDto.userDto != null and
+                   listDto.userDto.userRole != null and
+                   listDto.summaryDto != null and
+                   listDto.summaryDto.unreadPendingCount > 0 and
+                   (
+                   listDto.userDto.userRole.name() == 'ADMIN' or
+                  listDto.userDto.userRole.name() == 'APPROVER'
+                   )
+                  }" th:text="${listDto.summaryDto.unreadPendingCount}">4</span>
                 </span>
                 <span class="sidebar-home-user">
-                  <span class="sidebar-home-user-label">ログイン中</span>
+                  <span class="sidebar-home-user-label" th:if="${listDto.userDto != null and listDto.userDto.userRole != null and 
+                    listDto.userDto.userRole.name() == 'GUEST'}">ゲスト閲覧中</span>
+                  <span class="sidebar-home-user-label" th:unless="${listDto.userDto != null and listDto.userDto.userRole != null and
+                      listDto.userDto.userRole.name() == 'GUEST'}">ログイン中</span>
                   <span class="sidebar-home-user-name" th:text="${listDto.userDto.displayName}"></span>
                 </span>
               </a>
@@ -127,7 +146,7 @@
 
       <section class="col-lg-10 col-md-9">
         <div class="accordion w-100" id="accordionExample">
-          <div class="accordion-item" th:each="manual,stat:${listDto.searchManuals}">
+          <div class="accordion-item" th:each="manual,stat:${listDto.manuals}">
             <div class="accordion-header">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                 th:data-bs-target="|#collapse-${stat.index}|" th:attrappend="aria-controls=|collapse-${stat.index}|"
@@ -159,11 +178,13 @@
                   <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
                     class="btn btn-outline-secondary btn-sm">複製</a>
                 </div>
-                <h2 class="history-title mb-2">更新履歴</h2>
-                <ul class="history-list mb-0">
-                  <li>2026-04-05: 本文の修正</li>
-                  <li>2026-04-04: 新規作成</li>
-                </ul>
+                <div th:if="${manual.histories != null and !#lists.isEmpty(manual.histories)}">
+                  <h2 class="history-title mb-2">更新履歴</h2>
+                  <ul class="history-list mb-0" th:each="history:${histories}">
+                    <li th:text="|${#temporals.format(history.changedAt, 'yyyy-MM-dd')}: ${history.changeNote}|">
+                      2026-04-05: 本文の修正</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

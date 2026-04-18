@@ -62,42 +62,28 @@ public class ManualService {
   }
 
 
-
   //index表示
   public ManualIndexDto showIndex(
       Principal principal,
-      ManualSearchConditionDto condition
+      List<Manual>manuals
   ) {
     log.info("start");
-    //検索一覧リスト condition ページ毎に分ける必要有
-    List<ManualResponseDto> searchManuals =
-        searchManuals(condition,principal);
-    //カテゴリーリスト 検索欄用 active inactive
-    List<CategoryResponseDto> activeCategoriesDto =
-        categoryService.getActiveCategoryDtos();
-    List<CategoryResponseDto> inactiveCategoriesDto =
-        categoryService.getInactiveCategoryDtos();
-    //ステータスリスト　検索欄用
-    List<ManualResponseDto> defaultStatuses =
-        getDefaultStatuses();
-    //クイックビュー　通知
-    IndexSummaryDto summaryDto=
-        getIndexSummary(principal);
-    //ログインユーザー情報　DisplayName
-    UserResponseDto userDto = userService.toUserIndexViewDto(principal);
+    //標準表示項目取得
+    ManualIndexDto listDto = buildIndexCommonData(principal);
+    //一覧リスト ページ毎に分ける必要有
+    List<ManualResponseDto>ManualDtos = 
+      buildIndexWithManuals(manuals);
 
-    ManualIndexDto listDto = new ManualIndexDto();
-    listDto.setSearchManuals(searchManuals);
-    listDto.setActiveCategories(activeCategoriesDto);
-    listDto.setInactiveCategories(inactiveCategoriesDto);
-    listDto.setDefaultStatuses(defaultStatuses);
-    listDto.setSummaryDto(summaryDto);
-    listDto.setUserDto(userDto);
+    listDto.setManuals(ManualDtos);
 
-      return listDto;
+    return listDto;
   }
 
-  // 対応ボタン 新規作成(新規タブ)
+//============================================
+//登録・更新
+//============================================
+
+  //  新規作成(新規タブ)
   public void goToNewCreatePage(Principal principal) {
     log.info("start");
     if(!canGoToNewCreatePage(principal)){
@@ -105,7 +91,7 @@ public class ManualService {
     }
   }
 
-  // 対応ボタン 新規作成
+  //  新規作成
   public void submitManual(Long manualId) {
     log.info("start");
     Manual manual = findManualOrThrow(manualId);
@@ -115,7 +101,7 @@ public class ManualService {
     manualRepository.save(manual);
   }
 
-  // 対応ボタン 新規作成保存（DRAFT）
+  //  新規作成保存（DRAFT）
   public void saveDraftForCreate(
       Long manualId,
       ManualRequestDto requestDto,
@@ -139,7 +125,7 @@ public class ManualService {
     manualRepository.save(manual);
   }
 
-  // 対応ボタン 新規作成マニュアル公開(PENDING)
+  //  新規作成マニュアル公開(PENDING)
   public void submitToPending(
       Long manualId,
       ManualRequestDto requestDto,
@@ -164,7 +150,7 @@ public class ManualService {
     notificationService.createSubmitNotifications(principal,savedManual);
   }
 
-  // 対応ボタン 編集（新規タブ）
+  //  編集（新規タブ）
   public ManualResponseDto goToEditPage(
       Long manualId,
       Principal principal) {
@@ -180,7 +166,7 @@ public class ManualService {
     return toManualFormInputDto(manual);
   }
 
-  // 対応ボタン 複製（新規タブ）
+  //  複製（新規タブ）
   public ManualResponseDto goToCopyPage(
       Long manualId,
       Principal principal) {
@@ -192,7 +178,7 @@ public class ManualService {
     return toManualFormInputDto(manual);
   }
 
-  // 対応ボタン 複製編集保存(DRAFT)
+  //  複製編集保存(DRAFT)
   public void saveDraftForCopy(
       Long manualId,
       ManualRequestDto requestDto,
@@ -223,7 +209,7 @@ public class ManualService {
         principal);
   }
 
-  // 対応ボタン 編集マニュアル公開(PENDING)
+  //  編集マニュアル公開(PENDING)
   public void editToPending(
       Long manualId,
       ManualRequestDto requestDto,
@@ -252,7 +238,7 @@ public class ManualService {
     notificationService.deleteRollbackNotification(manualId,user);
   }
 
-  // 対応ボタン マニュアル詳細画面（新規タブ）
+  //  マニュアル詳細画面（新規タブ）
   public ManualDetailDto goToDetailPage(
       Long manualId,
       Principal principal) {
@@ -279,7 +265,7 @@ public class ManualService {
   }
 
   // TODO: 通知実装予定
-  // 対応ボタン 承認（チェンジノート無）
+  //  承認（チェンジノート無）
   public void approveManual(
       Long manualId,
       Principal principal) {
@@ -299,7 +285,7 @@ public class ManualService {
     notificationService.deletePendingApprovalNotificationsByManualId(manualId);
   }
 
-  // 対応ボタン 承認（チェンジノート有）
+  //  承認（チェンジノート有）
   public void approveManualWithComment(
       Long manualId,
       String changeNote,
@@ -323,7 +309,7 @@ public class ManualService {
     notificationService.deletePendingApprovalNotificationsByManualId(manualId);
   }
 
-  // 対応ボタン 差し戻し
+  //  差し戻し
   public void rollbackEditManual(
       Long manualId,
       ManualActionRequestDto requestDto,
@@ -341,7 +327,7 @@ public class ManualService {
         savedManual, requestDto.getChangeNote(), principal);
   }
 
-  // 対応ボタン アーカイブ
+  //  アーカイブ
   public void archiveManual(
       Long manualId,
       ManualActionRequestDto actionRequestDto,
@@ -362,7 +348,7 @@ public class ManualService {
         savedManual, actionRequestDto.getChangeNote(), principal);
   }
 
-  // 対応ボタン 復帰
+  //  復帰
   public void restoreManual(
       Long manualId,
       ManualActionRequestDto requestDto,
@@ -384,13 +370,16 @@ public class ManualService {
   // ===========================
 
   // index 検索表示 取得
-  public List<ManualResponseDto> searchManuals(
+
+  public List<Manual> findManualsBySearch(
       ManualSearchConditionDto condition,
       Principal principal) {
     log.info("start");
-    if (!canSearchManuals(principal)) {
+    User targetUser = userService.getUserByPrincipal(principal);
+    if (!canFindManualsBySearch(targetUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+
     Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
 
     Specification<Manual> keywordSpec = ManualSpecification.containsKeyword(condition.getKeyword());
@@ -408,30 +397,13 @@ public class ManualService {
       specification = specification.and(statusSpec);
     }
 
+
+
     List<Manual> manualList = manualRepository.findAll(
         specification,
         Sort.by(Sort.Direction.DESC, "updatedAt"));
 
-    List<ManualResponseDto> manualDtoList = new ArrayList<>();
-    for (Manual manual : manualList) {
-      ManualResponseDto manualDto = new ManualResponseDto();
-      CategoryResponseDto categoryDto = 
-          categoryService.toCategoryDto(manual.getCategory());
-      manualDto.setCategoryDto(categoryDto);
-      UserResponseDto userDto =
-          userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualDto.setCreatedUserDto(userDto);
-      manualDto.setTitle(manual.getTitle());
-      manualDto.setContent(manual.getContent());
-      manualDto.setManualId(manual.getId());
-      manualDto.setStatus(manual.getStatus());
-      manualDto.setUpdatedAt(manual.getUpdatedAt());
-      manualDto.setHistories(
-          manualHistoryService.getManualHistorySummaryDtoList(
-              manual.getId()));
-      manualDtoList.add(manualDto);
-    }
-    return manualDtoList;
+    return manualList;
   }
 
   // index quickView表示取得
@@ -471,157 +443,64 @@ public class ManualService {
     ManualStatus status[] = ManualStatus.values();
     for (ManualStatus manualStatus : status) {
       ManualResponseDto defaultStatus = new ManualResponseDto();
+      if(manualStatus==ManualStatus.DRAFT){
+      }else{
       defaultStatus.setStatus(manualStatus);
-      switch(manualStatus) {
-          case DRAFT:
-              continue;
-          case PENDING:
-            defaultStatus.setStatusLabel("申請中");
-              break; 
-          case APPROVED:
-            defaultStatus.setStatusLabel("承認済");
-              break; 
-          case ARCHIVED:
-            defaultStatus.setStatusLabel("アーカイブ");
-              break;  
-
-          default:
-              throw new AssertionError("不明なステータスです。");
-      }
+      defaultStatus.setStatusLabel(getStatusLabel(manualStatus));
       responseStatus.add(defaultStatus);
+    }
     }
     return responseStatus;
   }
 
-  //myPage 自分作成のデータを渡す
-  public List<ManualResponseDto> userCreatedManualList(User user) {
-    List<Manual> userCreatedManualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(user);
-    List<ManualResponseDto> userCreatedListDto = new ArrayList<>();
-    for (Manual manual : userCreatedManualList) {
-      ManualResponseDto manualDto = new ManualResponseDto();
-      manualDto.setManualId(manual.getId());
-      manualDto.setTitle(manual.getTitle());
-      manualDto.setStatus(manual.getStatus());
-      CategoryResponseDto categoryDto =
-        categoryService.toCategoryDto(manual.getCategory());
-      manualDto.setCategoryDto(categoryDto);
-      manualDto.setUpdatedAt(manual.getUpdatedAt());
-      UserResponseDto userDto =
-        userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualDto.setCreatedUserDto(userDto);
-      manualDto.setCreatedAt(manual.getCreatedAt());
-      List<ManualHistory> histories =
-        manualHistoryService.getManualIdHistory(manual.getId());
-      List<ManualHistoryDto> historiesDto =
-       manualHistoryService.toHistoriesDto(histories);
-      manualDto.setHistories(historiesDto);
-      userCreatedListDto.add(manualDto);
-    }
-    return userCreatedListDto;
-  }
 
   //MyPege 差し戻し（自分作成）のデータを渡す。
-  public List<ManualResponseDto> createdRollbackManualList(User user) {
+  public List<Manual> findCreatedRollbackManuals(User user) {
     log.info("start");
     List<Manual> rollbackList = manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
         user);
-    List<ManualResponseDto> rollbacklistDto = new ArrayList<>();
-    for (Manual manual : rollbackList) {
-      ManualResponseDto manualDto = new ManualResponseDto();
-      manualDto.setManualId(manual.getId());
-      manualDto.setTitle(manual.getTitle());
-      manualDto.setStatus(manual.getStatus());
-      CategoryResponseDto categoryDto =
-        categoryService.toCategoryDto(manual.getCategory());
-      manualDto.setCategoryDto(categoryDto);
-      manualDto.setUpdatedAt(manual.getUpdatedAt());
-      UserResponseDto userResponseDto =
-        userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualDto.setCreatedUserDto(userResponseDto);
-      rollbacklistDto.add(manualDto);
-    }
-    return rollbacklistDto;
+
+    return rollbackList;
   }
 
   //MyPege PENDINGの全マニュアル（自分作成以外）のデータを渡す。
-  public List<ManualResponseDto> pendingManualList(User user) {
+  public List<Manual> findPendingManuals(User user) {
     log.info("start");
     List<Manual> pendingManualList = manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
         user, ManualStatus.PENDING);
-    List<ManualResponseDto> pendingListDto = new ArrayList<>();
-    for (Manual manual : pendingManualList) {
-      ManualResponseDto manualDto = new ManualResponseDto();
-      manualDto.setManualId(manual.getId());
-      manualDto.setTitle(manual.getTitle());
-      manualDto.setStatus(manual.getStatus());
-      CategoryResponseDto categoryDto =
-        categoryService.toCategoryDto(manual.getCategory());
-      manualDto.setCategoryDto(categoryDto);
-      manualDto.setUpdatedAt(manual.getUpdatedAt());
-      UserResponseDto userDto =
-        userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualDto.setCreatedUserDto(userDto);
-      pendingListDto.add(manualDto);
-    }
-    return pendingListDto;
+    return pendingManualList;
+  }
+
+  //index 自分作成分のマニュアルデータ一覧を返す。
+  public List<Manual> findMyCreatedManuals(Principal principal){
+  log.info("start");
+  User targetUser = userService.getUserByPrincipal(principal);
+  List<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
+        targetUser);
+      return  manualList;
   }
 
   //index 自分作成PENDINGのデータ一覧を返す。
-  public List<ManualResponseDto> createdPendingManualList(Principal principal) {
+  public List<Manual> findMyPendingManuals(Principal principal) {
     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     List<Manual> manualList = manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
         targetUser, ManualStatus.PENDING);
-    List<ManualResponseDto> manualDto = new ArrayList<>();
-    for (Manual manual : manualList) {
-      ManualResponseDto manualResponseDto = new ManualResponseDto();
-      manualResponseDto.setManualId(manual.getId());
-      manualResponseDto.setTitle(manual.getTitle());
-      manualResponseDto.setContent(manual.getContent());
-      manualResponseDto.setStatus(manual.getStatus());
-      manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      UserResponseDto userResponseDto =
-        userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualResponseDto.setCreatedUserDto(userResponseDto);
-      CategoryResponseDto categoryDto =
-        categoryService.toCategoryDto(manual.getCategory());
-      manualResponseDto.setCategoryDto(categoryDto);
-      List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
-      manualResponseDto.setHistories(historyDto);
-      manualDto.add(manualResponseDto);
-    }
-      return  manualDto;
+      return  manualList;
   }
 
-   //index 最近７日間の更新のデータ一覧を返す。
-   public List<ManualResponseDto> getRecentWeeklyManuals() {
+  //index 最近７日間の更新のデータ一覧を返す。
+  public List<Manual> findRecentlyUpdatedManuals() {
      log.info("start");
     List<Manual> manualList =
         manualRepository.findByUpdatedAtAfterOrderByUpdatedAtDesc(
             LocalDateTime.now().minusDays(7));
-    List<ManualResponseDto> manualDto = new ArrayList<>();
-    for (Manual manual : manualList) {
-      ManualResponseDto manualResponseDto = new ManualResponseDto();
-      manualResponseDto.setManualId(manual.getId());
-      manualResponseDto.setTitle(manual.getTitle());
-      manualResponseDto.setContent(manual.getContent());
-      manualResponseDto.setStatus(manual.getStatus());
-      manualResponseDto.setUpdatedAt(manual.getUpdatedAt());
-      CategoryResponseDto categoryDto =
-        categoryService.toCategoryDto(manual.getCategory());
-      UserResponseDto userDto =
-        userService.toCreatedUserDto(manual.getCreatedByUser());
-      manualResponseDto.setCategoryDto(categoryDto);
-      manualResponseDto.setCreatedUserDto(userDto);
-      List<ManualHistoryDto> historyDto = manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
-      manualResponseDto.setHistories(historyDto);
-      manualDto.add(manualResponseDto);
-  }
-      return  manualDto;
+      return  manualList;
 }
 
-   //index 自分作成PENDINGの数を返す。
-   public int countCreatedPendingManual(Principal principal) {
+
+  //index count自分作成PENDINGの数を返す。
+  public int countCreatedPendingManual(Principal principal) {
      log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
      Long count =
@@ -631,8 +510,8 @@ public class ManualService {
     return targetCount;
    }
 
-   //index 最近7日間の更新の数を返す。
-   public int countRecentWeeklyManuals() {
+  //index count最近7日間の更新の数を返す。
+  public int countRecentWeeklyManuals() {
      log.info("start");
     Long count =
       manualRepository.countByUpdatedAtAfter(
@@ -641,8 +520,8 @@ public class ManualService {
     return  targetCount;
    }
 
-   //MyPage index通知 自分以外作成PENDINGの数を返す。
-   public int countNotUserCreatedPendingManualList(Principal principal) {
+  //MyPage index通知 count自分以外作成PENDINGの数を返す。
+  public int countNotUserCreatedPendingManualList(Principal principal) {
      log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserNotAndStatus(
@@ -652,8 +531,8 @@ public class ManualService {
     return targetCount;
    }
 
-   //MyPage index通知 作成者自分の差し戻しマニュアル数を返す。
-   public int countMyRollbackManual(Principal principal) {
+  //MyPage index通知 count作成者自分の差し戻しマニュアル数を返す。
+  public int countMyRollbackManual(Principal principal) {
      log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
      Long count = manualRepository.countByIsRolledbackTrueAndCreatedByUser(
@@ -662,8 +541,8 @@ public class ManualService {
      return targetCount;
    }
 
-   //index 自分作成分の数を返す。
-   public int countUserCreatedManual(Principal principal) {
+  //index count自分作成分の数を返す。
+  public int countUserCreatedManual(Principal principal) {
      log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
     Long count =
@@ -692,6 +571,31 @@ public class ManualService {
     responseDto.setContent(manual.getContent());
     responseDto.setTitle(manual.getTitle());
     return responseDto;
+  }
+
+  public List<ManualResponseDto>buildIndexWithManuals(List<Manual>manualList){
+  List<ManualResponseDto>responseDtos = new ArrayList<>();
+  for (Manual manual : manualList) {
+    ManualResponseDto responseDto = new ManualResponseDto();  
+    responseDto.setManualId(manual.getId());
+    responseDto.setTitle(manual.getTitle());
+    responseDto.setContent(manual.getContent());
+    UserResponseDto userDto = 
+      userService.toCreatedUserDto(manual.getCreatedByUser());
+    responseDto.setCreatedUserDto(userDto);
+    responseDto.setStatus(manual.getStatus());
+    responseDto.setStatusLabel(getStatusLabel(manual.getStatus()));
+    responseDto.setCreatedAt(manual.getCreatedAt());
+    responseDto.setUpdatedAt(manual.getUpdatedAt());
+    CategoryResponseDto categoryDto =
+      categoryService.toCategoryDto(manual.getCategory());
+    responseDto.setCategoryDto(categoryDto);
+    List<ManualHistoryDto>histories =
+      manualHistoryService.getManualHistorySummaryDtoList(manual.getId());
+    responseDto.setHistories(histories);
+    responseDtos.add(responseDto); 
+  }
+  return responseDtos;
   }
 
   // ============================
@@ -941,11 +845,10 @@ public class ManualService {
     return true;
   }
 
-  private boolean canSearchManuals(Principal principal) {
+  private boolean canFindManualsBySearch(User targetUser) {
     log.info("start");
     // アクティブユーザー
-    User user = userService.getUserByPrincipal(principal);
-    if (!user.isActive()) {
+    if (!targetUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
     return true;
@@ -962,5 +865,49 @@ public class ManualService {
       throw new RuntimeException("");
     }
     return manualOpt.get();
+  }
+
+  //index表示に必要なコモンデータ（一覧表示以外）を集める。
+  private ManualIndexDto buildIndexCommonData(Principal principal){
+    log.info("start");   
+  
+    //カテゴリーリスト 検索欄用 active inactive
+    List<CategoryResponseDto> activeCategoriesDto =
+        categoryService.getActiveCategoryDtos();
+    List<CategoryResponseDto> inactiveCategoriesDto =
+        categoryService.getInactiveCategoryDtos();
+    //ステータスリスト　検索欄用
+    List<ManualResponseDto> defaultStatuses =
+        getDefaultStatuses();
+    //クイックビュー　通知
+    IndexSummaryDto summaryDto=
+        getIndexSummary(principal);
+    //ログインユーザー情報　DisplayName
+    UserResponseDto userDto = userService.toUserIndexViewDto(principal);
+
+    ManualIndexDto listDto = new ManualIndexDto();
+    listDto.setActiveCategories(activeCategoriesDto);
+    listDto.setInactiveCategories(inactiveCategoriesDto);
+    listDto.setDefaultStatuses(defaultStatuses);
+    listDto.setSummaryDto(summaryDto);
+    listDto.setUserDto(userDto);  
+
+    return listDto;
+  }
+
+  //statusを参照してstatusLabelを返す
+  private String getStatusLabel(ManualStatus status){
+      switch(status) {
+          case DRAFT:
+              return "下書き";
+          case PENDING:
+              return "申請中"; 
+          case APPROVED:
+            return "承認済";
+          case ARCHIVED:
+            return "アーカイブ";
+          default:
+              throw new AssertionError("不明なステータスです。");
+      }
   }
 }

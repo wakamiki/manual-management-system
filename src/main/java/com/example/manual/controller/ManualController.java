@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -21,6 +21,7 @@ import com.example.manual.dto.ManualIndexDto;
 import com.example.manual.dto.ManualRequestDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
+import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualService;
 
@@ -49,7 +50,10 @@ public String showIndex(
         // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
         condition.setStatuses(defaultStatusCheck(condition));
 
-        ManualIndexDto listDto = manualService.showIndex(principal, condition);
+        ManualIndexDto listDto = manualService.showIndex(
+                principal,
+                manualService.findManualsBySearch(
+                        condition, principal));
         log.info("listDto null? {}", listDto == null);
         log.info("activeCategories null? {}", listDto != null ? listDto.getActiveCategories() == null : null);
         model.addAttribute("listDto", listDto);
@@ -62,7 +66,7 @@ public String showIndex(
 //登録・更新
 //============================================
 
-    //対応ボタン　下書き保存
+    //　下書き保存
     @PostMapping("/{manualId}/actions/save-draft")
     public String saveDraftForCreate(
             @PathVariable Long manualId,
@@ -81,7 +85,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}/actions/save-draft";
     }
 
-    //対応ボタン　下書き保存(複製ボタンから遷移)
+    //　下書き保存(複製ボタンから遷移)
     @PostMapping("/{manualId}/actions/save-draft-copy")
     public String saveDraftForCopy(
             @PathVariable Long manualId,
@@ -100,7 +104,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}/actions/save-draft-copy";
     }
 
-     //対応ボタン　マニュアルを公開（新規作成から遷移）
+     //　マニュアルを公開（新規作成から遷移）
     @PostMapping("/{manualId}/actions/submit-pending")
     public String submitToPending(
             @PathVariable Long manualId,
@@ -117,7 +121,7 @@ public String showIndex(
             "message", "マニュアルを承認待ち公開しました。");
         return "redirect:/manuals/{manualId}/actions/submit-pending";
     }
-    //対応ボタン　マニュアルを公開(編集画面から遷移)
+    //　マニュアルを公開(編集画面から遷移)
     @PostMapping("/{manualId}/actions/edit-to-pending")
     public String editToPending(
             @PathVariable Long manualId,
@@ -135,12 +139,49 @@ public String showIndex(
         return "redirect:/manuals/{manualId}/actions/edit-to-pending";
     }
 
+    //自分の作成分
+    @GetMapping("/manuals/index/my-created")
+    public String showMyManuals(@Valid @ModelAttribute ManualSearchConditionDto condition,
+                Principal principal,
+                Model model){
+        List<Manual>manuals =
+                manualService.findMyCreatedManuals(principal);
+        ManualIndexDto listDto =
+                manualService.showIndex(principal, manuals);
+        model.addAttribute("listDto", listDto);
+        return "index";
+    }
+
+    @GetMapping("/manuals/index/my-pending")
+    public String showcreatedPendingManuals(@Valid @ModelAttribute ManualSearchConditionDto condition,
+                Principal principal,
+                Model model){
+        List<Manual>manuals =
+                manualService.findMyPendingManuals(principal);
+        ManualIndexDto listDto =
+                manualService.showIndex(principal, manuals);
+        model.addAttribute("listDto", listDto);        
+        return "index";
+        }
+        
+    @GetMapping("/manuals/index/new-updatedAt")
+    public String showRecentWeeklyManuals(@Valid @ModelAttribute ManualSearchConditionDto condition,
+                Principal principal,
+                Model model){
+        List<Manual>manuals =
+                manualService.findRecentlyUpdatedManuals();
+        ManualIndexDto listDto =
+                manualService.showIndex(principal, manuals);
+        model.addAttribute("listDto", listDto);        
+        return "index";
+        }
+
 
 //============================================
 //新規タブ画面遷移
 //============================================
 
-    //対応ボタン　詳細を見る（新規タブ）
+    //　詳細を見る（新規タブ）
     @GetMapping("/{manualId}/edit")
     public ManualDetailDto goToDetailPage(
             @PathVariable Long manualId,
@@ -151,15 +192,15 @@ public String showIndex(
         return detailDto;
     }
 
-    //対応ボタン　新規作成
-    @GetMapping("/{manualId}/create")
+    //　新規作成（新規タブ）
+    @GetMapping("/create")
     public String goToNewCreatePage(Principal principal){
         manualService.goToNewCreatePage(principal);
         log.info("start");
-        return "/manual-create";
+        return "manual-create";
     }
 
-     //対応ボタン　複製（新規タブ）
+     //　複製（新規タブ）
     @GetMapping("/{manualId}/actions/copy")
     public ManualResponseDto goToCopyPage(
             @PathVariable Long manualId,
@@ -169,7 +210,7 @@ public String showIndex(
                                         manualId, principal);
         return responseDto;
      }
-     //対応ボタン　 編集（新規タブ）
+     //　 編集（新規タブ）
     @GetMapping("/{manualId}/actions/edit")
     public ManualResponseDto goToEditPage(
             @PathVariable Long manualId,
@@ -185,7 +226,7 @@ public String showIndex(
 //action
 //============================================
 
-    //対応ボタン　マニュアル公開（編集なし）
+    //　マニュアル公開（編集なし）
     @PostMapping("/{manualId}/actions/submit")
     public String submitManual(
             @PathVariable Long manualId,
@@ -198,7 +239,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}/actions/submit";
     }
 
-    //対応ボタン　承認（チェンジノート無）
+    //　承認（チェンジノート無）
     @PostMapping("/{manualId}/actions/approve")
     public String approveManual(
             @PathVariable Long manualId,
@@ -210,7 +251,7 @@ public String showIndex(
                 "message", "マニュアルを承認しました。");
         return "redirect:/manuals/{manualId}";
     }
-    //対応ボタン　承認（チェンジノート有）
+    //　承認（チェンジノート有）
     @PostMapping("/{manualId}/actions/approve-with-comment")
     public String approveManualWithComment(
             @PathVariable Long manualId,
@@ -228,7 +269,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}";
     }
 
-    //対応ボタン　差し戻し（チェンジノート必須）
+    //　差し戻し（チェンジノート必須）
     @PostMapping("/{manualId}/actions/rollback")
     public String rollbackEditManual(
             @PathVariable Long manualId,
@@ -246,7 +287,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}";
     }
 
-     //対応ボタン　アーカイブ（チェンジノート必須)
+     //　アーカイブ（チェンジノート必須)
     @PostMapping("/{manualId}/actions/archive")
     public String archiveManual(
             @PathVariable Long manualId,
@@ -262,7 +303,7 @@ public String showIndex(
         return "redirect:/manuals/{manualId}";
 
     }
-    //対応ボタン　復帰（チェンジノート必須）
+    //　復帰（チェンジノート必須）
     @PostMapping("/{manualId}/actions/restore")
     public String restoreManual(
             @PathVariable Long manualId,
@@ -278,21 +319,6 @@ public String showIndex(
                 "message", "マニュアルをアーカイブから復帰しました。");
         return "redirect:/manuals/{manualId}";
     }
-
-//====================================
-//検索・取得系
-//====================================
-
-public List<ManualResponseDto> searchManuals(
-        @ModelAttribute ManualSearchConditionDto condition,
-                Principal principal) {
-        log.info("start");
-        List<ManualResponseDto> manualDtoList = (List<ManualResponseDto>) manualService.searchManuals(
-                        condition,
-                        principal);
-
-        return manualDtoList;
-}
 
 // ====================================
 // 判定

@@ -9,7 +9,7 @@ public class ManualIndexDto {
 
   }
 
-  private List<ManualResponseDto> searchManuals= new ArrayList<>();
+  private List<ManualResponseDto> manuals= new ArrayList<>();
   private List<CategoryResponseDto> activeCategories = new ArrayList<>();
   private List<CategoryResponseDto> inactiveCategories= new ArrayList<>();
   private List<ManualResponseDto> defaultStatuses= new ArrayList<>();
@@ -18,8 +18,8 @@ public class ManualIndexDto {
 
  //getter
 
- public List<ManualResponseDto> getSearchManuals() {
-   return this.searchManuals;
+ public List<ManualResponseDto> getManuals() {
+   return this.manuals;
  }
 
  public List<CategoryResponseDto> getActiveCategories() {
@@ -45,10 +45,10 @@ public class ManualIndexDto {
 
 
   //setter
-  public void setSearchManuals(
-    List<ManualResponseDto>searchManuals
+  public void setManuals(
+    List<ManualResponseDto>manuals
   ) {
-    this.searchManuals = searchManuals;
+    this.manuals = manuals;
   }
 
   public void setActiveCategories(List<CategoryResponseDto> activeCategories) {

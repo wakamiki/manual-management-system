@@ -3,12 +3,13 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
+import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
@@ -40,7 +41,7 @@ public class MyPageService {
       throw new InvalidStateException("判定エラー");
     }
     MyPageDto pageDto = new MyPageDto();
-    pageDto.setCreatedManualList(getUserCreatedManual(user));
+    pageDto.setCreatedManualList(getUserCreatedManual(principal));
     pageDto.setPendingManualList(getPendingManual(user));
     pageDto.setRollbackManualList(getRollbackManual(user));
     pageDto.setRollbackCount(manualService.countMyRollbackManual(principal));
@@ -52,17 +53,23 @@ public class MyPageService {
   public List<ManualResponseDto> getRollbackManual(User user) {
     log.info("start");
     // 差し戻しマニュアルタブ
-    List<ManualResponseDto> responseDto =
-      manualService.createdRollbackManualList(user);
-    return responseDto;
+    List<Manual>manuals =
+      manualService.findCreatedRollbackManuals(user);
+
+    List<ManualResponseDto> responseDtos =
+      manualService.buildIndexWithManuals(manuals);
+    return responseDtos;
   }
 
-  public List<ManualResponseDto> getUserCreatedManual(User user) {
+  public List<ManualResponseDto> getUserCreatedManual(Principal principal) {
     log.info("start");
     // 自分作成マニュアルタブ
-    List<ManualResponseDto> listDto =
-        manualService.userCreatedManualList(user);
-    return listDto;
+    List<Manual>manuals =
+      manualService.findMyCreatedManuals(principal);
+
+    List<ManualResponseDto> responseDtos =
+      manualService.buildIndexWithManuals(manuals);
+    return responseDtos;
   }
 
   public List<ManualResponseDto> getPendingManual(User user) {
@@ -71,9 +78,12 @@ public class MyPageService {
     if (!canGetPendingManual(user)) {
       throw new InvalidStateException("判定エラー");
     }
-    List<ManualResponseDto> listDto =
-      manualService.pendingManualList(user);
-    return listDto;
+    List<Manual>manuals =
+      manualService.findPendingManuals(user);
+      
+    List<ManualResponseDto> responseDtos =
+      manualService.buildIndexWithManuals(manuals);
+    return responseDtos;
   }
 
 //=================================================

@@ -35,3 +35,6 @@ build/
 ### docs ###
 docs-local/
 docs/docs-local/
+
+### DB ####
+data/

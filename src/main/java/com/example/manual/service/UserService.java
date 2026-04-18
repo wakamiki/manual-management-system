@@ -246,6 +246,7 @@ public class UserService {
                 targetUser.getDisplayName() != null
                 ? targetUser.getDisplayName():"");
         userDto.setId(targetUser.getId());
+        userDto.setUserRole(targetUser.getRole());
         return userDto;
     }
 
