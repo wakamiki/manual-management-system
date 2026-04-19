@@ -3,7 +3,6 @@ package com.example.manual.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.manual.entity.ManualHistory;
 import com.example.manual.enums.ManualStatus;
 
 public class ManualDetailDto {
@@ -14,15 +13,13 @@ public class ManualDetailDto {
   private Long manualId;
   private String title;
   private ManualStatus status;
-  private Long categoryId;
-  private String categoryName;
+  private CategoryResponseDto categoryDto;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private LocalDateTime approvedAt;
-  private String createdByName;
+  private UserResponseDto createUserDto;
   private String content;
-  private ManualHistory history;
-  private List<ManualHistoryDto> histories;
+  private List<ManualDetailHistoryDto> histories;
   private boolean canEdit;
   private boolean canPending;
   private boolean canApprove;
@@ -44,14 +41,6 @@ public class ManualDetailDto {
     return this.status;
   }
 
-  public Long getCategoryId() {
-    return this.categoryId;
-  }
-
-  public String getCategoryName() {
-    return this.categoryName;
-  }
-
   public LocalDateTime getCreatedAt() {
     return this.createdAt;
   }
@@ -64,19 +53,11 @@ public class ManualDetailDto {
     return this.approvedAt;
   }
 
-  public String getCreatedByName() {
-    return this.createdByName;
-  }
-
   public String getContent() {
     return this.content;
   }
 
-  public ManualHistory getHistory() {
-    return this.history;
-  }
-
-  public List<ManualHistoryDto> getHistories() {
+  public List<ManualDetailHistoryDto> getHistories() {
     return this.histories;
   }
 
@@ -108,6 +89,14 @@ public class ManualDetailDto {
     return canCopy;
   }
 
+  public CategoryResponseDto getCategoryDto() {
+    return categoryDto;
+  }
+
+  public UserResponseDto getCreateUserDto() {
+    return createUserDto;
+  }
+
   // setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
@@ -119,14 +108,6 @@ public class ManualDetailDto {
 
   public void setStatus(ManualStatus status) {
     this.status = status;
-  }
-
-  public void setCategoryId(Long categoryId) {
-    this.categoryId = categoryId;
-  }
-
-  public void setCategoryName(String categoryName) {
-    this.categoryName = categoryName;
   }
 
   public void setCreatedAt(LocalDateTime createdAt) {
@@ -141,19 +122,11 @@ public class ManualDetailDto {
     this.approvedAt = approvedAt;
   }
 
-  public void setCreatedByName(String createdByName) {
-    this.createdByName = createdByName;
-  }
-
   public void setContent(String content) {
     this.content = content;
   }
 
-  public void setHistory(ManualHistory history) {
-    this.history = history;
-  }
-
-  public void setHistories(List<ManualHistoryDto> histories) {
+  public void setHistories(List<ManualDetailHistoryDto> histories) {
 
     this.histories = histories;
   }
@@ -184,5 +157,13 @@ public class ManualDetailDto {
 
   public void setCanArchive(boolean canArchive) {
     this.canArchive = canArchive;
+  }
+
+  public void setCategoryDto(CategoryResponseDto categoryDto) {
+    this.categoryDto = categoryDto;
+  }
+
+  public void setCreateUserDto(UserResponseDto createUserDto) {
+    this.createUserDto = createUserDto;
   }
 }

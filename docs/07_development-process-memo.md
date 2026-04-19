@@ -3,123 +3,6 @@
 Version: 01.00.15  
 更新日: 2026-04-19
 
----
-
-## 2026-04-19
-
-### 作業概要
-マニュアル詳細画面の実装準備として、Service 内の権限判定メソッド設計と DTO 組み立て方針を整理した。あわせて、詳細画面遷移時の 404 エラー切り分けと画面レイアウト検討を行った。
-
-### 実施内容
-- `canApproveManual(...)` の記述簡略化方針を整理
-  - ガード節維持と1行 return のトレードオフを確認
-- `changeNote` 必須/任意の扱いを整理
-  - 引数を統一して必須判定は操作種別で分岐する方針を確認
-- `ManualDetailDto` の組み立て方法を整理
-  - DTO同士を加算せず、ベースDTO作成後に権限フラグを適用する流れを確認
-- 変数命名方針を整理
-  - フラグ適用前 DTO は `baseDetailDto` を候補として採用
-- 詳細画面遷移の 404 を切り分け
-  - 静的リンク参照 (`manual-detail.html`) と Controller 経路参照の差を確認
-  - 再起動/ハードリロード/リンク先確認で再現確認手順を整理
-- 詳細画面レイアウト方針を検討
-  - ヘッダーは情報領域、本文カードはタイトル+本文に分離する案を整理
-- テキスト左揃えの実装方法を確認
-  - `text-start` と `text-align: left;` の使い分けを確認
-
-### 学び
-- 画面遷移不具合は、テンプレート記述だけでなく実行中プロセスのキャッシュ影響も確認する必要がある
-- DTO組み立ては「生成」と「権限フラグ適用」を分離すると責務が明確になりやすい
-
-### 次回着手予定
-- `buildDetailPermissions` の実装着手
-- `manual-detail` の表示制御（ボタン表示/非表示）を Thymeleaf に反映
-- 詳細画面の UI 役割分離（ヘッダー情報・本文・履歴）を具体化
-
----
-
-## 2026-04-18
-
-### 作業概要
-マニュアル詳細画面の実装に向けて、DTO 構成と権限制御の整理を進めた。あわせて、保存結果のメッセージ表示導線と `try-catch` の適用方針を整理した。
-
-### 実施内容
-- `ManualDetailDto` の項目整理を実施
-- 詳細画面ボタン制御用フラグ（`canEdit` など）の追加を開始
-- Service 側で権限共通処理をまとめる方針を整理
-- 保存成功/失敗メッセージを画面に返す導線を整理
-- Controller での `try-catch` 適用位置を確認
-  - 成功時メッセージ
-  - 失敗時メッセージ
-  - リダイレクト先の統一
-
-### 苦労した点
-- DTO 整理
-- メッセージ追加
-- `try-catch` の責務切り分け
-
-### 学び
-- 画面と通信しながら早い段階で実装確認を進める方が効率が高い
-- 全体の流れを早く把握でき、必要機能から順に着手しやすくなる
-
-### 次回着手予定
-- 詳細画面の権限判定メソッド整備
-- `buildDetailPermissions(manual, currentUser)` の実装
-- 詳細画面ボタン表示制御の Thymeleaf 反映
-
----
-
-## 2026-04-17
-
-### 作業概要
-index 画面の Thymeleaf 反映を進め、DTO の null 設計方針を明確化した。あわせて、SpEL エラーや Controller 経路競合など、表示エラーの根本原因を切り分けた。
-
-### 実施内容
-- index 一覧画面の SpEL エラーを修正
-- `listDto` 起点の参照へ統一
-- `th:object` と `${}` / `*{}` の使い分けを整理
-- カテゴリ表示を「1データ = 1行」に修正
-- Thymeleaf タグを最小構成から段階的に復元する進め方へ変更
-- `summaryDto` / `activeCategories` の null 参照エラーを解消
-- HomeController / ManualController の経路競合を整理
-- `IS_ROLLEDBACK` 列不一致を特定し、DB と Entity のズレを把握
-- index 検索フォームの送信名を DTO と一致させる方針を明確化
-  - `keyword`
-  - `categoryIds`
-  - `statuses`
-- アコーディオンの開閉不具合を切り分け
-  - `th:each` 行ごとの collapse id 一意化が必要
-  - `data-bs-target` / `aria-controls` / `id` の一致が必須
-- `/` と `/manuals/index` の到達差で再現有無を確認し、ルーティング起因の不具合を切り分け
-
-### DTO 設計の方針確定
-- List 項目は null を使わず空 List で返す
-- Service + DTO 初期化の二重防御を採用
-- 件数項目は `int` を基本とし、初期値 0 で扱う
-- 値の扱いを以下で統一
-  - 必須項目: null 禁止
-  - 件数: 0
-  - List: 空 List
-  - 任意項目: null 許可
-- Category DTO は `categoryId` を持つ方針
-- User DTO は `id` + `displayName` を持つ方針
-- DTO は「用途ごとの最小構成」で運用
-
-### 学び
-- Thymeleaf エラーは View 側だけでなく Controller やデータ構造起因が多い
-- DTO の null 設計は画面安定性に直結する
-- `th:each` は「1データ = 1 UI ブロック」で設計すると崩れにくい
-- 画面が真っ白になる現象でも、まずはデータ件数（0件除外）を確認すると原因特定が速い
-- Thymeleaf の不具合に見えても、Controller の Model 詰め替え不足や URL 経路が原因になりやすい
-
-### 次回着手予定
-- `index.html` の Thymeleaf タグを段階復元
-  - `listDto -> summary -> category -> manual -> history`
-- カテゴリチェックボックスと検索条件の連携実装
-- 一覧カード UI の仕上げ
-- `docs/02` への設計方針反映
-
----
 
 ## 2026-03-29
 
@@ -990,6 +873,39 @@ thin controller 方針を再確認した。
 
 ---
 
+## 2026-04-15
+
+### 作業概要
+index画面のThymeleaf表示確認、通知機能関連のRepository/Service整理、起動エラー対応、H2 file DB確認、Security設定追加を実施した。
+
+### 実施内容
+- NotificationRepository のメソッド名を Entity フィールド名に合わせて修正
+  - `notificationType` -> `type`
+- ManualRepository のプロパティ名不一致を修正
+- JPA の `countBy` / `deleteBy` 命名規則を整理
+- User Entity のテーブル名を `user` -> `users` に変更
+- H2 の予約語由来DDLエラーを解消
+- H2 file DB 接続確認
+  - `jdbc:h2:file:./data/testdb`
+- ポート競合（8080）を解消し、Spring Boot 起動成功
+- Tomcat 起動確認
+- Whitelabel Error 500 の原因切り分け
+- `SecurityConfig.java` を追加
+  - `/h2-console/**` を `permitAll`
+  - CSRF 対象外設定
+  - `frameOptions().sameOrigin()`
+- index 画面表示確認
+- H2 コンソールアクセス準備完了
+- DB未登録状態では一覧未表示となることを確認
+
+### 現在地
+- アプリ起動成功
+- index 画面表示成功
+- H2 コンソール確認フェーズ
+- 次工程は初期データ投入と一覧表示確認
+
+---
+
 ## 作業記録（2026-04-16）
 
 ### 1. 本日の作業テーマ
@@ -1083,35 +999,117 @@ thin controller 方針を再確認した。
 
 ---
 
-## 2026-04-15
+## 2026-04-17
 
 ### 作業概要
-index画面のThymeleaf表示確認、通知機能関連のRepository/Service整理、起動エラー対応、H2 file DB確認、Security設定追加を実施した。
+index 画面の Thymeleaf 反映を進め、DTO の null 設計方針を明確化した。あわせて、SpEL エラーや Controller 経路競合など、表示エラーの根本原因を切り分けた。
 
 ### 実施内容
-- NotificationRepository のメソッド名を Entity フィールド名に合わせて修正
-  - `notificationType` -> `type`
-- ManualRepository のプロパティ名不一致を修正
-- JPA の `countBy` / `deleteBy` 命名規則を整理
-- User Entity のテーブル名を `user` -> `users` に変更
-- H2 の予約語由来DDLエラーを解消
-- H2 file DB 接続確認
-  - `jdbc:h2:file:./data/testdb`
-- ポート競合（8080）を解消し、Spring Boot 起動成功
-- Tomcat 起動確認
-- Whitelabel Error 500 の原因切り分け
-- `SecurityConfig.java` を追加
-  - `/h2-console/**` を `permitAll`
-  - CSRF 対象外設定
-  - `frameOptions().sameOrigin()`
-- index 画面表示確認
-- H2 コンソールアクセス準備完了
-- DB未登録状態では一覧未表示となることを確認
+- index 一覧画面の SpEL エラーを修正
+- `listDto` 起点の参照へ統一
+- `th:object` と `${}` / `*{}` の使い分けを整理
+- カテゴリ表示を「1データ = 1行」に修正
+- Thymeleaf タグを最小構成から段階的に復元する進め方へ変更
+- `summaryDto` / `activeCategories` の null 参照エラーを解消
+- HomeController / ManualController の経路競合を整理
+- `IS_ROLLEDBACK` 列不一致を特定し、DB と Entity のズレを把握
+- index 検索フォームの送信名を DTO と一致させる方針を明確化
+  - `keyword`
+  - `categoryIds`
+  - `statuses`
+- アコーディオンの開閉不具合を切り分け
+  - `th:each` 行ごとの collapse id 一意化が必要
+  - `data-bs-target` / `aria-controls` / `id` の一致が必須
+- `/` と `/manuals/index` の到達差で再現有無を確認し、ルーティング起因の不具合を切り分け
 
-### 現在地
-- アプリ起動成功
-- index 画面表示成功
-- H2 コンソール確認フェーズ
-- 次工程は初期データ投入と一覧表示確認
+### DTO 設計の方針確定
+- List 項目は null を使わず空 List で返す
+- Service + DTO 初期化の二重防御を採用
+- 件数項目は `int` を基本とし、初期値 0 で扱う
+- 値の扱いを以下で統一
+  - 必須項目: null 禁止
+  - 件数: 0
+  - List: 空 List
+  - 任意項目: null 許可
+- Category DTO は `categoryId` を持つ方針
+- User DTO は `id` + `displayName` を持つ方針
+- DTO は「用途ごとの最小構成」で運用
+
+### 学び
+- Thymeleaf エラーは View 側だけでなく Controller やデータ構造起因が多い
+- DTO の null 設計は画面安定性に直結する
+- `th:each` は「1データ = 1 UI ブロック」で設計すると崩れにくい
+- 画面が真っ白になる現象でも、まずはデータ件数（0件除外）を確認すると原因特定が速い
+- Thymeleaf の不具合に見えても、Controller の Model 詰め替え不足や URL 経路が原因になりやすい
+
+### 次回着手予定
+- `index.html` の Thymeleaf タグを段階復元
+  - `listDto -> summary -> category -> manual -> history`
+- カテゴリチェックボックスと検索条件の連携実装
+- 一覧カード UI の仕上げ
+- `docs/02` への設計方針反映
 
 ---
+
+## 2026-04-18
+
+### 作業概要
+マニュアル詳細画面の実装に向けて、DTO 構成と権限制御の整理を進めた。あわせて、保存結果のメッセージ表示導線と `try-catch` の適用方針を整理した。
+
+### 実施内容
+- `ManualDetailDto` の項目整理を実施
+- 詳細画面ボタン制御用フラグ（`canEdit` など）の追加を開始
+- Service 側で権限共通処理をまとめる方針を整理
+- 保存成功/失敗メッセージを画面に返す導線を整理
+- Controller での `try-catch` 適用位置を確認
+  - 成功時メッセージ
+  - 失敗時メッセージ
+  - リダイレクト先の統一
+
+### 苦労した点
+- DTO 整理
+- メッセージ追加
+- `try-catch` の責務切り分け
+
+### 学び
+- 画面と通信しながら早い段階で実装確認を進める方が効率が高い
+- 全体の流れを早く把握でき、必要機能から順に着手しやすくなる
+
+### 次回着手予定
+- 詳細画面の権限判定メソッド整備
+- `buildDetailPermissions(manual, currentUser)` の実装
+- 詳細画面ボタン表示制御の Thymeleaf 反映
+
+---
+
+## 2026-04-19
+
+### 作業概要
+マニュアル詳細画面の実装準備として、Service 内の権限判定メソッド設計と DTO 組み立て方針を整理した。あわせて、詳細画面遷移時の 404 エラー切り分けと画面レイアウト検討を行った。
+
+### 実施内容
+- `canApproveManual(...)` の記述簡略化方針を整理
+  - ガード節維持と1行 return のトレードオフを確認
+- `changeNote` 必須/任意の扱いを整理
+  - 引数を統一して必須判定は操作種別で分岐する方針を確認
+- `ManualDetailDto` の組み立て方法を整理
+  - DTO同士を加算せず、ベースDTO作成後に権限フラグを適用する流れを確認
+- 変数命名方針を整理
+  - フラグ適用前 DTO は `baseDetailDto` を候補として採用
+- 詳細画面遷移の 404 を切り分け
+  - 静的リンク参照 (`manual-detail.html`) と Controller 経路参照の差を確認
+  - 再起動/ハードリロード/リンク先確認で再現確認手順を整理
+- 詳細画面レイアウト方針を検討
+  - ヘッダーは情報領域、本文カードはタイトル+本文に分離する案を整理
+- テキスト左揃えの実装方法を確認
+  - `text-start` と `text-align: left;` の使い分けを確認
+
+### 学び
+- 画面遷移不具合は、テンプレート記述だけでなく実行中プロセスのキャッシュ影響も確認する必要がある
+- DTO組み立ては「生成」と「権限フラグ適用」を分離すると責務が明確になりやすい
+
+### 次回着手予定
+- `buildDetailPermissions` の実装着手
+- `manual-detail` の表示制御（ボタン表示/非表示）を Thymeleaf に反映
+- 詳細画面の UI 役割分離（ヘッダー情報・本文・履歴）を具体化
+

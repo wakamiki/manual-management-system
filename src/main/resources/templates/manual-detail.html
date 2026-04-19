@@ -10,14 +10,22 @@
 </head>
 
 <body>
-  <main class="container mock-page">
+  <main class="container manual-detail-page">
     <header class="page-title-bar tight-gap">
       <div>
         <div class="d-flex align-items-center gap-2 mb-2">
-          <h1 class="h4 mb-0">配送手順の流れ</h1>
-          <span class="badge bg-success">承認済</span>
+          <span class="badge bg-success" th:text="${detailDto.status}">承認済</span>
+          <h1 class="h4 mb-0">詳細情報</h1>
+          <p class="text-muted mb-0" th:text="
+          |作成日: ${#temporals.format(detailDto.createdAt, 'yyyy-MM-dd')}
+          /作成者: ${detailDto.createUserDto.displayName}|"></p>
+
         </div>
-        <p class="text-muted mb-0">マニュアルID: 1001 / 営業部 / 作成日: 2026-04-04 / 更新日時: 2026-04-05 10:30 / 作成者: 山田 花子</p>
+        <p class="text-muted mb-0" th:text="|マニュアルID: ${detailDto.manualId}
+          /${detailDto.categoryDto.categoryName}
+          /更新日時: ${#temporals.format(detailDto.updatedAt, 'yyyy-MM-dd HH:mm')}
+          |">
+          マニュアルID: 1001 / 営業部 / 作成日: 2026-04-04 / 更新日時: 2026-04-05 10:30 / 作成者: 山田 花子</p>
       </div>
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
@@ -32,24 +40,30 @@
 
     <section class="card mb-4">
       <div class="card-body">
-        <h2 class="h5">本文</h2>
-        <p class="mb-0">本文のレビュー</p>
+        <h2 class="h5" th:text="${detailDto.title}">タイトル</h2>
+        <p class="mb-0" th:text="${detailDto.content}">本文</p>
       </div>
     </section>
 
     <section class="card mb-4">
-      <div class="card-body">
+      <div class="card-body" th:each="history:${detailDto.histories}">
         <h2 class="h5">更新履歴</h2>
         <ul class="mb-0">
-          <li>2026-04-05 10:30 / 更新者: 佐藤 次郎 / 本文の修正</li>
-          <li>2026-04-04 09:00 / 更新者: 山田 花子 / 初回作成</li>
+          <li th:text="|${#temporals.format(history.changedAt, 
+            'yyyy-MM-dd HH:mm')}/更新者: 
+            ${history.changedByUserName}/ ${history.changeNote}|">
+            日付 時間 / 更新者: / changeNote</li>
         </ul>
       </div>
     </section>
 
     <div class="d-flex flex-wrap gap-2">
-      <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary">編集（作成者専用）</a>
-      <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">複製</a>
+      <a th:href="@{/manuals/{manualId}/actions/edit(manualId=${detailDto.manualId})}" target=" _blank"
+        rel="noopener noreferrer" class="btn btn-primary">
+        編集（作成者専用）</a>
+      <a th:href="@{/manuals/{manualId}/actions/copy(manualId=${detailDto.manualId})}" target=" _blank"
+        rel="noopener noreferrer" class="btn btn-outline-secondary">
+        複製</a>
       <button type="button" class="btn btn-outline-primary">マニュアル公開</button>
       <button type="button" class="btn btn-outline-success">承認</button>
       <button type="button" class="btn btn-outline-warning">差し戻し</button>
