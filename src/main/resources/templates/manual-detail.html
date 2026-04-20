@@ -13,19 +13,22 @@
   <main class="container manual-detail-page">
     <header class="page-title-bar tight-gap">
       <div>
-        <div class="d-flex align-items-center gap-2 mb-2">
-          <span class="badge bg-success" th:text="${detailDto.status}">承認済</span>
-          <h1 class="h4 mb-0">詳細情報</h1>
-          <p class="text-muted mb-0" th:text="
-          |作成日: ${#temporals.format(detailDto.createdAt, 'yyyy-MM-dd')}
-          /作成者: ${detailDto.createUserDto.displayName}|"></p>
-
+        <div class="align-items-center gap-2 mb-2">
+          <div>
+            <h1 class="badge-status" th:classappend="' ' + ${detailDto.status.name().toLowerCase()}"
+              th:text="${detailDto.statusLabel}">承認済</h1>
+            <h1 class="h4 mb-0 d-inline">詳細情報</h1>
+          </div>
+          <div class="mt-2">
+            <span class="badge-status default"
+              th:text="|作成日: ${#temporals.format(detailDto.createdAt, 'yyyy-MM-dd')}|">作成日</span>
+            <span class="badge-status default" th:text="|作成者: ${detailDto.createUserDto.displayName}|">作成者</span>
+            <span class="badge-status default" th:text="|マニュアルID: ${detailDto.manualId}|"></span>
+            <span class="badge-status default" th:text="${detailDto.categoryDto.categoryName}">カテゴリー</span>
+            <span class="badge-status default"
+              th:text="|更新日時: ${#temporals.format(detailDto.updatedAt, 'yyyy-MM-dd HH:mm')}|"></span>
+          </div>
         </div>
-        <p class="text-muted mb-0" th:text="|マニュアルID: ${detailDto.manualId}
-          /${detailDto.categoryDto.categoryName}
-          /更新日時: ${#temporals.format(detailDto.updatedAt, 'yyyy-MM-dd HH:mm')}
-          |">
-          マニュアルID: 1001 / 営業部 / 作成日: 2026-04-04 / 更新日時: 2026-04-05 10:30 / 作成者: 山田 花子</p>
       </div>
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
@@ -40,17 +43,17 @@
 
     <section class="card mb-4">
       <div class="card-body">
-        <h2 class="h5" th:text="${detailDto.title}">タイトル</h2>
-        <p class="mb-0" th:text="${detailDto.content}">本文</p>
+        <h2 class="h5 text-base" th:text="${detailDto.title}">タイトル</h2>
+        <p class="mb-0 text-base" th:text="${detailDto.content}">本文</p>
       </div>
     </section>
 
     <section class="card mb-4">
       <div class="card-body" th:each="history:${detailDto.histories}">
-        <h2 class="h5">更新履歴</h2>
+        <h2 class="h5 text-base">更新履歴</h2>
         <ul class="mb-0">
-          <li th:text="|${#temporals.format(history.changedAt, 
-            'yyyy-MM-dd HH:mm')}/更新者: 
+          <li class="text-base" th:text="|${#temporals.format(history.changedAt,
+            'yyyy-MM-dd HH:mm')}/更新者:
             ${history.changedByUserName}/ ${history.changeNote}|">
             日付 時間 / 更新者: / changeNote</li>
         </ul>
@@ -59,22 +62,30 @@
 
     <div class="d-flex flex-wrap gap-2">
       <a th:href="@{/manuals/{manualId}/actions/edit(manualId=${detailDto.manualId})}" target=" _blank"
-        rel="noopener noreferrer" class="btn btn-primary">
+        rel="noopener noreferrer" class="btn btn-primary" th:if="${detailDto.canEdit}">
         編集（作成者専用）</a>
       <a th:href="@{/manuals/{manualId}/actions/copy(manualId=${detailDto.manualId})}" target=" _blank"
-        rel="noopener noreferrer" class="btn btn-outline-secondary">
+        rel="noopener noreferrer" class="btn btn-outline-secondary" th:if="${detailDto.canCopy}">
         複製</a>
-      <button type="button" class="btn btn-outline-primary">マニュアル公開</button>
-      <button type="button" class="btn btn-outline-success">承認</button>
-      <button type="button" class="btn btn-outline-warning">差し戻し</button>
-      <button type="button" class="btn btn-outline-danger">アーカイブ</button>
-      <button type="button" class="btn btn-outline-info">復帰</button>
+      <button type="button" class="btn btn-outline-primary" th:if="${detailDto.canPending}"
+        th:disabled="${detailDto.canGuest}">マニュアル公開</button>
+      <button type="button" class="btn btn-outline-success" th:if="${detailDto.canApprove}"
+        th:disabled="${detailDto.canGuest}">承認</button>
+      <button type="button" class="btn btn-outline-warning js-open-inline-panel" data-action="rollback"
+        th:data-url="@{/manuals/{manualId}/actions/rollback(manualId=${detailDto.manualId})}"
+        th:if="${detailDto.canRollback}" th:disabled="${detailDto.canGuest}">差し戻し</button>
+      <button type="button" class="btn btn-outline-danger js-open-inline-panel" data-action="archive"
+        th:data-url="@{/manuals/{manualId}/actions/archive(manualId=${detailDto.manualId})}"
+        th:if="${detailDto.canArchive}" th:disabled="${detailDto.canGuest}">アーカイブ</button>
+      <button type="button" class="btn btn-outline-info js-open-inline-panel" data-action="restore"
+        th:data-url="@{/manuals/{manualId}/actions/restore(manualId=${detailDto.manualId})}"
+        th:if="${detailDto.canRestore}" th:disabled="${detailDto.canGuest}">復帰</button>
     </div>
 
-    <section class="card mt-3 inline-action-panel">
+    <section id="inlineActionPanel" class="card mt-3 inline-action-panel" hidden>
       <div class="card-body">
         <div class="inline-action-patterns mb-3">
-          <span class="inline-action-chip is-active">差し戻し: 更新履歴 必須</span>
+          <span class="inline-action-chip">差し戻し: 更新履歴 必須</span>
           <span class="inline-action-chip">アーカイブ: 更新履歴 必須</span>
           <span class="inline-action-chip">復帰: 更新履歴 必須</span>
           <span class="inline-action-chip">承認: ダイアログ後に任意入力</span>
@@ -82,28 +93,28 @@
 
         <div class="inline-action-header">
           <div>
-            <p class="inline-action-label mb-1">差し戻しを実行</p>
+            <p id="inlineActionLabel" class="inline-action-label mb-1">差し戻しを実行</p>
             <h2 class="h5 mb-1">更新履歴を入力してください</h2>
             <p class="text-muted mb-0">差し戻し / アーカイブ / 復帰は、詳細画面内で更新履歴を入力して確定します。</p>
           </div>
-          <span class="badge bg-warning text-dark">更新履歴 必須</span>
+          <span id="inlineActionBadge" class="badge bg-warning text-dark">更新履歴 必須</span>
         </div>
 
         <div class="alert inline-action-note mt-3 mb-3" role="alert">
           承認ボタン押下時は「履歴コメントを残しますか」の確認ダイアログを表示します。`はい` の場合のみこの入力パネルを開き、`いいえ` の場合はそのまま承認します。
         </div>
+        <form id="inlineActionForm" method="post">
+          <div class="mb-3">
+            <label for="inlineChangeNote" class="form-label">更新履歴</label>
+            <textarea id="inlineChangeNote" name="changeNote" class="form-control" rows="3" maxlength="100"></textarea>
+            <div class="text-count" data-for="inlineChangeNote" data-max="100">0 / 100</div>
+          </div>
 
-        <div class="mb-3">
-          <label for="inlineChangeNote" class="form-label">更新履歴</label>
-          <textarea id="inlineChangeNote" class="form-control" rows="3" maxlength="100"
-            placeholder="差し戻し内容を入力してください"></textarea>
-          <div class="text-count" data-for="inlineChangeNote" data-max="100">0 / 100</div>
-        </div>
-
-        <div class="d-flex flex-wrap gap-2">
-          <button type="button" class="btn btn-outline-warning">差し戻しを確定</button>
-          <button type="button" class="btn btn-outline-secondary">キャンセル</button>
-        </div>
+          <div class="d-flex flex-wrap gap-2">
+            <button id="inlineSubmitButton" type="submit" class="btn btn-outline-warning">変更履歴内容を確定</button>
+            <button id="inlineCancelButton" type="button" class="btn btn-outline-secondary">キャンセル</button>
+          </div>
+        </form>
       </div>
     </section>
   </main>
@@ -140,15 +151,44 @@
         counter.classList.add("is-near-limit");
       }
     }
+    (() => {
+      const panel = document.getElementById('inlineActionPanel');
+      const form = document.getElementById('inlineActionForm');
+      const label = document.getElementById('inlineActionLabel');
+      const submitBtn = document.getElementById('inlineSubmitButton');
+      const note = document.getElementById('inlineChangeNote');
+      const cancelBtn = document.getElementById('inlineCancelButton');
 
-    const inlineChangeNote = document.getElementById("inlineChangeNote");
-    const inlineCounter = document.querySelector('.text-count[data-for="inlineChangeNote"]');
+      const map = {
+        rollback: { label: '差し戻しを実行', submit: '差し戻しを確定', ph: '差し戻し内容を入力してください', btn: 'btn-outline-warning' },
+        archive: { label: 'アーカイブを実行', submit: 'アーカイブを確定', ph: 'アーカイブ理由を入力してください', btn: 'btn-outline-danger' },
+        restore: { label: '復帰を実行', submit: '復帰を確定', ph: '復帰理由を入力してください', btn: 'btn-outline-info' }
+      };
 
-    if (inlineChangeNote && inlineCounter) {
-      const maxLength = Number(inlineCounter.dataset.max);
-      updateTextCount("inlineChangeNote", maxLength);
-      inlineChangeNote.addEventListener("input", () => updateTextCount("inlineChangeNote", maxLength));
-    }
+      document.querySelectorAll('.js-open-inline-panel').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.action;
+          const conf = map[action];
+          if (!conf) return;
+
+          form.action = btn.dataset.url;
+          label.textContent = conf.label;
+          submitBtn.textContent = conf.submit;
+          note.placeholder = conf.ph;
+
+          submitBtn.classList.remove('btn-outline-warning', 'btn-outline-danger', 'btn-outline-info');
+          submitBtn.classList.add(conf.btn);
+
+          panel.hidden = false;
+          note.focus();
+        });
+      });
+
+      cancelBtn?.addEventListener('click', () => {
+        panel.hidden = true;
+        note.value = '';
+      });
+    })();
   </script>
 </body>
 

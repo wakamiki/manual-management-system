@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="../css/common.css">
   <link rel="stylesheet" href="../css/my-page.css">
 </head>
+
 <body>
   <main class="container mock-page my-page">
     <header class="page-title-bar">
@@ -16,7 +18,7 @@
         <p class="mb-0 text-muted">通知と自分が関わるマニュアルをまとめて確認します。</p>
       </div>
       <div class="mypage-user-summary">
-        <span class="badge bg-primary">APPROVER</span>
+        <span class="badge bg-primary" th:text="${myPageDto.userRoleLabel}">APPROVER</span>
         <span class="mypage-user-name">山田 花子</span>
       </div>
     </header>
@@ -64,18 +66,25 @@
       <div class="card-body p-0">
         <ul class="nav nav-tabs mypage-tabs" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications-pane" type="button" role="tab" aria-controls="notifications-pane" aria-selected="true">通知</button>
+            <button class="nav-link active" id="notifications-tab" data-bs-toggle="tab"
+              data-bs-target="#notifications-pane" type="button" role="tab" aria-controls="notifications-pane"
+              aria-selected="true">通知</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="created-manuals-tab" data-bs-toggle="tab" data-bs-target="#created-manuals-pane" type="button" role="tab" aria-controls="created-manuals-pane" aria-selected="false">作成マニュアル</button>
+            <button class="nav-link" id="created-manuals-tab" data-bs-toggle="tab"
+              data-bs-target="#created-manuals-pane" type="button" role="tab" aria-controls="created-manuals-pane"
+              aria-selected="false">作成マニュアル</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pending-manuals-tab" data-bs-toggle="tab" data-bs-target="#pending-manuals-pane" type="button" role="tab" aria-controls="pending-manuals-pane" aria-selected="false">未承認マニュアル</button>
+            <button class="nav-link" id="pending-manuals-tab" data-bs-toggle="tab"
+              data-bs-target="#pending-manuals-pane" type="button" role="tab" aria-controls="pending-manuals-pane"
+              aria-selected="false">未承認マニュアル</button>
           </li>
         </ul>
 
         <div class="tab-content">
-          <div class="tab-pane fade show active tab-pane-body" id="notifications-pane" role="tabpanel" aria-labelledby="notifications-tab">
+          <div class="tab-pane fade show active tab-pane-body" id="notifications-pane" role="tabpanel"
+            aria-labelledby="notifications-tab">
             <div class="tab-pane-header">
               <div>
                 <h2 class="h5 mb-1">通知一覧</h2>
@@ -95,8 +104,10 @@
                   <h3 class="notification-title">配送手順の流れが差し戻されました</h3>
                   <p class="notification-text mb-3">変更理由を見直して、再申請してください。</p>
                   <div class="notification-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-secondary btn-sm">編集する</a>
                   </div>
                 </div>
               </article>
@@ -112,7 +123,8 @@
                   <h3 class="notification-title">発注処理フローの承認待ちがあります</h3>
                   <p class="notification-text mb-3">承認者として内容を確認し、承認または差し戻しを行ってください。</p>
                   <div class="notification-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
                     <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
                   </div>
                 </div>
@@ -120,7 +132,8 @@
             </div>
           </div>
 
-          <div class="tab-pane fade tab-pane-body" id="created-manuals-pane" role="tabpanel" aria-labelledby="created-manuals-tab">
+          <div class="tab-pane fade tab-pane-body" id="created-manuals-pane" role="tabpanel"
+            aria-labelledby="created-manuals-tab">
             <div class="tab-pane-header">
               <div>
                 <h2 class="h5 mb-1">作成マニュアル</h2>
@@ -141,8 +154,10 @@
                     <p class="dashboard-text mb-0">配送依頼から完了報告までの業務手順をまとめたマニュアルです。</p>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-secondary btn-sm">編集する</a>
                   </div>
                 </div>
               </article>
@@ -159,15 +174,18 @@
                     <p class="dashboard-text mb-0">発注依頼の確認事項と承認フローを整理したマニュアルです。</p>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集する</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-secondary btn-sm">編集する</a>
                   </div>
                 </div>
               </article>
             </div>
           </div>
 
-          <div class="tab-pane fade tab-pane-body" id="pending-manuals-pane" role="tabpanel" aria-labelledby="pending-manuals-tab">
+          <div class="tab-pane fade tab-pane-body" id="pending-manuals-pane" role="tabpanel"
+            aria-labelledby="pending-manuals-tab">
             <div class="tab-pane-header">
               <div>
                 <h2 class="h5 mb-1">未承認マニュアル</h2>
@@ -188,7 +206,8 @@
                     <p class="dashboard-text mb-0">見積作成時の確認ポイントと提出ルールを整理したマニュアルです。</p>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
                     <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
                   </div>
                 </div>
@@ -206,7 +225,8 @@
                     <p class="dashboard-text mb-0">月末締めから承認依頼までの処理フローをまとめたマニュアルです。</p>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
+                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
                     <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
                   </div>
                 </div>
@@ -219,4 +239,5 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

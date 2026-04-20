@@ -23,10 +23,11 @@ import com.example.manual.dto.ManualIndexDto;
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
 import com.example.manual.dto.UserResponseDto;
-import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
+import com.example.manual.enums.FormMode;
 import com.example.manual.enums.ManualStatus;
+import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
@@ -37,26 +38,26 @@ public class ManualQueryService {
   private static final Logger log = LoggerFactory.getLogger(ManualQueryService.class);
 
   private final ManualRepository manualRepository;
-  private final ManualHistoryService historyService;
   private final UserService userService;
   private final CategoryService categoryService;
+  private final ManualPermissionService permission;
+  private final ManualHistoryService historyService;
   private final NotificationService notificationService;
-  private final ManualCommandService command;
 
   public ManualQueryService(
       ManualRepository manualRepository,
-      ManualHistoryService manualHistoryService,
       UserService userService,
       CategoryService categoryService,
-      NotificationService notificationService,
-      ManualCommandService manualCommandService) {
+      ManualPermissionService permission,
+      ManualHistoryService historyService,
+      NotificationService notificationService) {
 
     this.manualRepository = manualRepository;
-    this.historyService = manualHistoryService;
     this.userService = userService;
     this.categoryService = categoryService;
+    this.permission = permission;
+    this.historyService = historyService;
     this.notificationService = notificationService;
-    this.command = manualCommandService;
   }
 
   // ============================================
@@ -86,7 +87,7 @@ public class ManualQueryService {
   public List<CategoryResponseDto> goToNewCreatePage(Principal principal) {
     log.info("start");
     User playUser = userService.getUserByPrincipal(principal);
-    if (!canGoToNewCreatePage(playUser)) {
+    if (!permission.canGoToNewCreatePage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
     List<CategoryResponseDto> categoryDto = categoryService.getActiveCategoryDtos();
@@ -101,11 +102,12 @@ public class ManualQueryService {
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
 
-    if (!canGoToEditPage(
+    if (!permission.canGoToEditPage(
         playUser, manual)) {
       throw new UnauthorizedException("判定エラー");
     }
-    return toManualFormInputDto(manual);
+    FormMode mode = FormMode.edit;
+    return toManualFormInputDto(manual, playUser, mode);
   }
 
   // 複製（新規タブ）
@@ -115,10 +117,11 @@ public class ManualQueryService {
     log.info("start");
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
-    if (!canGoToCopyPage(playUser)) {
+    if (!permission.canGoToCopyPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
-    return toManualFormInputDto(manual);
+    FormMode mode = FormMode.copy;
+    return toManualFormInputDto(manual, playUser, mode);
   }
 
   // マニュアル詳細画面（新規タブ）
@@ -128,7 +131,7 @@ public class ManualQueryService {
     log.info("start");
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
-    if (!canGoToDetailPage(playUser)) {
+    if (!permission.canGoToDetailPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
     ManualDetailDto baseDetailDto = toManualDetailDto(manual);
@@ -147,7 +150,7 @@ public class ManualQueryService {
       Principal principal) {
     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
-    if (!canFindManualsBySearch(targetUser)) {
+    if (!permission.canFindManualsBySearch(targetUser)) {
       throw new UnauthorizedException("判定エラー");
     }
 
@@ -175,51 +178,11 @@ public class ManualQueryService {
     return manualList;
   }
 
-  // index quickView表示取得
-  public IndexSummaryDto getIndexSummary(Principal principal) {
-    log.info("start");
-    // 通知欄２つの数字を取得
-    int unreadRollbackCount = notificationService.unreadRollbackCount(principal);
-    int unreadPendingCount = notificationService.unreadPendingCount(principal);
-    // count 自分の作成マニュアル
-    int countUserCreatedManual = countUserCreatedManual(principal);
-    // count 申請中
-    int countCreatedPendingManual = countCreatedPendingManual(principal);
-    // count 最近更新（７日間）
-    int countRecentWeeklyManual = countRecentWeeklyManuals();
-
-    IndexSummaryDto summaryDto = new IndexSummaryDto();
-    summaryDto.setCountUserCreatedManual(countUserCreatedManual);
-    summaryDto.setCountCreatedPendingManual(countCreatedPendingManual);
-    summaryDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
-    summaryDto.setUnreadRollbackCount(unreadRollbackCount);
-    summaryDto.setUnreadPendingCount(unreadPendingCount);
-
-    return summaryDto;
-  }
-
   // status一覧を返す
   public List<ManualStatus> getManualStatuses() {
     log.info("start");
     List<ManualStatus> responseStatus = Arrays.asList(ManualStatus.values());
 
-    return responseStatus;
-  }
-
-  // status一覧(Draft以外)を返す
-  public List<ManualResponseDto> getDefaultStatuses() {
-    log.info("start");
-    List<ManualResponseDto> responseStatus = new ArrayList<>();
-    ManualStatus status[] = ManualStatus.values();
-    for (ManualStatus manualStatus : status) {
-      ManualResponseDto defaultStatus = new ManualResponseDto();
-      if (manualStatus == ManualStatus.DRAFT) {
-      } else {
-        defaultStatus.setStatus(manualStatus);
-        defaultStatus.setStatusLabel(getStatusLabel(manualStatus));
-        responseStatus.add(defaultStatus);
-      }
-    }
     return responseStatus;
   }
 
@@ -315,19 +278,64 @@ public class ManualQueryService {
     return targetCount;
   }
 
+  // index quickView表示取得
+  public IndexSummaryDto getIndexSummary(Principal principal) {
+    log.info("start");
+    // 通知欄２つの数字を取得
+    int unreadRollbackCount = notificationService.unreadRollbackCount(principal);
+    int unreadPendingCount = notificationService.unreadPendingCount(principal);
+    // count 自分の作成マニュアル
+    int countUserCreatedManual = countUserCreatedManual(principal);
+    // count 申請中
+    int countCreatedPendingManual = countCreatedPendingManual(principal);
+    // count 最近更新（７日間）
+    int countRecentWeeklyManual = countRecentWeeklyManuals();
+
+    IndexSummaryDto summaryDto = new IndexSummaryDto();
+    summaryDto.setCountUserCreatedManual(countUserCreatedManual);
+    summaryDto.setCountCreatedPendingManual(countCreatedPendingManual);
+    summaryDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
+    summaryDto.setUnreadRollbackCount(unreadRollbackCount);
+    summaryDto.setUnreadPendingCount(unreadPendingCount);
+
+    return summaryDto;
+  }
+
+  // ============================
+  // 共通処理
+  // ============================
+
+  public Manual findManualOrThrow(Long id) {
+    log.info("start");
+    Optional<Manual> manualOpt = manualRepository.findById(id);
+    if (manualOpt.isEmpty()) {
+      throw new RuntimeException("");
+    }
+    return manualOpt.get();
+  }
+
   // ============================
   // Dto詰替
   // ============================
 
-  private ManualEditFormDto toManualFormInputDto(Manual manual) {
+  public ManualEditFormDto toManualFormInputDto(Manual manual, User playUser, FormMode mode) {
     log.info("start");
     ManualEditFormDto formDto = new ManualEditFormDto();
+    if (playUser.getRole() == UserRole.GUEST) {
+      formDto.setGuest(true);
+    }
     formDto.setManualId(manual.getId());
     CategoryResponseDto categoryDto = categoryService.toCategoryDto(manual.getCategory());
     formDto.setCategoryName((categoryDto.getCategoryName()));
     formDto.setCategoryId(categoryDto.getId());
     formDto.setContent(manual.getContent());
     formDto.setTitle(manual.getTitle());
+    formDto.setMode(mode);
+    if (mode == FormMode.copy) {
+      formDto.setModeLabel("複製");
+    } else if (mode == FormMode.edit) {
+      formDto.setModeLabel("編集");
+    }
     return formDto;
   }
 
@@ -353,7 +361,7 @@ public class ManualQueryService {
     return responseDtos;
   }
 
-  private ManualDetailDto toManualDetailDto(Manual manual) {
+  public ManualDetailDto toManualDetailDto(Manual manual) {
     ManualDetailDto detailDto = new ManualDetailDto();
     detailDto.setManualId(manual.getId());
     detailDto.setTitle(manual.getTitle());
@@ -372,21 +380,22 @@ public class ManualQueryService {
     return detailDto;
   }
 
-  // ============================
-  // 共通処理
-  // ============================
+  // manualDetailフラグをセットして返す
+  public ManualDetailDto buildDetailPermissions(Manual manual, User playUser, ManualDetailDto detailDto) {
+    detailDto.setCanApprove(permission.canApprove(manual, playUser));
+    detailDto.setCanArchive(permission.canArchive(manual, playUser));
+    detailDto.setCanCopy(permission.canCopy(manual));
+    detailDto.setCanEdit(permission.canEditManual(manual, playUser));
+    detailDto.setCanPending(permission.canPending(manual, playUser));
+    detailDto.setCanRestore(permission.canRestore(playUser, manual));
+    detailDto.setCanRollback(permission.canRollback(manual, playUser));
+    detailDto.setCanGuest(permission.isGuest(playUser));
 
-  public Manual findManualOrThrow(Long id) {
-    log.info("start");
-    Optional<Manual> manualOpt = manualRepository.findById(id);
-    if (manualOpt.isEmpty()) {
-      throw new RuntimeException("");
-    }
-    return manualOpt.get();
+    return detailDto;
   }
 
   // index表示に必要なコモンデータ（一覧表示以外）を集める。
-  private ManualIndexDto buildIndexCommonData(Principal principal) {
+  public ManualIndexDto buildIndexCommonData(Principal principal) {
     log.info("start");
 
     // カテゴリーリスト 検索欄用 active inactive
@@ -410,7 +419,7 @@ public class ManualQueryService {
   }
 
   // statusを参照してstatusLabelを返す
-  private String getStatusLabel(ManualStatus status) {
+  public String getStatusLabel(ManualStatus status) {
     switch (status) {
       case DRAFT:
         return "下書き";
@@ -425,182 +434,21 @@ public class ManualQueryService {
     }
   }
 
-  // manualDetailフラグをセットして返す
-  private ManualDetailDto buildDetailPermissions(Manual manual, User playUser, ManualDetailDto detailDto) {
-    detailDto.setCanApprove(canApprove(manual, playUser));
-    detailDto.setCanArchive(canArchive(manual, playUser));
-    detailDto.setCanCopy(canCopy(manual));
-    detailDto.setCanEdit(canEditManual(manual, playUser));
-    detailDto.setCanPending(canPending(manual, playUser));
-    detailDto.setCanRestore(canRestore(playUser, manual));
-    detailDto.setCanRollback(canRollback(manual, playUser));
-    detailDto.setCanGuest(command.isGuest(playUser));
-
-    return detailDto;
-  }
-
-  // ============================
-  // ボタン表示非表示判定
-  // ============================
-
-  private boolean canRestore(User playUser, Manual manual) {
-    if (!command.isApproverOrAdmin(playUser)) {
-      return false;
-    }
-    if (!command.isStatusArchived(manual)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canCopy(Manual manual) {
-    if (!manual.getCategory().isActive()) {
-      return false;
-    }
-    if (!command.isStatusPending(manual) &&
-        !command.isStatusApproved(manual) &&
-        !command.isStatusArchived(manual)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canApprove(Manual manual, User playUser) {
-    if (!command.isApproverOrAdmin(playUser)) {
-      return false;
-    }
-    // 作成者じゃない時のみOK
-    if (command.isOwner(manual.getCreatedByUser(), playUser)) {
-      return false;
-    }
-    if (!command.isStatusPending(manual)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canRollback(Manual manual, User playUser) {
-    if (!command.isApproverOrAdmin(playUser)) {
-      return false;
-    }
-    if (command.isOwner(manual.getCreatedByUser(), playUser)) {
-      return false;
-    }
-    if (!command.isStatusPending(manual)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean PublishDtaftManual(Manual manual, User playUser) {
-    if (!command.isStatusDraft(manual)) {
-      return false;
-    }
-    if (!command.isOwner(manual.getCreatedByUser(), playUser)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canEditManual(Manual manual, User playUser) {
-    if (!command.isOwner(manual.getCreatedByUser(), playUser)) {
-      return false;
-    }
-    if (!command.isStatusDraft(manual) &&
-        !command.isStatusPending(manual)) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canArchive(Manual manual, User playUser) {
-    if (!command.isApproverOrAdmin(playUser)) {
-      return false;
-    }
-    if (!command.isStatusArchived(manual) &&
-        !command.isStatusDraft(manual)) {
-      return false;
-    }
-    if (!command.isTitleAndContent(manual.getTitle(), manual.getContent())) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean canPending(Manual manual, User playUser) {
-    if (!command.isOwner(manual.getCreatedByUser(), playUser)) {
-      return false;
-    }
-    if (!command.isStatusDraft(manual)) {
-      return false;
-    }
-    if (!command.isTitleAndContent(manual.getTitle(), manual.getContent())) {
-      return false;
-    }
-    return true;
-  }
-
-  // ============================
-  // 権限判定
-  // ============================
-
-  private boolean canGoToDetailPage(User playUser) {
+  // status一覧(Draft以外)を返す
+  public List<ManualResponseDto> getDefaultStatuses() {
     log.info("start");
-    // アクティブユーザー
-    if (!command.isActive(playUser)) {
-      throw new UnauthorizedException("有効なユーザーではありません。");
+    List<ManualResponseDto> responseStatus = new ArrayList<>();
+    ManualStatus status[] = ManualStatus.values();
+    for (ManualStatus manualStatus : status) {
+      ManualResponseDto defaultStatus = new ManualResponseDto();
+      if (manualStatus == ManualStatus.DRAFT) {
+      } else {
+        defaultStatus.setStatus(manualStatus);
+        defaultStatus.setStatusLabel(getStatusLabel(manualStatus));
+        responseStatus.add(defaultStatus);
+      }
     }
-    return true;
-  }
-
-  private boolean canGoToCopyPage(User playUser) {
-    log.info("start");
-    // アクティブユーザー
-    if (!command.isActive(playUser)) {
-      throw new UnauthorizedException("有効なユーザーではありません。");
-    }
-    return true;
-  }
-
-  private boolean canFindManualsBySearch(User playUser) {
-    log.info("start");
-    // アクティブユーザー
-    if (!command.isActive(playUser)) {
-      throw new UnauthorizedException("有効なユーザーではありません。");
-    }
-    return true;
-  }
-
-  private boolean canGoToEditPage(
-      User playUser,
-      Manual manual) {
-    log.info("start");
-    Category category = categoryService.getCategoryById(manual.getCategory().getId());
-    if (!command.isActive(playUser)) {
-      throw new UnauthorizedException("有効なユーザーではありません。");
-    }
-    if (!command.isCategoryActivate(category)) {
-      throw new InvalidStateException(
-          "使用中カテゴリでのみ復帰が出来ます。");
-    }
-    if (!command.isStatusPending(manual) &&
-        !command.isStatusDraft(manual)) {
-      throw new InvalidStateException(
-          "編集ができるのはステータス:DRAFT/PENDINGのマニュアルのみです。");
-    }
-    if (!command.isOwner(manual.getCreatedByUser(), playUser)) {
-      throw new InvalidStateException(
-          "編集ができるのは自分が作成したマニュアルだけです。");
-    }
-    return true;
-  }
-
-  private boolean canGoToNewCreatePage(User playUser) {
-    log.info("start");
-    if (!command.isActive(playUser)) {
-      throw new UnauthorizedException("有効なユーザーではありません。");
-    }
-    return true;
+    return responseStatus;
   }
 
 }

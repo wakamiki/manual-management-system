@@ -1,6 +1,6 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.16  
+Version: 01.00.17  
 更新日: 2026-04-20
 
 ---
@@ -8,26 +8,43 @@ Version: 01.00.16
 ## 2026-04-20
 
 ### 作業概要
-Service の責務整理を実施し、`ManualService` を読み込み系と更新系で分離する方針を確定した。あわせて、マニュアルエディターを編集モードと複製モードで明確に扱う方針を確定した。
+Service の責務整理を実施し、`ManualService` を読み込み系・更新系・権限判定系の3つに分離する方針を確定した。あわせて、マニュアルエディターを編集モードと複製モードで明確に扱う方針を確定した。
 
 ### 実施内容
 - Service 分離方針を確定
   - 読み込み系: `ManualQueryService`
   - 更新系: `ManualCommandService`
+  - 権限判定系: `ManualPermissionService`
 - `manual-form` の mode 運用方針を再整理
   - `edit` と `copy` を別ユースケースとして扱う
   - 画面は共通、保存処理はモード別に分ける
+- DTO責務整理を実施
+  - Form DTO は入力 + 初期表示用として扱う
+  - 表示用レスポンスDTOと分ける方針を維持
+- フォーム送信設計を整理
+  - `<form th:action>` を基本とする
+  - ボタン別送信先は `th:formaction` を使用可能
+  - mode により送信先を切り替える方針を明確化
+- Thymeleaf / UI の調整
+  - mode バッジ表示調整
+  - レイアウト調整（上下構造の分離）
 - 関連仕様を docs に反映
   - `docs/02`
   - `docs/03`
   - `docs/04`
 
+### 反省点
+- Thymeleaf を一気に変更しようとして手戻りが増えた
+- 現状は一括変更より、1変更ごとの確認を優先するべきだった
+
 ### 学び
+- Service は画面やボタン単位ではなく、責務単位で分けると見通しが良くなる
+- `ManualService` の肥大化は探索時間を増やすため、責務分離の効果が大きい
 - Service の責務境界を先に決めると、Controller と DTO の設計が進めやすくなる
-- 画面共通化とユースケース分離を同時に維持すると、実装と説明の両方が安定する
 
 ### 次回着手予定
 - `ManualCommandService` / `ManualQueryService` の責務に合わせた既存メソッド移設
+- `ManualPermissionService` への判定メソッド集約と呼び出し統一
 - Controller 呼び出し先の整理
 - mode 別 submit 先と Service 呼び出しの整合確認
 

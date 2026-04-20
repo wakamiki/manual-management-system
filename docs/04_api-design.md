@@ -1,6 +1,6 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.12  
+Version: 01.03.13  
 更新日: 2026-04-20
 
 ---
@@ -64,6 +64,7 @@ Version: 01.03.12
 ### 2-1A. Service 分離方針
 - 読み込み系ユースケースは `ManualQueryService` へ集約する
 - 更新系ユースケースは `ManualCommandService` へ集約する
+- 権限判定は `ManualPermissionService` へ集約する
 - Controller からは用途に応じて Query / Command を呼び分ける
 
 ### 2-2. バリデーション

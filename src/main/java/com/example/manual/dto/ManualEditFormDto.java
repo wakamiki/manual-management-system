@@ -8,7 +8,8 @@ public class ManualEditFormDto {
   public ManualEditFormDto() {
 
   }
-  @Size(max=100)
+
+  @Size(max = 100)
   private String title;
   @Size(max = 10000)
   private String content;
@@ -18,8 +19,12 @@ public class ManualEditFormDto {
   @Size(max = 100)
   private String changeNote;
   private FormMode mode;
+  private String pendingSubmit;
+  private String draftSubmit;
+  private boolean guest = false;
+  private String modeLabel;
 
-  //getter
+  // getter
   public String getTitle() {
     return title;
   }
@@ -48,7 +53,23 @@ public class ManualEditFormDto {
     return categoryName;
   }
 
-  //setter
+  public String getDraftSubmit() {
+    return draftSubmit;
+  }
+
+  public String getPendingSubmit() {
+    return pendingSubmit;
+  }
+
+  public boolean getGuest() {
+    return guest;
+  }
+
+  public String getModeLabel() {
+    return modeLabel;
+  }
+
+  // setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
   }
@@ -65,12 +86,8 @@ public class ManualEditFormDto {
     this.changeNote = changeNote;
   }
 
-  public void markCopyMode(FormMode mode) {
-    this.mode = mode.copy;
-  }
-
-  public void markEdit(FormMode mode) {
-    this.mode = mode.edit;
+  public void setMode(FormMode mode) {
+    this.mode = mode;
   }
 
   public void setCategoryId(Long categoryId) {
@@ -79,5 +96,21 @@ public class ManualEditFormDto {
 
   public void setCategoryName(String categoryName) {
     this.categoryName = categoryName;
+  }
+
+  public void setPendingSubmit(String pendingSubmit) {
+    this.pendingSubmit = pendingSubmit;
+  }
+
+  public void setDraftSubmit(String draftSubmit) {
+    this.draftSubmit = draftSubmit;
+  }
+
+  public void setGuest(boolean guest) {
+    this.guest = guest;
+  }
+
+  public void setModeLabel(String modeLabel) {
+    this.modeLabel = modeLabel;
   }
 }

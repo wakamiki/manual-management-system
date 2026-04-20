@@ -25,8 +25,8 @@
               <div class="search-check" th:each="activeCategories:${listDto.activeCategories}">
                 <span th:text="${activeCategories.categoryName}">カテゴリ名</span>
                 <label><input type="checkbox" class="category-filter-item" name="categoryIds"
-                    th:value="${activeCategories.id}" th:checked="${manualSearchConditionDto.categoryIds != null and 
-                      #lists.contains(manualSearchConditionDto.categoryIds, 
+                    th:value="${activeCategories.id}" th:checked="${manualSearchConditionDto.categoryIds != null and
+                      #lists.contains(manualSearchConditionDto.categoryIds,
                       activeCategories.id)}"></label>
               </div>
               <details class="search-subfilter">
@@ -129,7 +129,7 @@
                 <span class="sidebar-home-icon-wrap">
                   <i class="bi bi-house-fill sidebar-home-icon" aria-hidden="true"></i>
                   <span class="sidebar-home-badge sidebar-home-badge-rollback" th:if="${(
-                    listDto.userDto != null and listDto.userDto.userRole != null) and 
+                    listDto.userDto != null and listDto.userDto.userRole != null) and
                     listDto.summaryDto.unreadRollbackCount!=0}"
                     th:text="${listDto.summaryDto.unreadRollbackCount}">2</span>
                   <span class="sidebar-home-badge sidebar-home-badge-pending" th:if="${
@@ -144,7 +144,7 @@
                   }" th:text="${listDto.summaryDto.unreadPendingCount}">4</span>
                 </span>
                 <span class="sidebar-home-user">
-                  <span class="sidebar-home-user-label" th:if="${listDto.userDto != null and listDto.userDto.userRole != null and 
+                  <span class="sidebar-home-user-label" th:if="${listDto.userDto != null and listDto.userDto.userRole != null and
                     listDto.userDto.userRole.name() == 'GUEST'}">ゲスト閲覧中</span>
                   <span class="sidebar-home-user-label" th:unless="${listDto.userDto != null and listDto.userDto.userRole != null and
                       listDto.userDto.userRole.name() == 'GUEST'}">ログイン中</span>
@@ -173,7 +173,9 @@
                   <div class="align-items-center gap-2">
                     <span class="text-muted"><small th:text="|マニュアルID:${manual.manualId}|">マニュアルID: 1001</small></span>
                     <span class="category" th:text="${manual.categoryDto.categoryName}">カテゴリ</span>
-                    <span class="badge bg-primary" th:text="${manual.statusLabel}">申請待ち</span>
+                    <span class="badge-status"
+                          th:classappend="' ' + ${manual.status.name().toLowerCase()}"
+                          th:text="${manual.statusLabel}">申請待ち</span>
                   </div>
                 </div>
               </button>

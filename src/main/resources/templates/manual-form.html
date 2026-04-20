@@ -13,14 +13,17 @@
   <main class="container mock-page">
     <div class="page-title-bar tight-gap">
       <div>
-        <span class="badge mb-1 mode-badge">編集</span>
+        <span class="badge mb-1 mode-badge" th:text="${formDto.modeLabel}">編集</span>
+        <span class="text-muted mb-0" th:text="|${formDto.modeLabel}元マニュアルID: ${formDto.manualId}|">
+          (複製元)(編集元)マニュアルID: 1001</span>
         <h1 class="h4 mb-1">マニュアルエディター</h1>
-        <p class="text-muted mb-0">マニュアルID: 1001 / 作成日時: 2026-04-04 09:00 / 更新日時: 2026-04-08 10:30 / 作成者: 山田 花子</p>
+
       </div>
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </div>
 
-    <div class="alert manual-form-alert mt-0 mb-2" role="alert" th:if="${message != null}" th:classappend="${
+    <div class="alert manual-form-alert mt-0 mb-2" id="flashMessage" role="alert" th:if="${message != null}"
+      th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'
@@ -28,35 +31,40 @@
       編集内容を更新できます。更新履歴は任意です。
     </div>
 
-    <form class="card">
+    <form class="card" method="post" th:object="${formDto}" th:action="${formDto.pendingSubmit}">
+      <input type="hidden" name="mode" th:value="${formDto.mode}">
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control" value="配送手順の流れ" maxlength="100">
+          <input id="title" type="text" class="form-control text-base" th:field="*{title}" maxlength="100">
           <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">本文</label>
-          <textarea id="content" class="form-control" rows="8" maxlength="10000">既定本文</textarea>
+          <textarea id="content" class="form-control text-base " th:field="*{content}" rows="8"
+            maxlength="10000"></textarea>
           <div class="text-count" data-for="content" data-max="10000">0 / 10000</div>
         </div>
         <div class="mb-3">
           <label for="category" class="form-label">カテゴリ</label>
-          <select id="category" class="form-select">
-            <option selected>営業部</option>
-            <option>経理部</option>
-            <option>総務部</option>
+          <select id="category" class="form-select" th:field="*{categoryId}">
+            <option class="text-base " th:each="category:${categoryDto}" th:value="${category.id}"
+              th:text="${category.categoryName}">営業部
+            </option>
           </select>
         </div>
         <div class="mb-3">
           <label for="changeNote" class="form-label">更新履歴</label>
-          <input id="changeNote" type="text" class="form-control" maxlength="100">
+          <input id="changeNote" type="text" th:field="*{changeNote}" class="form-control text-base" maxlength="100">
           <div class="text-count" data-for="changeNote" data-max="100">0 / 100</div>
         </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary">更新保存</button>
-        <button type="button" class="btn btn-outline-primary">下書きに保存</button>
+        <button type="submit" class="btn btn-primary" th:disabled="${formDto.guest}">
+          マニュアル公開</button>
+        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.draftSubmit}"
+          th:disabled="${formDto.guest}">
+          下書きに保存</button>
       </div>
     </form>
   </main>

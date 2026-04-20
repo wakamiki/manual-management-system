@@ -1,6 +1,6 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.14
+Version: 01.06.15
 更新日: 2026-04-20
 
 ---
@@ -28,6 +28,7 @@ Version: 01.06.14
 - Service は責務で分離する
   - 読み込み系: Query Service
   - 更新系: Command Service
+  - 権限判定系: Permission Service
 
 ### 2-1. Controller 方針
 - 画面表示系は GET
@@ -216,13 +217,19 @@ Version: 01.06.14
 - 更新系の権限チェックと状態遷移チェック
 - 更新系の例外方針統一（成功/失敗メッセージ連携を含む）
 
-### 7-3. 権限共通処理（Service 内部）
-- 詳細画面の権限フラグ組み立て
-  - `buildDetailPermissions(manual, currentUser)` を起点に扱う
+### 7-3. ManualPermissionService（権限判定系）
+- 実行可否判定を責務として扱う
+  - `canEdit`
+  - `canCopy`
+  - `canApprove`
+  - `canRollback`
+  - `canArchive`
+  - `canRestore`
 - 共通判定
   - `isUserActive`
   - `isOwner`
   - `isApproverOrAdmin`
+- Query / Command の双方から参照し、判定の重複実装を防ぐ
 
 ---
 

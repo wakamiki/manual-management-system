@@ -22,6 +22,7 @@ import com.example.manual.dto.ManualEditFormDto;
 import com.example.manual.dto.ManualIndexDto;
 import com.example.manual.dto.ManualSearchConditionDto;
 import com.example.manual.entity.Manual;
+import com.example.manual.enums.FormMode;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.service.ManualCommandService;
 import com.example.manual.service.ManualQueryService;
@@ -161,9 +162,15 @@ public class ManualController {
                 log.info("start");
                 ManualEditFormDto formDto = query.goToCopyPage(
                                 manualId, principal);
+                String pendingSubmit = "/manuals/" + manualId + "/actions/save-pending-copy";
+                String draftSubmit = "/manuals/" + manualId + "/actions/save-draft-copy";
+                formDto.setMode(FormMode.copy);
+                formDto.setPendingSubmit(pendingSubmit);
+                formDto.setDraftSubmit(draftSubmit);
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = query.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
+
                 return "manual-form";
         }
 
@@ -176,6 +183,10 @@ public class ManualController {
                 log.info("start");
                 ManualEditFormDto formDto = query.goToEditPage(
                                 manualId, principal);
+                String pendingSubmit = "/manuals/" + manualId + "/actions/save-pending-edit";
+                String draftSubmit = "/manuals/" + manualId + "/actions/save-draft-edit";
+                formDto.setPendingSubmit(pendingSubmit);
+                formDto.setDraftSubmit(draftSubmit);
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = query.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
@@ -226,7 +237,7 @@ public class ManualController {
         }
 
         // 下書き保存(複製)
-        @PostMapping("/actions/save-draft-copy")
+        @PostMapping("/{manualId}/actions/save-draft-copy")
         public String saveDraftForCopy(
                         @PathVariable Long manualId,
                         @Valid @ModelAttribute ManualEditFormDto formDto,
@@ -251,7 +262,7 @@ public class ManualController {
         }
 
         // マニュアルを公開(複製)
-        @PostMapping("/actions/save-pending-copy")
+        @PostMapping("/{manualId}/actions/save-pending-copy")
         public String savePendingForCopy(
                         @PathVariable Long manualId,
                         @Valid @ModelAttribute ManualEditFormDto formDto,
@@ -276,6 +287,29 @@ public class ManualController {
         }
 
         // 下書き保存(編集)
+        @PostMapping("/{manualId}/actions/edit-toDraft")
+        public String editToDraft(
+                        @PathVariable Long manualId,
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
+                        RedirectAttributes message,
+                        Principal principal) {
+                log.info("start");
+                try {
+                        command.editToPending(
+                                        manualId,
+                                        formDto,
+                                        principal);
+
+                        message.addFlashAttribute(
+                                        "message", "マニュアルを保存しました。");
+                        message.addFlashAttribute("messageType", "success");
+                        return "redirect:/manuals/{manualId}/actions/edit-to-pending";
+                } catch (Exception e) {
+                        message.addFlashAttribute("message", "マニュアルを保存できませんでした。");
+                        message.addFlashAttribute("messageType", "error");
+                        return "redirect:/manuals/{manualId}/actions/edit-to-pending";
+                }
+        }
 
         // マニュアルを公開(編集)
         @PostMapping("/{manualId}/actions/edit-to-pending")
