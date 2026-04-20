@@ -18,15 +18,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
-import com.example.manual.dto.ManualDraftRequestDto;
+import com.example.manual.dto.ManualEditFormDto;
 import com.example.manual.dto.ManualIndexDto;
-import com.example.manual.dto.ManualRequestDto;
-import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.ManualSearchConditionDto;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
-import com.example.manual.service.ManualService;
-import com.example.manual.service.UserService;
+import com.example.manual.service.ManualCommandService;
+import com.example.manual.service.ManualQueryService;
 
 import jakarta.validation.Valid;
 
@@ -34,15 +32,15 @@ import jakarta.validation.Valid;
 @RequestMapping("/manuals")
 public class ManualController {
 
+        private final ManualQueryService query;
+        private final ManualCommandService command;
+
         private static final Logger log = LoggerFactory.getLogger(ManualController.class);
 
-        private final UserService userService;
-
-        private final ManualService manualService;
-
-        public ManualController(ManualService manualService, UserService userService) {
-                this.manualService = manualService;
-                this.userService = userService;
+        public ManualController(ManualQueryService manualQueryService,
+                        ManualCommandService manualCommandService) {
+                this.command = manualCommandService;
+                this.query = manualQueryService;
         }
 
         // ============================================
@@ -59,9 +57,9 @@ public class ManualController {
                 // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
                 condition.setStatuses(defaultStatusCheck(condition));
 
-                ManualIndexDto listDto = manualService.showIndex(
+                ManualIndexDto listDto = query.showIndex(
                                 principal,
-                                manualService.findManualsBySearch(
+                                query.findManualsBySearch(
                                                 condition, principal));
                 log.info("listDto null? {}", listDto == null);
                 log.info("activeCategories null? {}", listDto != null ? listDto.getActiveCategories() == null : null);
@@ -79,8 +77,8 @@ public class ManualController {
                         RedirectAttributes message) {
                 log.info("start");
                 try {
-                        List<Manual> manuals = manualService.findMyCreatedManuals(principal);
-                        ManualIndexDto listDto = manualService.showIndex(principal, manuals);
+                        List<Manual> manuals = query.findMyCreatedManuals(principal);
+                        ManualIndexDto listDto = query.showIndex(principal, manuals);
                         model.addAttribute("listDto", listDto);
                         return "index";
                 } catch (Exception e) {
@@ -98,8 +96,8 @@ public class ManualController {
                         RedirectAttributes message) {
                 log.info("start");
                 try {
-                        List<Manual> manuals = manualService.findMyPendingManuals(principal);
-                        ManualIndexDto listDto = manualService.showIndex(principal, manuals);
+                        List<Manual> manuals = query.findMyPendingManuals(principal);
+                        ManualIndexDto listDto = query.showIndex(principal, manuals);
                         model.addAttribute("listDto", listDto);
                         return "index";
                 } catch (Exception e) {
@@ -117,8 +115,8 @@ public class ManualController {
                         RedirectAttributes message) {
                 log.info("start");
                 try {
-                        List<Manual> manuals = manualService.findRecentlyUpdatedManuals();
-                        ManualIndexDto listDto = manualService.showIndex(principal, manuals);
+                        List<Manual> manuals = query.findRecentlyUpdatedManuals();
+                        ManualIndexDto listDto = query.showIndex(principal, manuals);
                         model.addAttribute("listDto", listDto);
                         return "index";
                 } catch (Exception e) {
@@ -139,7 +137,7 @@ public class ManualController {
                         Principal principal,
                         Model model) {
                 log.info("start");
-                ManualDetailDto detailDto = manualService.goToDetailPage(
+                ManualDetailDto detailDto = query.goToDetailPage(
                                 manualId, principal);
                 model.addAttribute("detailDto", detailDto);
                 return "manual-detail";
@@ -149,31 +147,39 @@ public class ManualController {
         @GetMapping("/create")
         public String goToNewCreatePage(Principal principal, Model model) {
                 log.info("start");
-                List<CategoryResponseDto> categoryDto = manualService.goToNewCreatePage(principal);
+                List<CategoryResponseDto> categoryDto = query.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
                 return "manual-create";
         }
 
         // 複製（新規タブ）
         @GetMapping("/{manualId}/actions/copy")
-        public ManualResponseDto goToCopyPage(
+        public String goToCopyPage(
                         @PathVariable Long manualId,
-                        Principal principal) {
+                        Principal principal,
+                        Model model) {
                 log.info("start");
-                ManualResponseDto responseDto = manualService.goToCopyPage(
+                ManualEditFormDto formDto = query.goToCopyPage(
                                 manualId, principal);
-                return responseDto;
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = query.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-form";
         }
 
         // 編集（新規タブ）
         @GetMapping("/{manualId}/actions/edit")
-        public ManualResponseDto goToEditPage(
+        public String goToEditPage(
                         @PathVariable Long manualId,
-                        Principal principal) {
+                        Principal principal,
+                        Model model) {
                 log.info("start");
-                ManualResponseDto responseDto = manualService.goToEditPage(
+                ManualEditFormDto formDto = query.goToEditPage(
                                 manualId, principal);
-                return responseDto;
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = query.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-form";
         }
 
         // ============================================
@@ -183,12 +189,12 @@ public class ManualController {
         // 新規作成DRAFT保存
         @PostMapping("/create/draft")
         public String saveDraftForCreate(
-                        @Valid @ModelAttribute ManualDraftRequestDto requestDto,
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
                         Principal principal,
                         RedirectAttributes message) {
                 try {
                         log.info("start");
-                        manualService.saveDraftForCreate(requestDto, principal);
+                        command.saveDraftForCreate(formDto, principal);
                         message.addFlashAttribute("message", "下書きを保存しました。");
                         message.addFlashAttribute("messageType", "success");
                         return "redirect:/manuals/create";
@@ -200,37 +206,37 @@ public class ManualController {
         }
 
         // 新規作成PENDING公開
-        // @PostMapping("/create/pending")
-        // public String createPendingManual(
-        // @Valid @ModelAttribute ManualRequestDto requestDto,
-        // Principal principal,
-        // RedirectAttributes message){
-        // log.info("start");
-        // try{
-        // manualService.createPendingManual(requestDto,principal);
-        // message.addFlashAttribute("message","マニュアルを公開しました。");
-        // message.addFlashAttribute("messageType","success");
+        @PostMapping("/create/pending")
+        public String createPendingManual(
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
+                        Principal principal,
+                        RedirectAttributes message) {
+                log.info("start");
+                try {
+                        command.createPendingManual(formDto, principal);
+                        message.addFlashAttribute("message", "マニュアルを公開しました。");
+                        message.addFlashAttribute("messageType", "success");
 
-        // return "redirect:/manuals/create";
-        // }catch(Exception e){
-        // message.addFlashAttribute("message","公開に失敗しました。");
-        // message.addFlashAttribute("messageType","error");
-        // return "redirect:/manuals/create";
-        // }
-        // }
+                        return "redirect:/manuals/create";
+                } catch (Exception e) {
+                        message.addFlashAttribute("message", "公開に失敗しました。");
+                        message.addFlashAttribute("messageType", "error");
+                        return "redirect:/manuals/create";
+                }
+        }
 
-        // 下書き保存(複製ボタンから遷移)
-        @PostMapping("/{manualId}/actions/save-draft-copy")
+        // 下書き保存(複製)
+        @PostMapping("/actions/save-draft-copy")
         public String saveDraftForCopy(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualRequestDto requestDto,
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
                         RedirectAttributes message,
                         Principal principal) {
                 log.info("start");
                 try {
-                        manualService.saveDraftForCopy(
+                        command.saveDraftForCopy(
                                         manualId,
-                                        requestDto,
+                                        formDto,
                                         principal);
 
                         message.addFlashAttribute(
@@ -244,39 +250,45 @@ public class ManualController {
                 }
         }
 
-        // マニュアルを公開（新規作成から遷移）
-        @PostMapping("/{manualId}/actions/submit-pending")
-        public String submitToPending(
+        // マニュアルを公開(複製)
+        @PostMapping("/actions/save-pending-copy")
+        public String savePendingForCopy(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualRequestDto requestDto,
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
                         RedirectAttributes message,
                         Principal principal) {
                 log.info("start");
                 try {
+                        command.savePendingForCopy(
+                                        manualId,
+                                        formDto,
+                                        principal);
 
                         message.addFlashAttribute(
-                                        "message", "マニュアルを公開しました。");
+                                        "message", "複製マニュアルを下書きに保存しました");
                         message.addFlashAttribute("messageType", "success");
-                        return "redirect:/manuals/{manualId}/actions/submit-pending";
+                        return "redirect:/manuals/{manualId}/actions/save-draft-copy";
                 } catch (Exception e) {
-                        message.addFlashAttribute("message", "マニュアルを公開できませんでした。");
+                        message.addFlashAttribute("message", "複製マニュアルを保存できませんでした。");
                         message.addFlashAttribute("messageType", "error");
-                        return "redirect:/manuals/{manualId}/actions/submit-pending";
+                        return "redirect:/manuals/{manualId}/actions/save-draft-copy";
                 }
         }
 
-        // マニュアルを公開(編集画面から遷移)
+        // 下書き保存(編集)
+
+        // マニュアルを公開(編集)
         @PostMapping("/{manualId}/actions/edit-to-pending")
         public String editToPending(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualRequestDto requestDto,
+                        @Valid @ModelAttribute ManualEditFormDto formDto,
                         RedirectAttributes message,
                         Principal principal) {
                 log.info("start");
                 try {
-                        manualService.editToPending(
+                        command.editToPending(
                                         manualId,
-                                        requestDto,
+                                        formDto,
                                         principal);
 
                         message.addFlashAttribute(
@@ -290,28 +302,12 @@ public class ManualController {
                 }
         }
 
-        // 下書き保存
-        @PostMapping("/{manualId}/actions/save-draft")
-        public String saveDraftForCreate(
-                        @PathVariable Long manualId,
-                        Principal principal,
-                        @Valid @ModelAttribute ManualRequestDto requestDto,
-                        RedirectAttributes message) {
-                log.info("start");
-                try {
-                        message.addFlashAttribute(
-                                        "message", "マニュアルを下書きに保存しました");
-                        message.addFlashAttribute("messageType", "success");
-                        return "redirect:/manuals/{manualId}/actions/save-draft";
-                } catch (Exception e) {
-                        message.addFlashAttribute("message", "マニュアルを保存できませんでした。");
-                        message.addFlashAttribute("messageType", "error");
-                        return "redirect:/manuals/{manualId}/actions/save-draft";
-                }
-        }
+        // ============================================
+        // ワンボタン処理
+        // ============================================
 
-        // マニュアル公開（編集なしワンボタン）
-        @PostMapping("/{manualId}/actions/submit")
+        // マニュアル公開
+        @GetMapping("/{manualId}/actions/submit")
         public String submitManual(
                         @PathVariable Long manualId,
                         RedirectAttributes message) {
@@ -328,27 +324,8 @@ public class ManualController {
                 }
         }
 
-        // 承認（チェンジノート無）
-        // @PostMapping("/{manualId}/actions/approve")
-        // public String approveManual(
-        // @PathVariable Long manualId,
-        // RedirectAttributes message,
-        // Principal principal) {
-        // log.info("start");
-        // try {
-        // manualService.approveManual(manualId, principal);
-        // message.addFlashAttribute(
-        // "message", "マニュアルを承認しました。");
-        // message.addFlashAttribute("messageType", "success");
-        // return "redirect:/manuals/";
-        // } catch (Exception e) {
-        // message.addFlashAttribute("message", "マニュアルを承認できませんでした。");
-        // message.addFlashAttribute("messageType", "error");
-        // return "redirect:/manuals/index";
-        // }
-        // }
-        // 承認（チェンジノート有）
-        @PostMapping("/{manualId}/actions/approve-with-comment")
+        // 承認
+        @PostMapping("/{manualId}/actions/approve")
         public String approveManualWithComment(
                         @PathVariable Long manualId,
                         @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
@@ -356,7 +333,7 @@ public class ManualController {
                         Principal principal) {
                 log.info("start");
                 try {
-                        manualService.approveManualWithComment(
+                        command.approveManual(
                                         manualId,
                                         actionRequestDto.getChangeNote(),
                                         principal);
@@ -372,76 +349,75 @@ public class ManualController {
         }
 
         // 差し戻し（チェンジノート必須）
-        // @PostMapping("/{manualId}/actions/rollback")
-        // public String rollbackEditManual(
-        // @PathVariable Long manualId,
-        // @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
-        // RedirectAttributes message,
-        // Principal principal) {
-        // log.info("start");
-        // try {
-        // manualService.rollbackEditManual(
-        // manualId,
-        // actionRequestDto,
-        // principal);
-        // message.addFlashAttribute(
-        // "message", "マニュアルを差し戻しました。");
-        // message.addFlashAttribute("messageType", "success");
-        // return "redirect:/manuals/{manualId}";
-        // } catch (Exception e) {
-        // message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-        // message.addFlashAttribute("messageType", "error");
-        // return "index";
-        // }
-        // }
+        @PostMapping("/{manualId}/actions/rollback")
+        public String rollbackEditManual(
+                        @PathVariable Long manualId,
+                        @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
+                        RedirectAttributes message,
+                        Principal principal) {
+                log.info("start");
+                try {
+                        command.rollbackEditManual(
+                                        manualId,
+                                        actionRequestDto,
+                                        principal);
+                        message.addFlashAttribute(
+                                        "message", "マニュアルを差し戻しました。");
+                        message.addFlashAttribute("messageType", "success");
+                        return "redirect:/manuals/{manualId}";
+                } catch (Exception e) {
+                        message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+                        message.addFlashAttribute("messageType", "error");
+                        return "index";
+                }
+        }
 
         // アーカイブ（チェンジノート必須)
-        // @PostMapping("/{manualId}/actions/archive")
-        // public String archiveManual(
-        // @PathVariable Long manualId,
-        // @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
-        // RedirectAttributes message,
-        // Principal principal) {
-        // log.info("start");
-        // try {
-        // manualService.archiveManual(manualId,
-        // actionRequestDto,
-        // principal);
-        // message.addFlashAttribute(
-        // "message", "マニュアルをアーカイブしました。");
-        // message.addFlashAttribute("messageType", "success");
-        // return "redirect:/manuals/{manualId}";
-        // } catch (Exception e) {
-        // message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-        // message.addFlashAttribute("messageType", "error");
-        // return "index";
-        // }
-
-        // }
+        @PostMapping("/{manualId}/actions/archive")
+        public String archiveManual(
+                        @PathVariable Long manualId,
+                        @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
+                        RedirectAttributes message,
+                        Principal principal) {
+                log.info("start");
+                try {
+                        command.archiveManual(manualId,
+                                        actionRequestDto,
+                                        principal);
+                        message.addFlashAttribute(
+                                        "message", "マニュアルをアーカイブしました。");
+                        message.addFlashAttribute("messageType", "success");
+                        return "redirect:/manuals/{manualId}";
+                } catch (Exception e) {
+                        message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+                        message.addFlashAttribute("messageType", "error");
+                        return "index";
+                }
+        }
 
         // 復帰（チェンジノート必須）
-        // @PostMapping("/{manualId}/actions/restore")
-        // public String restoreManual(
-        // @PathVariable Long manualId,
-        // @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
-        // RedirectAttributes message,
-        // Principal principal) {
-        // log.info("start");
-        // try {
-        // manualService.restoreManual(
-        // manualId,
-        // actionRequestDto,
-        // principal);
-        // message.addFlashAttribute(
-        // "message", "マニュアルをアーカイブから復帰しました。");
-        // message.addFlashAttribute("messageType", "success");
-        // return "redirect:/manuals/{manualId}";
-        // } catch (Exception e) {
-        // message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-        // message.addFlashAttribute("messageType", "error");
-        // return "index";
-        // }
-        // }
+        @PostMapping("/{manualId}/actions/restore")
+        public String restoreManual(
+                        @PathVariable Long manualId,
+                        @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
+                        RedirectAttributes message,
+                        Principal principal) {
+                log.info("start");
+                try {
+                        command.restoreManual(
+                                        manualId,
+                                        actionRequestDto,
+                                        principal);
+                        message.addFlashAttribute(
+                                        "message", "マニュアルをアーカイブから復帰しました。");
+                        message.addFlashAttribute("messageType", "success");
+                        return "redirect:/manuals/{manualId}";
+                } catch (Exception e) {
+                        message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+                        message.addFlashAttribute("messageType", "error");
+                        return "index";
+                }
+        }
 
         // ====================================
         // 判定

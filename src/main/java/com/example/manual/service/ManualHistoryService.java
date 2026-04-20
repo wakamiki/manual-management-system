@@ -4,10 +4,6 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualDetailHistoryDto;
 import com.example.manual.dto.ManualHistoryDto;
 import com.example.manual.entity.Manual;
@@ -15,12 +11,16 @@ import com.example.manual.entity.ManualHistory;
 import com.example.manual.entity.User;
 import com.example.manual.repository.ManualHistoryRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 @Service
 public class ManualHistoryService {
 
   private static final Logger log = LoggerFactory.getLogger(ManualHistoryService.class);
 
-  public final ManualHistoryRepository manualHistoryRepository;
+  public final ManualHistoryRepository historyRepository;
   public final UserService userRepository;
   public final UserService userService;
 
@@ -29,7 +29,7 @@ public class ManualHistoryService {
       UserService userRepository,
       UserService userService) {
 
-      this.manualHistoryRepository = manualHistoryRepository;
+      this.historyRepository = manualHistoryRepository;
       this.userRepository = userRepository;
       this.userService = userService;
   }
@@ -45,7 +45,7 @@ public class ManualHistoryService {
   User changedByUser = userService.getUserByPrincipal(principal);
   history.setChangedByUser(changedByUser);
   history.setManual(manual);
-  return manualHistoryRepository.save(history);
+  return historyRepository.save(history);
 }
 
 
@@ -56,12 +56,12 @@ public class ManualHistoryService {
 //manualIDで紐づいた履歴を全て取得(更新履歴昇順)
 public List<ManualHistory> getManualIdHistory(Long manualId) {
   log.info("start");
-  return manualHistoryRepository.findByManual_IdOrderByChangedAtDesc(
+  return historyRepository.findByManual_IdOrderByChangedAtDesc(
       manualId);
 }
 
 public List<ManualHistory> getAllHistories(){
-  return manualHistoryRepository.findAllByOrderByChangedAtDesc();
+  return historyRepository.findAllByOrderByChangedAtDesc();
 }
 
 //一覧表示用 manualIDで紐づいた履歴を全て取得(更新履歴昇順)
@@ -106,12 +106,12 @@ public List<ManualDetailHistoryDto> getManualHistoryDetailDtoList(
     List<ManualHistoryDto>historiesDto = new ArrayList<>();
 
     for (ManualHistory history : histories) {
-      ManualHistoryDto historyDto = new ManualHistoryDto(); 
+      ManualHistoryDto historyDto = new ManualHistoryDto();
       historyDto.setChangedAt(history.getChangedAt());
       historyDto.setChangeNote(history.getChangeNote());
       historiesDto.add(historyDto);
     }
    return historiesDto;
-  } 
+  }
 
 }

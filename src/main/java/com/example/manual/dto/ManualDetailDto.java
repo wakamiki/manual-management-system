@@ -13,6 +13,7 @@ public class ManualDetailDto {
   private Long manualId;
   private String title;
   private ManualStatus status;
+  private String statusLabel;
   private CategoryResponseDto categoryDto;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
@@ -27,6 +28,8 @@ public class ManualDetailDto {
   private boolean canArchive;
   private boolean canRestore;
   private boolean canCopy;
+  private boolean canGuest;
+
 
   // getter
   public Long getManualId() {
@@ -97,6 +100,14 @@ public class ManualDetailDto {
     return createUserDto;
   }
 
+  public boolean isCanGuest() {
+    return canGuest;
+  }
+
+  public String getStatusLabel() {
+    return statusLabel;
+  }
+
   // setter
   public void setManualId(Long manualId) {
     this.manualId = manualId;
@@ -165,5 +176,13 @@ public class ManualDetailDto {
 
   public void setCreateUserDto(UserResponseDto createUserDto) {
     this.createUserDto = createUserDto;
+  }
+
+  public void setCanGuest(boolean canGuest) {
+    this.canGuest = canGuest;
+  }
+
+  public void setStatusLabel(String statusLabel) {
+    this.statusLabel = statusLabel;
   }
 }

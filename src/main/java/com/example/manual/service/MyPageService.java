@@ -3,10 +3,6 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.Manual;
@@ -15,18 +11,27 @@ import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 @Service
 public class MyPageService {
 
   private static final Logger log = LoggerFactory.getLogger(MyPageService.class);
 
   private final UserService userService;
-  private final ManualService manualService;
+  private final ManualCommandService command;
+  private final ManualQueryService query;
 
-  public MyPageService(UserService userService, ManualService manualService) {
+  public MyPageService(UserService userService,
+        ManualCommandService manualCommandService,
+        ManualQueryService manualQueryService
+  ) {
 
     this.userService = userService;
-    this.manualService = manualService;
+    this.command = manualCommandService;
+    this.query = manualQueryService;
   }
 
 // ================================================
@@ -44,8 +49,8 @@ public class MyPageService {
     pageDto.setCreatedManualList(getUserCreatedManual(principal));
     pageDto.setPendingManualList(getPendingManual(user));
     pageDto.setRollbackManualList(getRollbackManual(user));
-    pageDto.setRollbackCount(manualService.countMyRollbackManual(principal));
-    pageDto.setPendingUnCreatedCount(manualService.countNotUserCreatedPendingManualList(principal));
+    pageDto.setRollbackCount(query.countMyRollbackManual(principal));
+    pageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
 
     return pageDto;
   }
@@ -54,10 +59,10 @@ public class MyPageService {
     log.info("start");
     // 差し戻しマニュアルタブ
     List<Manual>manuals =
-      manualService.findCreatedRollbackManuals(user);
+      query.findCreatedRollbackManuals(user);
 
     List<ManualResponseDto> responseDtos =
-      manualService.buildIndexWithManuals(manuals);
+      query.buildIndexWithManuals(manuals);
     return responseDtos;
   }
 
@@ -65,10 +70,10 @@ public class MyPageService {
     log.info("start");
     // 自分作成マニュアルタブ
     List<Manual>manuals =
-      manualService.findMyCreatedManuals(principal);
+      query.findMyCreatedManuals(principal);
 
     List<ManualResponseDto> responseDtos =
-      manualService.buildIndexWithManuals(manuals);
+      query.buildIndexWithManuals(manuals);
     return responseDtos;
   }
 
@@ -79,10 +84,10 @@ public class MyPageService {
       throw new InvalidStateException("判定エラー");
     }
     List<Manual>manuals =
-      manualService.findPendingManuals(user);
-      
+      query.findPendingManuals(user);
+
     List<ManualResponseDto> responseDtos =
-      manualService.buildIndexWithManuals(manuals);
+      query.buildIndexWithManuals(manuals);
     return responseDtos;
   }
 
