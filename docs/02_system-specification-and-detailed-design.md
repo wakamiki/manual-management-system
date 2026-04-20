@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.13
-更新日: 2026-04-18
+Version: 01.06.14
+更新日: 2026-04-20
 
 ---
 
@@ -25,6 +25,9 @@ Version: 01.06.13
 - Controller は thin controller を維持する
 - 業務ロジックは Service に集約する
 - Entity は整合性を守る専用メソッドを持つ
+- Service は責務で分離する
+  - 読み込み系: Query Service
+  - 更新系: Command Service
 
 ### 2-1. Controller 方針
 - 画面表示系は GET
@@ -193,11 +196,14 @@ Version: 01.06.13
 
 ## 7. Service 設計
 
-### 7-1. ManualService
+### 7-1. ManualQueryService（読み込み系）
 - 一覧取得
 - マニュアル検索
 - 詳細取得
 - 履歴取得の窓口
+- 画面表示用DTO組み立て
+
+### 7-2. ManualCommandService（更新系）
 - 新規作成
 - 更新
 - 編集
@@ -207,9 +213,13 @@ Version: 01.06.13
 - 差し戻し
 - アーカイブ
 - 復帰
+- 更新系の権限チェックと状態遷移チェック
+- 更新系の例外方針統一（成功/失敗メッセージ連携を含む）
+
+### 7-3. 権限共通処理（Service 内部）
 - 詳細画面の権限フラグ組み立て
   - `buildDetailPermissions(manual, currentUser)` を起点に扱う
-- 権限共通処理
+- 共通判定
   - `isUserActive`
   - `isOwner`
   - `isApproverOrAdmin`
@@ -220,16 +230,16 @@ Version: 01.06.13
 - 停止カテゴリに紐づくマニュアルは原則そのまま保持（非表示扱い）
 - 同名カテゴリの上書きで再アクティブ化した場合は、旧カテゴリ配下のマニュアルを一括アーカイブする
 
-### 7-2. ManualHistoryService
+### 7-4. ManualHistoryService
 - 履歴保存
 - 履歴一覧取得
 
-### 7-3. NotificationService
+### 7-5. NotificationService
 - 承認者全員への通知作成
 - 作成者への承認通知作成
 - 作成者への差し戻し通知作成
 
-### 7-4. MyPageService
+### 7-6. MyPageService
 - 通知一覧取得
 - 自分の作成マニュアル取得
 - 未承認マニュアル取得

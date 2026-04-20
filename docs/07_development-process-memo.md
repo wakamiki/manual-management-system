@@ -1,7 +1,35 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.00.15  
-更新日: 2026-04-19
+Version: 01.00.16  
+更新日: 2026-04-20
+
+---
+
+## 2026-04-20
+
+### 作業概要
+Service の責務整理を実施し、`ManualService` を読み込み系と更新系で分離する方針を確定した。あわせて、マニュアルエディターを編集モードと複製モードで明確に扱う方針を確定した。
+
+### 実施内容
+- Service 分離方針を確定
+  - 読み込み系: `ManualQueryService`
+  - 更新系: `ManualCommandService`
+- `manual-form` の mode 運用方針を再整理
+  - `edit` と `copy` を別ユースケースとして扱う
+  - 画面は共通、保存処理はモード別に分ける
+- 関連仕様を docs に反映
+  - `docs/02`
+  - `docs/03`
+  - `docs/04`
+
+### 学び
+- Service の責務境界を先に決めると、Controller と DTO の設計が進めやすくなる
+- 画面共通化とユースケース分離を同時に維持すると、実装と説明の両方が安定する
+
+### 次回着手予定
+- `ManualCommandService` / `ManualQueryService` の責務に合わせた既存メソッド移設
+- Controller 呼び出し先の整理
+- mode 別 submit 先と Service 呼び出しの整合確認
 
 
 ## 2026-03-29
@@ -1112,4 +1140,3 @@ index 画面の Thymeleaf 反映を進め、DTO の null 設計方針を明確�
 - `buildDetailPermissions` の実装着手
 - `manual-detail` の表示制御（ボタン表示/非表示）を Thymeleaf に反映
 - 詳細画面の UI 役割分離（ヘッダー情報・本文・履歴）を具体化
-

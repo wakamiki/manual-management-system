@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.11  
-更新日: 2026-04-17
+Version: 01.03.12  
+更新日: 2026-04-20
 
 ---
 
@@ -60,6 +60,11 @@ Version: 01.03.11
 - Request DTO / Response DTO を使い分ける
 - View エンドポイントと JSON API を混在させない
 - 画面表示では `Model` に詰める属性名を固定し、テンプレート参照と一致させる
+
+### 2-1A. Service 分離方針
+- 読み込み系ユースケースは `ManualQueryService` へ集約する
+- 更新系ユースケースは `ManualCommandService` へ集約する
+- Controller からは用途に応じて Query / Command を呼び分ける
 
 ### 2-2. バリデーション
 - DTO の形式チェックは `@Valid` で行う
