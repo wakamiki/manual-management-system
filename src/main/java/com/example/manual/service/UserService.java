@@ -89,6 +89,12 @@ public class UserService {
     // 更新・変更処理
     // =============================================
 
+    public void updateLastLoginAt(String loginId) {
+        User playUser = getUserByLoginId(loginId);
+        playUser.markLastLoginNow();
+        userRepository.save(playUser);
+    }
+
     public UserDetailDto createUser(
             UserRequestDto requestDto,
             Principal principal) {
