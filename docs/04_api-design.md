@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.13  
-更新日: 2026-04-20
+Version: 01.03.14  
+更新日: 2026-04-21
 
 ---
 
@@ -26,19 +26,19 @@ Version: 01.03.13
 
 ### 1-2. Category API
 - GET `/categories/category-management`
-- POST `/categories`
-- PUT `/categories/{categoryId}`
-- PUT `/categories/{categoryId}/deactivate`
-- PUT `/categories/{categoryId}/activate`
+- POST `/categories/create`
+- POST `/categories/update`
+- GET `/categories/{categoryId}/deactivate`
+- GET `/categories/{categoryId}/activate`
 
 ### 1-3. User API
 - GET `/users`
 - GET `/users/{userId}`
 - POST `/users`
-- PUT `/users/{userId}`
-- PUT `/users/{userId}/deactivate`
-- PUT `/users/{userId}/activate`
-- PUT `/users/{userId}/reset-password`
+- POST `/users/update`
+- GET `/users/{userId}/deactivate`
+- GET `/users/{userId}/activate`
+- POST `/users/{userId}/reset-password`
 - GET `/users/{userId}/operation-histories`
 
 ### 1-4. Auth API
@@ -168,6 +168,8 @@ Version: 01.03.13
 - `ManualSearchConditionDto`
 - `CategoryRequestDto`
 - `UserRequestDto`
+- `CategoryFormDto`
+- `UserFormDto`
 
 ### 4-2. Response DTO
 - `ManualResponseDto`
@@ -175,6 +177,12 @@ Version: 01.03.13
 - `ManualDetailDto`
 - `CategoryResponseDto`
 - `UserResponseDto`
+
+### 4-2A. 管理画面フォーム mode
+- `ViewMode` を `CREATE / EDIT` で扱う
+- フォームDTOに mode を保持する
+- 画面表示時は mode により見出し・ボタン・送信先を切り替える
+- mode 未設定による null 参照を避けるため、DTO初期値を `CREATE` にする
 
 ### 4-3. 一覧検索 DTO 補足
 - `ManualSearchConditionDto`

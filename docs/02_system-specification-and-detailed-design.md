@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.15
-更新日: 2026-04-20
+Version: 01.06.16
+更新日: 2026-04-21
 
 ---
 
@@ -118,6 +118,19 @@ Version: 01.06.15
 - `下書きに保存` では `PENDING → DRAFT` を許可する
 - 復帰対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする
 - 画面統合と API 統合は分けて考える
+
+### 5-4. ユーザー管理 / カテゴリ管理モード運用
+- 管理画面フォームは `CREATE` / `EDIT` の mode で表示文脈を切り替える
+- 初期表示は `CREATE` とする
+- 一覧の設定操作から対象データを読み込み `EDIT` に切り替える
+- `User` と `Category` は同じ mode 運用方針を採用する
+- `userId` は更新時も変更可とする
+
+### 5-5. カテゴリ重複確認フロー
+- 同名カテゴリ検知時は即エラーにせず確認対象とする
+- 新規作成時は `existsByCategoryName(...)` で判定する
+- 更新時は対象IDを除外して `existsByCategoryNameAndIdNot(...)` で判定する
+- 重複検知時のみ確認ダイアログ（confirm）を表示し、確認後に同導線で再送する
 
 ### 5-3. ID 命名方針
 - Entity 主キーは `id`
