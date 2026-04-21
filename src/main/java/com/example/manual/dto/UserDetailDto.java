@@ -8,62 +8,72 @@ public class UserDetailDto {
   public UserDetailDto() {
 
   }
-private String loginId;
-private String displayName;
-private UserRole role;
-private boolean isActive;
-private LocalDateTime LastLoginAt;
-private String activeLabel;
 
-//getter
-public  String getLoginId() {
-return this.loginId;
-}
+  private Long id;
+  private String loginId;
+  private String displayName;
+  private UserRole role;
+  private boolean isActive;
+  private LocalDateTime lastLoginAt;
+  private String activeLabel;
 
-public String getDisplayName() {
-return this.displayName;
-}
+  // getter
+  public String getLoginId() {
+    return this.loginId;
+  }
 
-public UserRole getRole() {
+  public String getDisplayName() {
+    return this.displayName;
+  }
 
-  return this.role;
-}
+  public UserRole getRole() {
 
-public boolean isActive(){
-  return this.isActive;
-}
+    return this.role;
+  }
 
-public LocalDateTime getLastLoginAt() {
-  return this.LastLoginAt;
-}
+  public boolean isActive() {
+    return this.isActive;
+  }
 
-public String getActiveLabel() {
-  return activeLabel;
-}
+  public LocalDateTime getLastLoginAt() {
+    return this.lastLoginAt;
+  }
 
-// setter
-public void setLoginId(String loginId) {
-  this.loginId = loginId;
-}
+  public String getActiveLabel() {
+    return activeLabel;
+  }
 
-public void setDisplayName(String displayName) {
-  this.displayName = displayName;
-}
+  public Long getId() {
+    return id;
+  }
 
-public void setRole(UserRole role) {
+  // setter
+  public void setLoginId(String loginId) {
+    this.loginId = loginId;
+  }
 
-  this.role = role;
-}
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
+  }
 
-public void setActive(boolean isActive){
-  this.isActive = isActive;
-}
+  public void setRole(UserRole role) {
 
-public void setLastLoginAt(LocalDateTime lastLoginAt) {
-  this.LastLoginAt = lastLoginAt;
-}
+    this.role = role;
+  }
 
-public void setActiveLabel(String statusLabel) {
-  this.activeLabel = statusLabel;
-}
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
+  }
+
+  public void setLastLoginAt(LocalDateTime lastLoginAt) {
+    this.lastLoginAt = lastLoginAt;
+  }
+
+  public void setActiveLabel(String statusLabel) {
+    this.activeLabel = statusLabel;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 }

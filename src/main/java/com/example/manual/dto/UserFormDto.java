@@ -12,7 +12,7 @@ public class UserFormDto {
   }
 
   private List<UserDetailDto> allUserDto;
-  private ViewMode mode;
+  private ViewMode mode = ViewMode.CREATE;
   private UserResponseDto playUser;
   private UserDetailDto targetUser = new UserDetailDto();
   private List<UserRole> allRole;

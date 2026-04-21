@@ -8,15 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.example.manual.entity.User;
 
-
-
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
   private static final Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
 
   private final UserService userService;
-
 
   public CustomUserDetailsService(UserService userService) {
     this.userService = userService;
@@ -25,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String loginId) {
     log.info("start");
-    User targetUser = userService.getUserByloginId(loginId);
+    User targetUser = userService.getUserByLoginId(loginId);
 
     UserDetails userDetails = org.springframework.security.core.userdetails.User
         .withUsername(targetUser.getLoginId())

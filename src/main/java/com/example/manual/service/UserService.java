@@ -36,17 +36,22 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // =============================================
+    // 画面表示
+    // =============================================
+
     // user-management表示
-    public UserFormDto showUserManagementPege(
+    public UserFormDto showUserManagementPage(
             User playUser) {
         log.info("start");
-        if (!canShowUserManagementPege(playUser)) {
+        if (!canShowUserManagementPage(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         List<User> userList = userRepository.findAllByOrderByUpdatedAtDesc();
         List<UserDetailDto> userResponseDto = new ArrayList<>();
         for (User user : userList) {
             UserDetailDto responseDto = new UserDetailDto();
+            responseDto.setId(user.getId());
             responseDto.setLoginId(user.getLoginId());
             responseDto.setDisplayName(user.getDisplayName());
             responseDto.setRole(user.getRole());
@@ -65,6 +70,25 @@ public class UserService {
         return formDto;
     }
 
+    public UserFormDto showUpdateMode(
+            Principal principal, Long userId) {
+        User playUser = getUserByPrincipal(principal);
+        User targetUser = getUserById(userId);
+        if (!canShowUpdateMode(playUser)) {
+            throw new InvalidStateException("判定エラー");
+        }
+        UserDetailDto detailDto = toCreatedUserDetailDto(targetUser);
+        UserFormDto formDto = showUserManagementPage(playUser);
+        formDto.setTargetUser(detailDto);
+        formDto.setMode(ViewMode.EDIT);
+
+        return formDto;
+    }
+
+    // =============================================
+    // 更新・変更処理
+    // =============================================
+
     public UserDetailDto createUser(
             UserRequestDto requestDto,
             Principal principal) {
@@ -81,6 +105,7 @@ public class UserService {
         User savedUser = userRepository.save(targetUser);
 
         UserDetailDto responseDto = new UserDetailDto();
+        responseDto.setId(savedUser.getId());
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
@@ -104,6 +129,7 @@ public class UserService {
         User savedUser = userRepository.save(targetUser);
 
         UserDetailDto responseDto = new UserDetailDto();
+        responseDto.setId(savedUser.getId());
         responseDto.setLoginId(savedUser.getLoginId());
         responseDto.setDisplayName(savedUser.getDisplayName());
         responseDto.setRole(savedUser.getRole());
@@ -155,7 +181,6 @@ public class UserService {
         if (!canUserSaved(user, principal)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserDetailDto responseDto = new UserDetailDto();
         return userRepository.save(user);
     }
 
@@ -164,9 +189,9 @@ public class UserService {
     // =============================================
 
     // ユーザー管理画面取得
-    public List<UserDetailDto> getUserManagementViewDeta(Principal principal) {
+    public List<UserDetailDto> getUserManagementViewData(Principal principal) {
         log.info("start");
-        if (!canGetUserManagementViewDeta(principal)) {
+        if (!canGetUserManagementViewData(principal)) {
             throw new InvalidStateException("判定エラー");
         }
         List<User> allUsers = findAllUser();
@@ -202,9 +227,20 @@ public class UserService {
         return userList;
     }
 
-    public User getUserByloginId(String loginId) {
+    public User getUserByLoginId(String loginId) {
         log.info("start");
         Optional<User> userOpt = userRepository.findByLoginId(loginId);
+        if (userOpt.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
+        }
+        User targetUser = userOpt.get();
+        return targetUser;
+    }
+
+    public User getUserById(Long id) {
+        log.info("start");
+        Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
@@ -286,16 +322,39 @@ public class UserService {
         userDto.setUserRole(targetUser.getRole());
         return userDto;
     }
+
+    public UserDetailDto toCreatedUserDetailDto(User targetUser) {
+        UserDetailDto userDto = new UserDetailDto();
+        userDto.setId(targetUser.getId());
+        userDto.setLoginId(targetUser.getLoginId());
+        userDto.setDisplayName(targetUser.getDisplayName());
+        userDto.setRole(targetUser.getRole());
+        userDto.setActive(targetUser.isActive());
+        userDto.setActiveLabel(getActivateLabel(targetUser.isActive()));
+        return userDto;
+    }
+
     // =========================================
     // 権限判定
     // =========================================
 
-    private boolean canShowUserManagementPege(User user) {
+    private boolean canShowUserManagementPage(User targetUser) {
         log.info("start");
-        if (!user.isActive()) {
+        if (!targetUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        if (user.getRole() != UserRole.ADMIN) {
+        if (targetUser.getRole() != UserRole.ADMIN) {
+            throw new UnauthorizedException("権限が不足しています。");
+        }
+        return true;
+    }
+
+    private boolean canShowUpdateMode(User targetUser) {
+        log.info("start");
+        if (!targetUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (targetUser.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedException("権限が不足しています。");
         }
         return true;
@@ -313,8 +372,8 @@ public class UserService {
         if (playUser.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        for (User tergetUser : users) {
-            if (requestDto.getLoginId().equals(tergetUser.getLoginId())) {
+        for (User targetUser : users) {
+            if (requestDto.getLoginId().equals(targetUser.getLoginId())) {
                 throw new InvalidStateException(
                         "すでに同じユーザーIDが使われています。");
             }
@@ -382,7 +441,7 @@ public class UserService {
         return true;
     }
 
-    private boolean canGetUserManagementViewDeta(
+    private boolean canGetUserManagementViewData(
             Principal principal) {
         log.info("start");
         User targetUser = getUserByPrincipal(principal);

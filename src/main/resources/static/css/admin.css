@@ -21,6 +21,14 @@
   font-weight: 600;
 }
 
+.admin-mode-title {
+  background-color: #5cb1bb;
+  border-bottom: 1px solid #ffffff;
+  color: #ffffff;
+  font-weight: 600;
+  padding: .5rem 1rem;
+}
+
 .admin-form-actions,
 .admin-inline-actions {
   display: flex;

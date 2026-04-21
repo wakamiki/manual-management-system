@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,150 +21,155 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/users")
 public class UserController {
 
-  private static final Logger log =
-        LoggerFactory.getLogger(UserController.class);
+  private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    private final UserService userService;
+  private final UserService userService;
 
-    public UserController(UserService userService) {
-      this.userService = userService;
-    }
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
 
+  // =============================================
+  // 画面表示
+  // =============================================
 
-//==============================================
-// 取得系
-// =============================================
+  // user-management表示
+  @GetMapping
+  public String showUserManagementPage(
+      Principal principal, Model model) {
+    log.info("start");
+    User playUser = userService.getUserByPrincipal(principal);
+    UserFormDto formDto = userService.showUserManagementPage(playUser);
+    model.addAttribute("formDto", formDto);
+    return "user-management";
+  }
 
-// user-management表示
-    @GetMapping
-    public String showUserManagementPege(
-        Principal principal, Model model) {
-      log.info("start");
-      User playUser = userService.getUserByPrincipal(principal);
-      UserFormDto formDto =
-          userService.showUserManagementPege(playUser);
-      model.addAttribute("formDto", formDto);
-      return "user-management";
-    }
-
+  // 更新モード表示
   @GetMapping("/action/{userId}")
-  public String getUserById(
-    Principal principal,
-    RedirectAttributes message) {
+  public String showUpdateMode(
+      Principal principal,
+      @PathVariable Long userId,
+      RedirectAttributes message,
+      Model model) {
     log.info("start");
     try {
-    //ユーザーID　displayネーム　ロール　isActive
-    message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+      UserFormDto formDto = userService.showUpdateMode(principal, userId);
+      model.addAttribute("formDto", formDto);
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
-  }
+
+  // =============================================
+  // DB処理
+  // =============================================
 
   @PostMapping("/create")
   public String createUser(RedirectAttributes message) {
     log.info("start");
-      try {
-    //初期状態はアクティブ　loginID・displayNAME・ロール必須　adminのみ実行可　ログインID重複チェック
-    //操作者　対象ユーザー　実行日時
-    message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+    try {
+      // 初期状態はアクティブ loginID・displayNAME・ロール必須 adminのみ実行可 ログインID重複チェック
+      // 操作者 対象ユーザー 実行日時
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
   @PutMapping("/update")
   public String updateUser(RedirectAttributes message) {
     log.info("start");
-      try {
-    //氏名変更対応・ロール変更想定　ユーザーID変更可能
-    //adminのみ実行可　ログインID重複チェック
-    //DB DisplayName role
-    //操作者　対象ユーザー　実行日時 loginId displayName Role
+    try {
+      // 氏名変更対応・ロール変更想定 ユーザーID変更可能
+      // adminのみ実行可 ログインID重複チェック
+      // DB DisplayName role
+      // 操作者 対象ユーザー 実行日時 loginId displayName Role
       message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
   @PutMapping("/{userId}/deactivate")
   public String deactivateUser(RedirectAttributes message) {
     log.info("start");
-  try {
-    //adminのみ実行可
-    //操作者　対象ユーザー　実行日時
-        message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+    try {
+      // adminのみ実行可
+      // 操作者 対象ユーザー 実行日時
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
   @PutMapping("/{userId}/activate")
   public String activateUser(RedirectAttributes message) {
     log.info("start");
-  try {
-    //adminのみ実行可
-    //操作者　対象ユーザー　実行日時
-        message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+    try {
+      // adminのみ実行可
+      // 操作者 対象ユーザー 実行日時
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
   @PutMapping("/{userId}/reset-password")
   public String resetPassword(RedirectAttributes message) {
     log.info("start");
-  try {
-    //アクティブのみ　adminのみ実行可
-    //自分自身のリセット禁止　一時パスを通知で渡す
-    //初回ログインで強制パスワード変更要請
-    //監査ログを記録　操作者・対象・日時・理由を保存
-    //連続実行抑止: 連続リセットを制限
-    //操作タイプ＋理由をoperationhistoriesに残す
-    //操作者　対象ユーザー　実行日時 理由や変更内容
-        message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+    try {
+      // アクティブのみ adminのみ実行可
+      // 自分自身のリセット禁止 一時パスを通知で渡す
+      // 初回ログインで強制パスワード変更要請
+      // 監査ログを記録 操作者・対象・日時・理由を保存
+      // 連続実行抑止: 連続リセットを制限
+      // 操作タイプ＋理由をoperationhistoriesに残す
+      // 操作者 対象ユーザー 実行日時 理由や変更内容
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
   @GetMapping("/{userId}/operation-histories")
   public String getOperationHistories(RedirectAttributes message) {
     log.info("start");
-  try {
-    //アクティブのみ　adminのみ実行可
-    //操作者　実行日時
-    message.addFlashAttribute("message", "処理に成功しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
+    try {
+      // アクティブのみ adminのみ実行可
+      // 操作者 実行日時
+      message.addFlashAttribute("message", "処理に成功しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/users";
     } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/users";
+    }
   }
 
 }

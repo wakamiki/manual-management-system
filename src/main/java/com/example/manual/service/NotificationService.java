@@ -25,45 +25,43 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public NotificationService(
-        UserService userService,
-        NotificationRepository notificationRepository){
-        this.userService=userService;
+            UserService userService,
+            NotificationRepository notificationRepository) {
+        this.userService = userService;
         this.notificationRepository = notificationRepository;
     }
 
+    // ========================================================
+    // 通知作成
+    // ========================================================
 
+    // 承認待ち申請時に承認者全員へ通知を作成する。
+    // 有効ユーザーのadmin/approverに通知を送る（作成者を除く）
 
-//========================================================
-//通知作成
-//========================================================
-
-//承認待ち申請時に承認者全員へ通知を作成する。
-//有効ユーザーのadmin/approverに通知を送る（作成者を除く）
-
-public void createSubmitNotifications(Principal principal, Manual manual) {
-    log.info("start");
+    public void createSubmitNotifications(Principal principal, Manual manual) {
+        log.info("start");
         User user = userService.getUserByPrincipal(principal);
-    if (!canCreateSubmitNotifications(principal)) {
-        throw new UnauthorizedException("判定エラー");
-    }
-    //通知先ユーザーリスト
-    List<User>users = userService.findApproverAndAdminUsersExcept(user.getId());
+        if (!canCreateSubmitNotifications(principal)) {
+            throw new UnauthorizedException("判定エラー");
+        }
+        // 通知先ユーザーリスト
+        List<User> users = userService.findApproverAndAdminUsersExcept(user.getId());
 
-    for (User targetUser : users) {
-        Notification notification = new Notification();
-        notification.setTargetUser(targetUser);
-        notification.setManual(manual);
-        notification.setType(NotificationType.PENDING_APPROVAL);
-        notification.markCreatedNow();
-        notificationRepository.save(notification);
-    }
+        for (User targetUser : users) {
+            Notification notification = new Notification();
+            notification.setTargetUser(targetUser);
+            notification.setManual(manual);
+            notification.setType(NotificationType.PENDING_APPROVAL);
+            notification.markCreatedNow();
+            notificationRepository.save(notification);
+        }
     }
 
     public void createRollbackNotification(Manual manual) {
         log.info("start");
-    //差し戻し時に作成者へ通知を作成する。
-User targetUser = userService.getUserByloginId(
-        manual.getCreatedByUser().getLoginId());
+        // 差し戻し時に作成者へ通知を作成する。
+        User targetUser = userService.getUserByLoginId(
+                manual.getCreatedByUser().getLoginId());
 
         Notification notification = new Notification();
         notification.setTargetUser(targetUser);
@@ -71,99 +69,96 @@ User targetUser = userService.getUserByloginId(
         notification.setType(NotificationType.ROLLBACK);
         notification.markCreatedNow();
         notificationRepository.save(notification);
-}
-
-
-
-// public void createApproveNotification(Manual manual){}
-//承認完了時に作成者へ通知を作成する。 余裕があれば実装
-
-//========================================================
-//通知削除
-//========================================================
-
-//マニュアル承認時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
-public void deletePendingApprovalNotificationsByManualId(
-        Long manualId) {
-    log.info("start");
-            notificationRepository.deleteByManualIdAndType(
-            manualId, NotificationType.PENDING_APPROVAL);
-}
-
-//差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
-public void deleteRollbackNotification(Long manualId, User user) {
-    log.info("start");
-    //通知のあるユーザーがPENDINGしたときに実行
-    notificationRepository.deleteByManualIdAndType(
-        manualId, NotificationType.ROLLBACK);
-}
-
-public void deleteAsRead(Long notificationId, User user) {
-    log.info("start");
-    // 指定通知を既読にする。既読ボタンに対応。
-    // 有効ユーザー 画面更新要
-}
-
-public void deleteAllAsRead(User user) {
-    log.info("start");
-    // まとめて既読にする。全既読ボタン用。
-    // 有効ユーザー
-}
-
-public void clearPendingNotifications(Long manualId){
-    log.info("start");
-}
-
-//========================================================
-//通知数取得
-//========================================================
-public void getUnreadCount(User user) {
-    log.info("start");
-    //未読件数を返す。バッヂ表示に使う。
-//有効ユーザー　件数を取得。取得方法検討
-}
-
-//ユーザー未読の差し戻し通知数を取得
-public int unreadRollbackCount(Principal principal) {
-    log.info("start");
-    User targetUser = userService.getUserByPrincipal(principal);
-    Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.ROLLBACK);
-    int notificationCount = Math.toIntExact(count);
-    return notificationCount;
-}
-
-//ユーザー未読の承認待ち通知数を取得
-public int unreadPendingCount(Principal principal) {
-    log.info("start");
-    User targetUser = userService.getUserByPrincipal(principal);
-   Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.PENDING_APPROVAL);
-   int notificationCount = Math.toIntExact(count);
-    return notificationCount;
-}
-
-
-//========================================================
-//権限判定
-//========================================================
-private boolean isActiveUser(Principal principal) {
-    log.info("start");
-    User user = userService.getUserByPrincipal(principal);
-    if(!user.isActive()){
-        throw new UnauthorizedException("有効なユーザーではありません。");
     }
-    return true;
-}
 
-private boolean canCreateSubmitNotifications(Principal principal) {
-    log.info("start");
-    User user = userService.getUserByPrincipal(principal);
-    if (user.getRole()!=UserRole.APPROVER &&
-        user.getRole()!=UserRole.ADMIN) {
-        throw new InvalidStateException("権限が不足しています。");
+    // public void createApproveNotification(Manual manual){}
+    // 承認完了時に作成者へ通知を作成する。 余裕があれば実装
+
+    // ========================================================
+    // 通知削除
+    // ========================================================
+
+    // マニュアル承認時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
+    public void deletePendingApprovalNotificationsByManualId(
+            Long manualId) {
+        log.info("start");
+        notificationRepository.deleteByManualIdAndType(
+                manualId, NotificationType.PENDING_APPROVAL);
     }
-    if (!isActiveUser(principal)) {
-        throw new UnauthorizedException("有効なユーザーではありません。");
+
+    // 差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
+    public void deleteRollbackNotification(Long manualId, User user) {
+        log.info("start");
+        // 通知のあるユーザーがPENDINGしたときに実行
+        notificationRepository.deleteByManualIdAndType(
+                manualId, NotificationType.ROLLBACK);
     }
+
+    public void deleteAsRead(Long notificationId, User user) {
+        log.info("start");
+        // 指定通知を既読にする。既読ボタンに対応。
+        // 有効ユーザー 画面更新要
+    }
+
+    public void deleteAllAsRead(User user) {
+        log.info("start");
+        // まとめて既読にする。全既読ボタン用。
+        // 有効ユーザー
+    }
+
+    public void clearPendingNotifications(Long manualId) {
+        log.info("start");
+    }
+
+    // ========================================================
+    // 通知数取得
+    // ========================================================
+    public void getUnreadCount(User user) {
+        log.info("start");
+        // 未読件数を返す。バッヂ表示に使う。
+        // 有効ユーザー 件数を取得。取得方法検討
+    }
+
+    // ユーザー未読の差し戻し通知数を取得
+    public int unreadRollbackCount(Principal principal) {
+        log.info("start");
+        User targetUser = userService.getUserByPrincipal(principal);
+        Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.ROLLBACK);
+        int notificationCount = Math.toIntExact(count);
+        return notificationCount;
+    }
+
+    // ユーザー未読の承認待ち通知数を取得
+    public int unreadPendingCount(Principal principal) {
+        log.info("start");
+        User targetUser = userService.getUserByPrincipal(principal);
+        Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.PENDING_APPROVAL);
+        int notificationCount = Math.toIntExact(count);
+        return notificationCount;
+    }
+
+    // ========================================================
+    // 権限判定
+    // ========================================================
+    private boolean isActiveUser(Principal principal) {
+        log.info("start");
+        User user = userService.getUserByPrincipal(principal);
+        if (!user.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
         return true;
-}
+    }
+
+    private boolean canCreateSubmitNotifications(Principal principal) {
+        log.info("start");
+        User user = userService.getUserByPrincipal(principal);
+        if (user.getRole() != UserRole.APPROVER &&
+                user.getRole() != UserRole.ADMIN) {
+            throw new InvalidStateException("権限が不足しています。");
+        }
+        if (!isActiveUser(principal)) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        return true;
+    }
 }

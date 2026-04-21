@@ -38,9 +38,7 @@ public class User {
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
-
-
-  //getter
+  // getter
   public Long getId() {
     return this.id;
   }
@@ -78,8 +76,7 @@ public class User {
     return this.updatedAt;
   }
 
-
-  //setter
+  // setter
   public void setPassword(String password) {
     this.password = password;
   }
@@ -89,15 +86,15 @@ public class User {
     this.displayName = displayName;
   }
 
-  private void setLoginId(String loginId){
+  private void setLoginId(String loginId) {
     this.loginId = loginId;
   }
 
-  private void setUserRole(UserRole role){
-    this.role =role;
+  private void setUserRole(UserRole role) {
+    this.role = role;
   }
 
-  //メソッド
+  // メソッド
 
   public void activate() {
     this.isActive = true;
@@ -106,17 +103,20 @@ public class User {
   public void deactivate() {
     this.isActive = false;
   }
+
   public void markLastLoginNow() {
     this.lastLoginAt = LocalDateTime.now();
   }
+
   public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
   }
+
   public void markUpdatedNow() {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public static User createNew(String loginId,String displayName,UserRole role){
+  public static User createNew(String loginId, String displayName, UserRole role) {
     User user = new User();
     user.setLoginId(loginId);
     user.setDisplayName(displayName);
@@ -127,7 +127,7 @@ public class User {
     return user;
   }
 
-    public static UserRole applyRole(UserRole role){
+  public static UserRole applyRole(UserRole role) {
     User targetUser = new User();
     targetUser.setUserRole(role);
     return targetUser.getRole();
