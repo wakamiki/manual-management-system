@@ -3,8 +3,6 @@ package com.example.manual.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.manual.enums.UserRole;
-
 public class MyPageDto {
   public MyPageDto() {
 
@@ -16,7 +14,7 @@ public class MyPageDto {
   private int rollbackCount = 0;
   private int pendingUnCreatedCount = 0;
   private String userRoleLabel;
-  private UserRole role;
+  private UserResponseDto userDto;
 
   // getter
   public List<ManualResponseDto> getRollbackManualList() {
@@ -43,8 +41,8 @@ public class MyPageDto {
     return userRoleLabel;
   }
 
-  public UserRole getRole() {
-    return role;
+  public UserResponseDto getUserDto() {
+    return userDto;
   }
 
   // setter
@@ -72,7 +70,8 @@ public class MyPageDto {
     this.userRoleLabel = userRoleLabel;
   }
 
-  public void setRole(UserRole role) {
-    this.role = role;
+  public void setUserDto(UserResponseDto userDto) {
+    this.userDto = userDto;
   }
+
 }

@@ -30,7 +30,6 @@ public class Category {
   @Column(nullable = false)
   private LocalDateTime updatedAt;
 
-
   public Long getId() {
     return this.id;
   }
@@ -68,7 +67,6 @@ public class Category {
   public void markCreatedNow() {
     this.createdAt = LocalDateTime.now();
   }
-
 
   public void markUpdatedNow() {
     this.updatedAt = LocalDateTime.now();

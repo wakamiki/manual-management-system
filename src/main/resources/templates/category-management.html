@@ -30,9 +30,16 @@
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="card-header">カテゴリ登録/更新</div>
+        <div class="card-header" th:if="${'CREATE'.equals(formDto.mode.name())}">カテゴリー新規作成モード</div>
+        <div class="card-header" th:if="${'EDIT'.equals(formDto.mode.name())}">カテゴリー更新モード</div>
         <div class="card-body">
-          <form>
+          <form th:field="${formDto}" th:action="@{/categories/create}" method="post"
+            th:onsubmit="${duplicate} ? 'return confirm(&quot;同名のカテゴリがあります。このまま更新しますか？&quot;);' : 'return true;'">
+
+            <div class="mb-2">
+              <label for="categoryId" class="form-label">categoryId</label>
+              <input id="categoryId" type="text" class="form-control" name="categoryId">
+            </div>
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
               <input id="categoryName" type="text" class="form-control" value="営業部">
@@ -42,10 +49,10 @@
               <input id="displayOrder" type="number" class="form-control" value="1" min="1" placeholder="指定の番号に割り込み">
             </div>
             <div class="admin-form-actions">
-              <button type="button" class="btn btn-primary">新規登録</button>
-              <button type="button" class="btn btn-outline-primary">更新</button>
-              <button type="button" class="btn btn-outline-danger">使用停止</button>
-              <button type="button" class="btn btn-outline-secondary">復帰</button>
+              <button type="submit" class="btn btn-primary">新規登録</button>
+              <button type="submit" class="btn btn-outline-primary">更新</button>
+              <button type="submit" class="btn btn-outline-danger">使用停止</button>
+              <button type="submit" class="btn btn-outline-secondary">復帰</button>
             </div>
           </form>
         </div>

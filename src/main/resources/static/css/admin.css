@@ -9,7 +9,7 @@
 
 .admin-layout {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(150px, 300px) minmax(0, 1fr);
   gap: 24px;
 }
 

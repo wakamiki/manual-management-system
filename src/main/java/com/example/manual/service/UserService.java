@@ -2,23 +2,26 @@ package com.example.manual.service;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import com.example.manual.dto.UserDetailDto;
+import com.example.manual.dto.UserFormDto;
+import com.example.manual.dto.UserRequestDto;
+import com.example.manual.dto.UserResponseDto;
+import com.example.manual.entity.User;
+import com.example.manual.enums.UserRole;
+import com.example.manual.enums.ViewMode;
+import com.example.manual.exception.InvalidStateException;
+import com.example.manual.exception.UnauthorizedException;
+import com.example.manual.repository.UserRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.example.manual.dto.UserDetailDto;
-import com.example.manual.dto.UserRequestDto;
-import com.example.manual.dto.UserResponseDto;
-import com.example.manual.entity.User;
-import com.example.manual.enums.UserRole;
-import com.example.manual.exception.InvalidStateException;
-import com.example.manual.exception.UnauthorizedException;
-import com.example.manual.repository.UserRepository;
 
 import jakarta.validation.Valid;
 
@@ -34,15 +37,13 @@ public class UserService {
     }
 
     // user-management表示
-    public List<UserDetailDto> showUserManagementPege(
-            Principal principal) {
+    public UserFormDto showUserManagementPege(
+            User playUser) {
         log.info("start");
-                User targetUser = getUserByPrincipal(principal);
-        if (!canShowUserManagementPege(targetUser)) {
+        if (!canShowUserManagementPege(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        List<User> userList =
-                userRepository.findAllByOrderByUpdatedAtDesc();
+        List<User> userList = userRepository.findAllByOrderByUpdatedAtDesc();
         List<UserDetailDto> userResponseDto = new ArrayList<>();
         for (User user : userList) {
             UserDetailDto responseDto = new UserDetailDto();
@@ -51,16 +52,24 @@ public class UserService {
             responseDto.setRole(user.getRole());
             responseDto.setActive(user.isActive());
             responseDto.setLastLoginAt(user.getLastLoginAt());
+            responseDto.setActiveLabel(getActivateLabel(user.isActive()));
             userResponseDto.add(responseDto);
         }
-        return userResponseDto;
+        UserFormDto formDto = new UserFormDto();
+        formDto.setAllUserDto(userResponseDto);
+        formDto.setPlayUser(toCreatedUserDto(playUser));
+        List<UserRole> roleList = Arrays.asList(UserRole.values());
+        formDto.setAllRole(roleList);
+        formDto.setUserCount(getAllUserCount());
+        formDto.setMode(ViewMode.CREATE);
+        return formDto;
     }
 
     public UserDetailDto createUser(
             UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
-                if (!canCreateUser(requestDto, principal)) {
+        if (!canCreateUser(requestDto, principal)) {
             throw new InvalidStateException("判定エラー");
         }
         User targetUser = new User();
@@ -212,6 +221,20 @@ public class UserService {
         return users;
     }
 
+    private Long getAllUserCount() {
+        Long count = userRepository.count();
+        return count;
+    }
+
+    private String getActivateLabel(boolean isActive) {
+        if (isActive) {
+            String label = "使用中";
+            return label;
+        } else {
+            String label = "停止中";
+            return label;
+        }
+    }
 
     // =========================================
     // Dto詰替
@@ -227,7 +250,8 @@ public class UserService {
                     targetUser.getLoginId());
             userDto.setDisplayName(
                     targetUser.getDisplayName() != null
-                    ?targetUser.getDisplayName():"");
+                            ? targetUser.getDisplayName()
+                            : "");
             userDto.setRole(
                     targetUser.getRole());
             userDto.setLastLoginAt(targetUser.getLastLoginAt());
@@ -244,19 +268,22 @@ public class UserService {
         UserResponseDto userDto = new UserResponseDto();
         userDto.setDisplayName(
                 targetUser.getDisplayName() != null
-                ? targetUser.getDisplayName():"");
+                        ? targetUser.getDisplayName()
+                        : "");
         userDto.setId(targetUser.getId());
         userDto.setUserRole(targetUser.getRole());
         return userDto;
     }
 
-    //検索一覧画面表示用にDto変換
+    // 検索一覧画面表示用にDto変換
     public UserResponseDto toCreatedUserDto(User targetUser) {
         UserResponseDto userDto = new UserResponseDto();
         userDto.setDisplayName(
                 targetUser.getDisplayName() != null
-                ? targetUser.getDisplayName():"");
+                        ? targetUser.getDisplayName()
+                        : "");
         userDto.setId(targetUser.getId());
+        userDto.setUserRole(targetUser.getRole());
         return userDto;
     }
     // =========================================
@@ -310,7 +337,7 @@ public class UserService {
             UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
-                User playUser = getUserByPrincipal(principal);
+        User playUser = getUserByPrincipal(principal);
         if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -348,7 +375,7 @@ public class UserService {
             User user,
             Principal principal) {
         log.info("start");
-                User playUser = getUserByPrincipal(principal);
+        User playUser = getUserByPrincipal(principal);
         if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -358,7 +385,7 @@ public class UserService {
     private boolean canGetUserManagementViewDeta(
             Principal principal) {
         log.info("start");
-                User targetUser = getUserByPrincipal(principal);
+        User targetUser = getUserByPrincipal(principal);
         if (!targetUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }

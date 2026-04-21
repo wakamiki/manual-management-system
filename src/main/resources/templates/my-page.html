@@ -15,11 +15,11 @@
     <header class="page-title-bar">
       <div>
         <h1 class="h4 mb-1">マイページ</h1>
-        <p class="mb-0 text-muted">通知と自分が関わるマニュアルをまとめて確認します。</p>
+        <p class="mb-0 text-muted">通知と自分が関わるマニュアルをまとめて確認出来ます。</p>
       </div>
       <div class="mypage-user-summary">
-        <span class="badge bg-primary">APPROVER</span>
-        <span class="mypage-user-name">山田 花子</span>
+        <span class="badge bg-primary" th:text="${myPageDto.userDto.userRole}">APPROVER</span>
+        <span class="mypage-user-name" th:text="${myPageDto.userDto.displayName}">山田 花子</span>
       </div>
     </header>
 
@@ -34,32 +34,55 @@
     <section class="notification-overview card mb-4">
       <div class="card-body">
         <div class="overview-header">
-          <div>
+          <div class=" overview-summary">
             <h2 class="h5 mb-1">通知サマリー</h2>
             <p class="text-muted mb-0">ホームアイコン横に表示される通知バッヂの確認用です。</p>
           </div>
+
+        <div class="overview-icon">
+          <div class="home-icon-preview">
+            <a target="_blank"
+          rel="noopener noreferrer"
+           type="button" class="home-icon-button"
+           aria-label="ユーザー"
+            th:if="${myPageDto.userDto.userRole.name()=='ADMIN'}"
+            th:href="@{/users}">
+              <i class="bi bi-person-fill-gear home-icon-shape" aria-hidden="true"></i>
+          </a>
+          </div>
+
+          <div class="home-icon-preview">
+            <a target="_blank"
+          rel="noopener noreferrer"
+          type="button"
+          class="home-icon-button"
+          aria-label="カテゴリー"
+            th:if="${myPageDto.userDto.userRole.name()=='ADMIN'}"
+            th:href="@{/categories}">
+              <i class="bi bi-diagram-3-fill home-icon-shape" aria-hidden="true"></i>
+          </a>
+          </div>
+
           <div class="home-icon-preview">
             <button type="button" class="home-icon-button" aria-label="ホーム">
               <i class="bi bi-house-fill home-icon-shape" aria-hidden="true"></i>
             </button>
-            <span class="home-badge home-badge-rollback">2</span>
-            <span class="home-badge home-badge-pending">4</span>
+            <span class="home-badge home-badge-rollback" th:text="${myPageDto.rollbackCount}">2</span>
+            <span class="home-badge home-badge-pending" th:text="${myPageDto.pendingUnCreatedCount}">4</span>
+          </div>
           </div>
         </div>
-
         <div class="row g-3 mt-2">
           <div class="col-md-6">
             <div class="overview-tile overview-tile-rollback">
               <div class="overview-label">差し戻し通知</div>
-              <div class="overview-count">2件</div>
-              <div class="overview-note">上段バッヂ / オレンジ表示</div>
+              <div class="overview-count" th:text="|${myPageDto.rollbackCount}件|">2件</div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="overview-tile overview-tile-pending">
               <div class="overview-label">未承認通知</div>
-              <div class="overview-count">4件</div>
-              <div class="overview-note">下段バッヂ / 緑表示</div>
+              <div class="overview-count" th:text="|${myPageDto.pendingUnCreatedCount}件|">4件</div>
             </div>
           </div>
         </div>
@@ -79,7 +102,9 @@
               data-bs-target="#created-manuals-pane" type="button" role="tab" aria-controls="created-manuals-pane"
               aria-selected="false" tabindex="-1">作成マニュアル</button>
           </li>
-          <li class="nav-item" role="presentation">
+          <li class="nav-item" role="presentation"
+          th:if="${'APPROVER'.equals(myPageDto.userDto.userRole.name())
+           or 'ADMIN'.equals(myPageDto.userDto.userRole.name())}">
             <button class="nav-link" id="pending-manuals-tab" data-bs-toggle="tab"
               data-bs-target="#pending-manuals-pane" type="button" role="tab" aria-controls="pending-manuals-pane"
               aria-selected="false" tabindex="-1">未承認マニュアル</button>
@@ -97,14 +122,16 @@
             </div>
 
             <div class="notification-list">
-              <article class="notification-card notification-card-rollback">
+              <article class="notification-card notification-card-rollback"
+              th:if="${!#lists.isEmpty(myPageDto.rollbackManualList)}"
+              th:each="manual:${myPageDto.rollbackManualList}">
                 <div class="notification-accent"></div>
                 <div class="notification-content">
                   <div class="notification-meta">
                     <span class="notification-chip notification-chip-rollback">差し戻し</span>
-                    <small class="text-muted">2026-04-08 09:30</small>
+                    <small class="text-muted" th:text="${#temporals.format(manual.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-04-08 09:30</small>
                   </div>
-                  <p class="text-muted mb-2">マニュアルID: 1001</p>
+                  <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</p>
                   <h3 class="notification-title">配送手順の流れが差し戻されました</h3>
                   <p class="notification-text mb-3">変更理由を見直して、再申請してください。</p>
                   <div class="notification-actions">
@@ -116,14 +143,16 @@
                 </div>
               </article>
 
-              <article class="notification-card notification-card-pending">
+              <article class="notification-card notification-card-pending"
+              th:if="${!#lists.isEmpty(myPageDto.pendingManualList)}"
+              th:each="manual:${myPageDto.pendingManualList}">
                 <div class="notification-accent"></div>
                 <div class="notification-content">
                   <div class="notification-meta">
                     <span class="notification-chip notification-chip-pending">未承認</span>
-                    <small class="text-muted">2026-04-08 08:45</small>
+                    <small class="text-muted" th:text="${#temporals.format(manual.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-04-08 08:45</small>
                   </div>
-                  <p class="text-muted mb-2">マニュアルID: 1002</p>
+                  <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1002</p>
                   <h3 class="notification-title">発注処理フローの承認待ちがあります</h3>
                   <p class="notification-text mb-3">承認者として内容を確認し、承認または差し戻しを行ってください。</p>
                   <div class="notification-actions">
@@ -132,6 +161,9 @@
                     <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
                   </div>
                 </div>
+              </article>
+              <article class="notification-empty" th:if="${#lists.isEmpty(myPageDto.rollbackManualList)
+                and #lists.isEmpty(myPageDto.pendingManualList)}">通知はありません。
               </article>
             </div>
           </div>
@@ -145,47 +177,29 @@
               </div>
             </div>
 
-            <div class="dashboard-list">
+            <div class="dashboard-list" th:each="manual:${myPageDto.createdManualList}">
               <article class="dashboard-card">
                 <div class="dashboard-card-main">
                   <div>
                     <div class="dashboard-meta">
-                      <span class="badge bg-success">承認済</span>
-                      <small class="text-muted">マニュアルID: 1001</small>
-                      <small class="text-muted">更新日: 2026-04-05</small>
+                      <span class="badge bg-success" th:text="${manual.statusLabel}">承認済</span>
+                      <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</small>
+                      <small class="text-muted" th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-05</small>
                     </div>
-                    <h3 class="dashboard-title">配送手順の流れ</h3>
-                    <p class="dashboard-text mb-0">配送依頼から完了報告までの業務手順をまとめたマニュアルです。</p>
+                    <h3 class="dashboard-title" th:text="${manual.title}">配送手順の流れ</h3>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-secondary btn-sm">編集する</a>
+                    <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細</a>
+                    <a th:href="@{/manuals/{manualId}/actions/edit(manualId=${manual.manualId})}" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-secondary btn-sm">編集</a>
                   </div>
                 </div>
               </article>
 
-              <article class="dashboard-card">
-                <div class="dashboard-card-main">
-                  <div>
-                    <div class="dashboard-meta">
-                      <span class="badge bg-primary">申請中</span>
-                      <small class="text-muted">マニュアルID: 1002</small>
-                      <small class="text-muted">更新日: 2026-04-08</small>
-                    </div>
-                    <h3 class="dashboard-title">発注処理フロー</h3>
-                    <p class="dashboard-text mb-0">発注依頼の確認事項と承認フローを整理したマニュアルです。</p>
-                  </div>
-                  <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <a href="./manual-form.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-secondary btn-sm">編集する</a>
-                  </div>
-                </div>
-              </article>
             </div>
+                    <article class="notification-empty" th:if="${#lists.isEmpty(myPageDto.createdManualList)}">作成マニュアルはありません。
+                    </article>
           </div>
 
           <div class="tab-pane fade tab-pane-body" id="pending-manuals-pane" role="tabpanel"
@@ -197,47 +211,28 @@
               </div>
             </div>
 
-            <div class="dashboard-list">
+            <div class="dashboard-list" th:each="manual:${myPageDto.pendingManualList}">
               <article class="dashboard-card dashboard-card-pending">
                 <div class="dashboard-card-main">
                   <div>
                     <div class="dashboard-meta">
-                      <span class="badge bg-primary">申請中</span>
-                      <small class="text-muted">マニュアルID: 1003</small>
-                      <small class="text-muted">申請者: 佐藤 次郎</small>
-                      <small class="text-muted">更新日: 2026-04-08</small>
+                      <span class="badge bg-primary" th:text="${manual.statusLabel}">申請中</span>
+                      <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1003</small>
+                      <small class="text-muted" th:text="|申請者: ${manual.createdUserDto.displayName}|">申請者: 佐藤 次郎</small>
+                      <small class="text-muted" th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-08</small>
                     </div>
-                    <h3 class="dashboard-title">見積作成ルール</h3>
-                    <p class="dashboard-text mb-0">見積作成時の確認ポイントと提出ルールを整理したマニュアルです。</p>
+                    <h3 class="dashboard-title"  th:text="${manual.title}">見積作成ルール</h3>
                   </div>
                   <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
+                    <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank" rel="noopener noreferrer"
+                      class="btn btn-outline-primary btn-sm">詳細</a>
                   </div>
                 </div>
               </article>
 
-              <article class="dashboard-card dashboard-card-pending">
-                <div class="dashboard-card-main">
-                  <div>
-                    <div class="dashboard-meta">
-                      <span class="badge bg-primary">申請中</span>
-                      <small class="text-muted">マニュアルID: 1004</small>
-                      <small class="text-muted">申請者: 鈴木 一郎</small>
-                      <small class="text-muted">更新日: 2026-04-07</small>
-                    </div>
-                    <h3 class="dashboard-title">月次締め処理</h3>
-                    <p class="dashboard-text mb-0">月末締めから承認依頼までの処理フローをまとめたマニュアルです。</p>
-                  </div>
-                  <div class="dashboard-actions">
-                    <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
-                      class="btn btn-outline-primary btn-sm">詳細を見る</a>
-                    <button type="button" class="btn btn-outline-success btn-sm">承認する</button>
-                  </div>
-                </div>
-              </article>
             </div>
+                      <article class="notification-empty" th:if="${#lists.isEmpty(myPageDto.pendingManualList)}">未承認マニュアルはありません。
+                      </article>
           </div>
         </div>
       </div>

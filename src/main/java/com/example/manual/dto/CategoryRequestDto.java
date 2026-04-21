@@ -10,37 +10,46 @@ public class CategoryRequestDto {
 
   }
 
-@NotBlank
-@Size(max=50)
-private String categoryName;
-@NotNull
-private Integer displayOrder;
-@NotNull
-private Long id;
+  @NotBlank
+  @Size(max = 50)
+  private String categoryName;
+  @NotNull
+  private Integer displayOrder;
+  private Long id;
+  private boolean confirmed;
 
-//getter
-public Long getId(){
-  return  this.id;
-}
+  // getter
 
-public String getCategoryName() {
-return this.categoryName;
-}
+  public Long getId() {
+    return this.id;
+  }
 
-public Integer getDisplayOrder() {
-  return this.displayOrder;
-}
+  public String getCategoryName() {
+    return this.categoryName;
+  }
 
-// setter
-public void setCategoryName(String categoryName) {
-  this.categoryName = categoryName;
-}
+  public Integer getDisplayOrder() {
+    return this.displayOrder;
+  }
 
-public void setDisplayOrder(Integer displayOrder) {
-  this.displayOrder = displayOrder;
-}
+  public boolean isConfirmed() {
+    return confirmed;
+  }
 
-public void setId(Long id){
-  this.id=id;
-}
+  // setter
+  public void setCategoryName(String categoryName) {
+    this.categoryName = categoryName;
+  }
+
+  public void setDisplayOrder(Integer displayOrder) {
+    this.displayOrder = displayOrder;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setConfirmed(boolean confirmed) {
+    this.confirmed = confirmed;
+  }
 }

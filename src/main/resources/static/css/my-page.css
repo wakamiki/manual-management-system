@@ -23,11 +23,23 @@
 
 .overview-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.overview-icon {
+  display: flex;
+  margin-left: auto;
   flex-wrap: wrap;
   gap: 14px;
 }
+
+.overview-summary {
+    display: flex;
+  flex-wrap: wrap;
+  gap: 0px;
+      flex-direction: column;
+}
+
 
 .home-icon-preview {
   position: relative;
@@ -88,6 +100,10 @@
   border: 1px solid #c6dadd;
   border-radius: 14px;
   background-color: var(--color-bg-surface);
+    display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 }
 
 .overview-tile-rollback {
@@ -104,13 +120,14 @@
   margin-bottom: 4px;
   color: #5c7276;
   font-size: 12px;
+
 }
 
 .overview-count {
   color: #23464c;
   font-size: 16px;
-  font-weight: 700;
   line-height: 1;
+
 }
 
 .overview-note {
@@ -202,6 +219,15 @@
   padding: 14px 18px;
 }
 
+.notification-empty {
+  min-height: 31vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a8f94;
+  font-size: 1rem;
+}
+
 .notification-meta,
 .dashboard-meta,
 .notification-actions,
@@ -263,6 +289,7 @@
   border: 1px solid #d4e1e3;
   border-radius: 14px;
   background-color: var(--color-bg-surface);
+  margin-bottom: 10px;
 }
 
 .dashboard-card-pending {

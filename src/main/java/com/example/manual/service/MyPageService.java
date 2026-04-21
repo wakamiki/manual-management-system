@@ -3,10 +3,6 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.Manual;
@@ -14,6 +10,10 @@ import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MyPageService {
@@ -40,16 +40,17 @@ public class MyPageService {
   // myPage表示
   public MyPageDto showMyPage(Principal principal) {
     log.info("start");
-    User user = userService.getUserByPrincipal(principal);
-    if (!canShowMyPage(user)) {
+    User playUser = userService.getUserByPrincipal(principal);
+    if (!canShowMyPage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
     MyPageDto pageDto = new MyPageDto();
     pageDto.setCreatedManualList(getUserCreatedManual(principal));
-    pageDto.setPendingManualList(getPendingManual(user));
-    pageDto.setRollbackManualList(getRollbackManual(user));
+    pageDto.setPendingManualList(getPendingManual(playUser));
+    pageDto.setRollbackManualList(getRollbackManual(playUser));
     pageDto.setRollbackCount(query.countMyRollbackManual(principal));
     pageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
+    pageDto.setUserDto(userService.toCreatedUserDto(playUser));
 
     return pageDto;
   }

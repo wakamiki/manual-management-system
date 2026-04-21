@@ -13,8 +13,9 @@ private String displayName;
 private UserRole role;
 private boolean isActive;
 private LocalDateTime LastLoginAt;
+private String activeLabel;
 
-  //getter
+//getter
 public  String getLoginId() {
 return this.loginId;
 }
@@ -36,6 +37,10 @@ public LocalDateTime getLastLoginAt() {
   return this.LastLoginAt;
 }
 
+public String getActiveLabel() {
+  return activeLabel;
+}
+
 // setter
 public void setLoginId(String loginId) {
   this.loginId = loginId;
@@ -54,7 +59,11 @@ public void setActive(boolean isActive){
   this.isActive = isActive;
 }
 
-public void setLastLoginAt(LocalDateTime lastLoginAt){
+public void setLastLoginAt(LocalDateTime lastLoginAt) {
   this.LastLoginAt = lastLoginAt;
+}
+
+public void setActiveLabel(String statusLabel) {
+  this.activeLabel = statusLabel;
 }
 }

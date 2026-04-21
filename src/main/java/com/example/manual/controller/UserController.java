@@ -1,7 +1,10 @@
 package com.example.manual.controller;
 
 import java.security.Principal;
-import java.util.List;
+
+import com.example.manual.dto.UserFormDto;
+import com.example.manual.entity.User;
+import com.example.manual.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.example.manual.dto.UserDetailDto;
-import com.example.manual.service.UserService;
 
 @Controller
 @RequestMapping("/users")
@@ -34,34 +34,19 @@ public class UserController {
 // 取得系
 // =============================================
 
-    // user-management表示
+// user-management表示
+    @GetMapping
     public String showUserManagementPege(
         Principal principal, Model model) {
-      log.info("showUserManagementPege start");
-      List<UserDetailDto> userResponseDto =
-        userService.showUserManagementPege(principal);
-
-      model.addAttribute("manualListDto", userResponseDto);
+      log.info("start");
+      User playUser = userService.getUserByPrincipal(principal);
+      UserFormDto formDto =
+          userService.showUserManagementPege(playUser);
+      model.addAttribute("formDto", formDto);
       return "user-management";
     }
 
-  @GetMapping
-  public String getAllUsers(RedirectAttributes message) {
-    log.info("start");
-  try {
-    //ページ切り替え有
-    //ユーザーID　displayネーム　ロール　isActive
-  message.addFlashAttribute("message", "ユーザーを取得しました。");
-    message.addFlashAttribute("messageType", "success");
-    return "redirect:/users";
-  } catch (Exception e) {
-    message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-    message.addFlashAttribute("messageType", "error");
-    return "redirect:/users";
-  }
-  }
-
-  @GetMapping("/{userId}")
+  @GetMapping("/action/{userId}")
   public String getUserById(
     Principal principal,
     RedirectAttributes message) {
@@ -78,7 +63,7 @@ public class UserController {
   }
   }
 
-  @PostMapping
+  @PostMapping("/create")
   public String createUser(RedirectAttributes message) {
     log.info("start");
       try {
@@ -94,7 +79,7 @@ public class UserController {
   }
   }
 
-  @PutMapping("/{userId}")
+  @PutMapping("/update")
   public String updateUser(RedirectAttributes message) {
     log.info("start");
       try {
@@ -180,5 +165,5 @@ public class UserController {
     return "redirect:/users";
   }
   }
-  
+
 }
