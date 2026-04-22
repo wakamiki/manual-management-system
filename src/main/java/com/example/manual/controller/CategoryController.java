@@ -31,15 +31,44 @@ public class CategoryController {
     this.categoryService = categoryService;
   }
 
+  // =============================================
+  // 画面表示
+  // =============================================
+
   // category-management表示
   @GetMapping
   public String showCategoryManagement(
       Principal principal, Model model) {
     log.info("start");
-    CategoryFormDto categoryDto = categoryService.showCategoryManagement(principal);
-    model.addAttribute("categoryDto", categoryDto);
+    CategoryFormDto formDto = categoryService.showCategoryManagement(principal);
+    model.addAttribute("formDto", formDto);
     return "category-management";
   }
+
+  // 変更モード表示
+  @GetMapping("/{categoryId}/action")
+  public String showCategoryUpdateMode(
+      Principal principal,
+      @PathVariable Long categoryId,
+      RedirectAttributes message,
+      Model model) {
+    log.info("start");
+    try {
+      CategoryFormDto formDto = categoryService.showCategoryUpdateMode(principal, categoryId);
+      model.addAttribute("formDto", formDto);
+      message.addFlashAttribute("message", "カテゴリーを取得しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "category-management";
+    } catch (Exception e) {
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "category-management";
+    }
+  }
+
+  // =============================================
+  // DB処理
+  // =============================================
 
   @PostMapping("/create")
   public String createCategory(
@@ -71,7 +100,7 @@ public class CategoryController {
     }
   }
 
-  @PostMapping("/update")
+  @PostMapping("/{categoryId}/update")
   public String updateCategory(
       @Valid @ModelAttribute CategoryRequestDto requestDto,
       Principal principal,

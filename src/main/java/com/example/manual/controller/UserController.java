@@ -47,14 +47,14 @@ public class UserController {
 
   // 更新モード表示
   @GetMapping("/{userId}/action")
-  public String showUpdateMode(
+  public String showUserUpdateMode(
       Principal principal,
       @PathVariable Long userId,
       RedirectAttributes message,
       Model model) {
     log.info("start");
     try {
-      UserFormDto formDto = userService.showUpdateMode(principal, userId);
+      UserFormDto formDto = userService.showUserUpdateMode(principal, userId);
       model.addAttribute("formDto", formDto);
       message.addFlashAttribute("message", "ユーザーを取得しました。");
       message.addFlashAttribute("messageType", "success");

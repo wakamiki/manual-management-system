@@ -70,7 +70,7 @@ public class UserService {
         return formDto;
     }
 
-    public UserFormDto showUpdateMode(
+    public UserFormDto showUserUpdateMode(
             Principal principal, Long userId) {
         User playUser = getUserByPrincipal(principal);
         User targetUser = getUserById(userId);

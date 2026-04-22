@@ -39,6 +39,10 @@ public class CategoryService {
     this.userService = userService;
   }
 
+  // =============================================
+  // 画面表示
+  // =============================================
+
   // category-management表示
   public CategoryFormDto showCategoryManagement(
       Principal principal) {
@@ -51,6 +55,27 @@ public class CategoryService {
     CategoryFormDto categoryDto = toCategoryFormDto(playUser, categories);
 
     return categoryDto;
+  }
+
+  public CategoryFormDto showCategoryUpdateMode(
+      Principal principal, Long categoryId) {
+    User playUser = userService.getUserByPrincipal(principal);
+    if (!canShowCategoryUpdateMode(playUser)) {
+      throw new InvalidStateException("判定エラー");
+    }
+    Category category = getCategoryById(categoryId);
+    CategoryDetailDto detailDto = new CategoryDetailDto();
+    detailDto.setId(categoryId);
+    detailDto.setCategoryName(category.getCategoryName());
+    detailDto.setDisplayOrder(category.getDisplayOrder());
+    detailDto.setActive(category.isActive());
+    detailDto.setActiveLabel(getActiveLabel(category.isActive()));
+    detailDto.setUpdatedAt(category.getUpdatedAt());
+    CategoryFormDto formDto = showCategoryManagement(principal);
+    formDto.setMode(ViewMode.EDIT);
+    formDto.setTargetCategory(detailDto);
+
+    return formDto;
   }
 
   // ============================================
@@ -260,6 +285,7 @@ public class CategoryService {
       responseDto.setDisplayOrder(category.getDisplayOrder());
       responseDto.setId(category.getId());
       responseDto.setUpdatedAt(category.getUpdatedAt());
+      responseDto.setActiveLabel(getActiveLabel(category.isActive()));
       responseDtos.add(responseDto);
     }
 
@@ -324,6 +350,17 @@ public class CategoryService {
     return true;
   }
 
+  private boolean canShowCategoryUpdateMode(User playUser) {
+    log.info("start");
+    if (playUser.getRole() != UserRole.ADMIN) {
+      throw new UnauthorizedException("権限が不足しています。");
+    }
+    if (playUser.isActive() != true) {
+      throw new UnauthorizedException("有効なユーザーではありません。");
+    }
+    return true;
+  }
+
   private boolean canCreateCategory(CategoryRequestDto requestDto, User playUser) {
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
@@ -369,6 +406,13 @@ public class CategoryService {
       throw new NotFoundException("カテゴリが見つかりません。");
     }
     return categoryOpt.get();
+  }
+
+  public String getActiveLabel(boolean isActive) {
+    if (isActive) {
+      return "使用中";
+    }
+    return "停止中";
   }
 
 }

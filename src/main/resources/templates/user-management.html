@@ -67,17 +67,20 @@
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
-                th:if="${'CREATE'.equals(formDto.mode.name())}" th:formaction="@{/users/create}">新規作成</button>
-              <button type="submit" class="btn btn-outline-primary" th:if="${'EDIT'.equals(formDto.mode.name())}"
-                th:formaction="@{/users/{userId}/update(userId=${user.id})}">更新</button>
-              <button type="submit" class="btn btn-outline-danger" th:if="${'EDIT'.equals(formDto.mode.name()) and
-              formDto.targetUser.isActive==true }"
-                th:formaction="@{/users/{userId}/deactivate(userId=${user.id})}">停止</button>
-              <button type="submit" class="btn btn-outline-secondary" th:if="${'EDIT'.equals(formDto.mode.name()) and
+                th:if="${formDto.targetUser != null or 'CREATE'.equals(formDto.mode.name())}"
+                th:formaction="@{/users/create}">新規作成</button>
+              <button type="submit" class="btn btn-outline-primary"
+                th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name())}"
+                th:formaction="@{/users/{userId}/update(userId=${formDto.targetUser.id})}">更新</button>
+              <button type="submit" class="btn btn-outline-danger" th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name()) and
+              formDto.targetUser.isActive==true}"
+                th:formaction="@{/users/{userId}/deactivate(userId=${formDto.targetUser.id})}">停止</button>
+              <button type="submit" class="btn btn-outline-secondary" th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name()) and
               formDto.targetUser.isActive==false}"
-                th:formaction="@{/users/{userId}/activate(userId=${user.id})}">復帰</button>
-              <button type="submit" class="btn btn-outline-warning" th:if="${'EDIT'.equals(formDto.mode.name())}"
-                th:formaction="@{/users/{userId}/reset-password(userId=${user.id})}">パスワードリセット</button>
+                th:formaction="@{/users/{userId}/activate(userId=${formDto.targetUser.id})}">復帰</button>
+              <button type="submit" class="btn btn-outline-warning"
+                th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name())}"
+                th:formaction="@{/users/{userId}/reset-password(userId=${formDto.targetUser.id})}">パスワードリセット</button>
             </div>
           </form>
         </div>
@@ -115,7 +118,7 @@
                   <td>
                     <div class="admin-inline-actions">
                       <a class="btn btn-outline-primary btn-sm"
-                        th:href="@{/users/{userId}action/(userId=${user.id})}">設定</a>
+                        th:href="@{/users/{userId}/action(userId=${user.id})}">設定</a>
                     </div>
                   </td>
                 </tr>

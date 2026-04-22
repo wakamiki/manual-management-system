@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www/thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>category-management</title>
+  <title>カテゴリー管理画面</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" th:href="@{/css/common.css}">
   <link rel="stylesheet" th:href="@{/css/admin.css}">
@@ -30,29 +30,53 @@
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="card-header" th:if="${'CREATE'.equals(formDto.mode.name())}">カテゴリー新規作成モード</div>
-        <div class="card-header" th:if="${'EDIT'.equals(formDto.mode.name())}">カテゴリー更新モード</div>
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(formDto.mode.name())}">
+          カテゴリー新規作成モード</div>
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(formDto.mode.name())}">
+          カテゴリー更新モード</div>
+
+        <div class="form-mode-info d-flex justify-content-end"
+          th:if="${formDto.mode != null and 'EDIT'.equals(formDto.mode.name())}">
+          <span class="admin-mode-select" th:text="|編集中:${formDto.targetCategory.categoryName}|">
+            編集中:
+          </span>
+          <a class="admin-mode-select" th:href="@{/categories}">
+            ×選択解除
+          </a>
+        </div>
+
         <div class="card-body">
-          <form th:field="${formDto}" th:action="@{/categories/create}" method="post"
+          <form th:object="${formDto}" th:action="@{/categories/create}" method="post"
             th:onsubmit="${duplicate} ? 'return confirm(&quot;同名のカテゴリがあります。このまま更新しますか？&quot;);' : 'return true;'">
 
-            <div class="mb-2">
+            <div class="mb-2" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}">
               <label for="categoryId" class="form-label">categoryId</label>
-              <input id="categoryId" type="text" class="form-control" name="categoryId">
+              <input id="categoryId" type="text" class="form-control"
+                th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}" th:value="*{targetCategory.id}"
+                readonly>
             </div>
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
-              <input id="categoryName" type="text" class="form-control" value="営業部">
+              <input id="categoryName" type="text" class="form-control" th:field="*{targetCategory.categoryName}">
             </div>
             <div class="mb-4">
               <label for="displayOrder" class="form-label">displayOrder</label>
-              <input id="displayOrder" type="number" class="form-control" value="1" min="1" placeholder="指定の番号に割り込み">
+              <input id="displayOrder" type="number" class="form-control" th:field="*{targetCategory.displayOrder}"
+                value="1" min="1" placeholder="指定の番号に割り込み">
             </div>
             <div class="admin-form-actions">
-              <button type="submit" class="btn btn-primary">新規登録</button>
-              <button type="submit" class="btn btn-outline-primary">更新</button>
-              <button type="submit" class="btn btn-outline-danger">使用停止</button>
-              <button type="submit" class="btn btn-outline-secondary">復帰</button>
+              <button type="submit" class="btn btn-primary admin-button-primry"
+                th:if="*{targetCategory != null or 'CREATE'.equals(mode.name())}"
+                th:formaction="@{/categories/create}">新規登録</button>
+              <button type="submit" class="btn btn-outline-primary"
+                th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}"
+                th:formaction="@{/categories/{categoryId}/update(categoryId=*{targetCategory.id})}">変更</button>
+              <button type="submit" class="btn btn-outline-danger" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name()) and
+              targetCategory.isActive==true}"
+                th:formaction="@{/categories/{categoryId}/deactivate(categoryId=*{targetCategory.id})}">使用停止</button>
+              <button type="submit" class="btn btn-outline-secondary" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name()) and
+              targetCategory.isActive==false}"
+                th:formaction="@{/categories/{categoryId}/activate(categoryId=*{targetCategory.id})}">復帰</button>
             </div>
           </form>
         </div>
@@ -61,11 +85,11 @@
       <div class="card admin-table-card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>カテゴリ一覧</span>
-          <span class="admin-note">表示順で並び替え</span>
+          <span class="admin-note">表示:ID順</span>
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle user-table">
               <thead>
                 <tr>
                   <th scope="col">categoryId</th>
@@ -75,51 +99,16 @@
                   <th scope="col">操作</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody th:each="category:${formDto.categoryListDto}">
                 <tr>
-                  <td>01</td>
-                  <td>営業部</td>
-                  <td>1</td>
-                  <td><span class="admin-status is-active">使用中</span></td>
+                  <td th:text="${category.id}">01</td>
+                  <td th:text="${category.categoryName}">営業部</td>
+                  <td th:text="${category.displayOrder}">1</td>
+                  <td><span class="admin-status is-active" th:text="${category.activeLabel}">使用中</span></td>
                   <td>
                     <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">使用停止</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>02</td>
-                  <td>経理部</td>
-                  <td>2</td>
-                  <td><span class="admin-status is-active">使用中</span></td>
-                  <td>
-                    <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">使用停止</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>03</td>
-                  <td>経理部</td>
-                  <td>3</td>
-                  <td><span class="admin-status is-active">使用中</span></td>
-                  <td>
-                    <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-primary btn-sm">更新</button>
-                      <button type="button" class="btn btn-outline-danger btn-sm">使用停止</button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>04</td>
-                  <td>旧営業部</td>
-                  <td>9</td>
-                  <td><span class="admin-status is-inactive">停止中</span></td>
-                  <td>
-                    <div class="admin-inline-actions">
-                      <button type="button" class="btn btn-outline-secondary btn-sm">復帰</button>
+                      <a class="btn btn-outline-primary btn-sm"
+                        th:href="@{/categories/{categoryId}/action(categoryId=${category.id})}">変更</a>
                     </div>
                   </td>
                 </tr>
