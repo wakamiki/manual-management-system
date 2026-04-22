@@ -34,35 +34,50 @@
           ユーザー新規作成モード</div>
         <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(formDto.mode.name())}">
           ユーザー更新モード</div>
+
+        <div class="form-mode-info d-flex justify-content-end"
+          th:if="${formDto.mode != null and 'EDIT'.equals(formDto.mode.name())}">
+          <span class="admin-mode-select" th:text="|編集中:${formDto.targetUser.loginId}|">
+            編集中:
+          </span>
+          <a class="admin-mode-select" th:href="@{/users}">
+            ×選択解除
+          </a>
+        </div>
+
         <div class="card-body">
-          <form>
+          <form th:object="${formDto}" th:action="@{/users/create}" method="post">
+            <div class="mb-3" th:if="*{'EDIT'.equals(mode.name())}">
+              <label for="id" class="form-label">id</label>
+              <input id="id" type="text" class="form-control" th:value="*{targetUser.id}" readonly>
+            </div>
             <div class="mb-3">
               <label for="userId" class="form-label">userId</label>
-              <input id="userId" type="text" class="form-control" th:if="${formDto.targetUser != null}"
-                th:text="${formDto.targetUser.loginId}">
+              <input id="userId" type="text" class="form-control" th:field="*{targetUser.loginId}">
             </div>
             <div class="mb-3">
               <label for="displayName" class="form-label">displayName</label>
-              <input id="displayName" type="text" class="form-control" th:if="${formDto.targetUser != null}"
-                th:text="${formDto.targetUser.displayName}">
+              <input id="displayName" type="text" class="form-control" th:field="*{targetUser.displayName}">
             </div>
             <div class="mb-4">
               <label for="role" class="form-label">role</label>
-              <select id="role" class="form-select">
-                <option th:each="role:${formDto.allRole}" th:text="${role}">USER</option>
+              <select id="role" class="form-select" th:field="*{targetUser.role}">
+                <option th:each="role:*{allRole}" th:text="${role}" th:value="${role}">USER</option>
               </select>
             </div>
             <div class="admin-form-actions">
-              <button type="button" class="btn btn-primary"
-                th:if="${'CREATE'.equals(formDto.mode.name())}">新規作成</button>
-              <button type="button" class="btn btn-outline-primary"
-                th:if="${'EDIT'.equals(formDto.mode.name())}">更新</button>
-              <button type="button" class="btn btn-outline-danger" th:if="${'EDIT'.equals(formDto.mode.name()) and
-              formDto.targetUser.isActive==true}">停止</button>
-              <button type="button" class="btn btn-outline-secondary" th:if="${'EDIT'.equals(formDto.mode.name()) and
-              formDto.targetUser.isActive==false}">復帰</button>
-              <button type="button" class="btn btn-outline-warning"
-                th:if="${'EDIT'.equals(formDto.mode.name())}">パスワードリセット</button>
+              <button type="submit" class="btn btn-primary admin-button-primry"
+                th:if="${'CREATE'.equals(formDto.mode.name())}" th:formaction="@{/users/create}">新規作成</button>
+              <button type="submit" class="btn btn-outline-primary" th:if="${'EDIT'.equals(formDto.mode.name())}"
+                th:formaction="@{/users/{userId}/update(userId=${user.id})}">更新</button>
+              <button type="submit" class="btn btn-outline-danger" th:if="${'EDIT'.equals(formDto.mode.name()) and
+              formDto.targetUser.isActive==true }"
+                th:formaction="@{/users/{userId}/deactivate(userId=${user.id})}">停止</button>
+              <button type="submit" class="btn btn-outline-secondary" th:if="${'EDIT'.equals(formDto.mode.name()) and
+              formDto.targetUser.isActive==false}"
+                th:formaction="@{/users/{userId}/activate(userId=${user.id})}">復帰</button>
+              <button type="submit" class="btn btn-outline-warning" th:if="${'EDIT'.equals(formDto.mode.name())}"
+                th:formaction="@{/users/{userId}/reset-password(userId=${user.id})}">パスワードリセット</button>
             </div>
           </form>
         </div>
@@ -75,15 +90,15 @@
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle user-table">
               <thead>
                 <tr>
-                  <th scope="col">userId</th>
-                  <th scope="col">displayName</th>
-                  <th scope="col">role</th>
-                  <th scope="col">status</th>
-                  <th scope="col">lastLoginAt</th>
-                  <th scope="col">操作</th>
+                  <th scope="col" class="user-table-head">userId</th>
+                  <th scope="col" class="user-table-head">displayName</th>
+                  <th scope="col" class="user-table-head">role</th>
+                  <th scope="col" class="user-table-head">status</th>
+                  <th scope="col" class="user-table-head">lastLoginAt</th>
+                  <th scope="col" class="user-table-head">操作</th>
                 </tr>
               </thead>
               <tbody th:each="user:${formDto.allUserDto}">
@@ -99,8 +114,8 @@
                   <td th:text="${#temporals.format(user.lastLoginAt, 'yyyy-MM-dd HH:mm')}">2026-04-05 09:15</td>
                   <td>
                     <div class="admin-inline-actions">
-                      <a type="button" class="btn btn-outline-primary btn-sm"
-                        th:href="@{/users/action/{userId}(userId=${user.id})}">設定</a>
+                      <a class="btn btn-outline-primary btn-sm"
+                        th:href="@{/users/{userId}action/(userId=${user.id})}">設定</a>
                     </div>
                   </td>
                 </tr>

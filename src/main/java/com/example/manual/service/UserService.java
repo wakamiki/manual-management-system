@@ -6,6 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.example.manual.dto.UserDetailDto;
 import com.example.manual.dto.UserFormDto;
 import com.example.manual.dto.UserRequestDto;
@@ -14,16 +20,9 @@ import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
 import com.example.manual.enums.ViewMode;
 import com.example.manual.exception.InvalidStateException;
+import com.example.manual.exception.NotFoundException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.UserRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import jakarta.validation.Valid;
 
 @Service
 public class UserService {
@@ -42,8 +41,9 @@ public class UserService {
 
     // user-management表示
     public UserFormDto showUserManagementPage(
-            User playUser) {
+            Principal principal) {
         log.info("start");
+        User playUser = getUserByPrincipal(principal);
         if (!canShowUserManagementPage(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -78,7 +78,7 @@ public class UserService {
             throw new InvalidStateException("判定エラー");
         }
         UserDetailDto detailDto = toCreatedUserDetailDto(targetUser);
-        UserFormDto formDto = showUserManagementPage(playUser);
+        UserFormDto formDto = showUserManagementPage(principal);
         formDto.setTargetUser(detailDto);
         formDto.setMode(ViewMode.EDIT);
 
@@ -91,119 +91,110 @@ public class UserService {
 
     public void updateLastLoginAt(String loginId) {
         User playUser = getUserByLoginId(loginId);
+        if (!canUpdateLastLoginAt(playUser)) {
+            throw new InvalidStateException("判定エラー");
+        }
         playUser.markLastLoginNow();
         userRepository.save(playUser);
     }
 
-    public UserDetailDto createUser(
+    // TODO: 監査ログ追加予定
+    public boolean createUser(
             UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
-        if (!canCreateUser(requestDto, principal)) {
+        User playUser = getUserByPrincipal(principal);
+        if (!canCreateUser(requestDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        User targetUser = new User();
-        targetUser.createNew(
+        // 重複チェック
+        if (isUserIdTaken(requestDto)) {
+            return true;
+        }
+        User targetUser = User.createNew(
                 requestDto.getLoginId(),
                 requestDto.getDisplayName(),
                 requestDto.getRole());
 
-        User savedUser = userRepository.save(targetUser);
-
-        UserDetailDto responseDto = new UserDetailDto();
-        responseDto.setId(savedUser.getId());
-        responseDto.setLoginId(savedUser.getLoginId());
-        responseDto.setDisplayName(savedUser.getDisplayName());
-        responseDto.setRole(savedUser.getRole());
-        responseDto.setActive(savedUser.isActive());
-        return responseDto;
+        userRepository.save(targetUser);
+        return false;
     }
 
-    public UserDetailDto updateUser(
-            @Valid UserRequestDto requestDto,
-            Principal principal) {
+    // TODO: 監査ログ追加予定
+    public boolean updateUser(
+            UserRequestDto requestDto,
+            Principal principal,
+            Long id) {
         log.info("start");
-        if (!canUpdateUser(requestDto, principal)) {
+        User playUser = getUserByPrincipal(principal);
+        if (!canUpdateUser(requestDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserRole role = requestDto.getRole();
-
-        User targetUser = new User();
-        targetUser.applyRole(role);
+        // ログインID重複チェック
+        if (isUserIdTaken(requestDto)) {
+            return true;
+        }
+        User targetUser = getUserById(id);
+        targetUser.changeLoginId(requestDto.getLoginId());
+        targetUser.changeRole(requestDto.getRole());
         targetUser.setDisplayName(requestDto.getDisplayName());
         targetUser.markUpdatedNow();
-        User savedUser = userRepository.save(targetUser);
-
-        UserDetailDto responseDto = new UserDetailDto();
-        responseDto.setId(savedUser.getId());
-        responseDto.setLoginId(savedUser.getLoginId());
-        responseDto.setDisplayName(savedUser.getDisplayName());
-        responseDto.setRole(savedUser.getRole());
-        responseDto.setActive(savedUser.isActive());
-        responseDto.setLastLoginAt(savedUser.getLastLoginAt());
-        return responseDto;
+        userRepository.save(targetUser);
+        return false;
     }
 
-    public UserDetailDto changeRole(
-            @Valid UserRequestDto requestDto,
-            Principal principal) {
+    // TODO: 監査ログ追加予定
+    public void deactivateUser(
+            Principal principal,
+            UserRequestDto requestDto,
+            Long id) {
         log.info("start");
-        if (!canChangeRole(requestDto, principal)) {
+        User targetUser = getUserById(id);
+        User playUser = getUserByPrincipal(principal);
+        if (!canDeactivateUser(targetUser, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserDetailDto responseDto = new UserDetailDto();
-        return responseDto;
+        targetUser.deactivate();
+        targetUser.markUpdatedNow();
+        userRepository.save(targetUser);
     }
 
-    public UserDetailDto deactivateUser(Principal principal) {
+    // TODO: 監査ログ追加予定
+    public void activateUser(
+            Principal principal,
+            Long id) {
         log.info("start");
-        if (!canDeactivateUser(principal)) {
+        User targetUser = getUserById(id);
+        User playUser = getUserByPrincipal(principal);
+        if (!canActivateUser(targetUser, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserDetailDto responseDto = new UserDetailDto();
-        return responseDto;
+        targetUser.activate();
+        targetUser.markUpdatedNow();
+        userRepository.save(targetUser);
     }
 
-    public UserDetailDto activateUser(Principal principal) {
+    // TODO: 監査ログ追加予定
+    public String resetPassword(
+            Principal principal,
+            Long id) {
         log.info("start");
-        if (!canActivateUser(principal)) {
+        User targetUser = getUserById(id);
+        User playUser = getUserByPrincipal(principal);
+        if (!canResetPassword(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserDetailDto responseDto = new UserDetailDto();
-        return responseDto;
-    }
-
-    public UserDetailDto resetPassword(Principal principal) {
-        log.info("start");
-        if (!canResetPassword(principal)) {
-            throw new InvalidStateException("判定エラー");
-        }
-        UserDetailDto responseDto = new UserDetailDto();
-        return responseDto;
-    }
-
-    public User userSaved(User user, Principal principal) {
-        log.info("start");
-        if (!canUserSaved(user, principal)) {
-            throw new InvalidStateException("判定エラー");
-        }
-        return userRepository.save(user);
+        // 処理記入
+        String newPassword = "newpass";
+        targetUser.setPassword("newpass");
+        targetUser.markUpdatedNow();
+        userRepository.save(targetUser);
+        return newPassword;
     }
 
     // =============================================
     // 取得・検索系
     // =============================================
-
-    // ユーザー管理画面取得
-    public List<UserDetailDto> getUserManagementViewData(Principal principal) {
-        log.info("start");
-        if (!canGetUserManagementViewData(principal)) {
-            throw new InvalidStateException("判定エラー");
-        }
-        List<User> allUsers = findAllUser();
-        List<UserDetailDto> allUserDto = toUserListDtoList(allUsers);
-        return allUserDto;
-    }
 
     public User getUserByPrincipal(Principal principal) {
         log.info("start");
@@ -278,6 +269,10 @@ public class UserService {
         }
     }
 
+    private String encodePassword(String raw) {
+        return raw; // 今は平文、後で passwordEncoder.encode(raw) に差し替え
+    }
+
     // =========================================
     // Dto詰替
     // =========================================
@@ -340,9 +335,35 @@ public class UserService {
         return userDto;
     }
 
+    // 重複チェック時に値を返すためDTO詰め替え
+    public UserFormDto concertToUserFormDto(
+            UserRequestDto requestDto,
+            Principal principal) {
+        UserFormDto formDto = showUserManagementPage(principal);
+        UserDetailDto detailDto = new UserDetailDto();
+        detailDto.setId(requestDto.getId());
+        detailDto.setLoginId(requestDto.getLoginId());
+        detailDto.setDisplayName(requestDto.getDisplayName());
+        detailDto.setRole(requestDto.getRole());
+        formDto.setTargetUser(detailDto);
+        if (requestDto.getId() == null) {
+            formDto.setMode(ViewMode.CREATE);
+        } else {
+            formDto.setMode(ViewMode.EDIT);
+        }
+        return formDto;
+    }
+
     // =========================================
     // 権限判定
     // =========================================
+
+    private boolean canUpdateLastLoginAt(User playUser) {
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        return true;
+    }
 
     private boolean canShowUserManagementPage(User targetUser) {
         log.info("start");
@@ -368,95 +389,85 @@ public class UserService {
 
     private boolean canCreateUser(
             UserRequestDto requestDto,
-            Principal principal) {
+            User playUser) {
         log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        List<User> users = userRepository.findAll();
+
         if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
         if (playUser.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        for (User targetUser : users) {
-            if (requestDto.getLoginId().equals(targetUser.getLoginId())) {
-                throw new InvalidStateException(
-                        "すでに同じユーザーIDが使われています。");
-            }
+        if (requestDto.getLoginId() == null || requestDto.getLoginId().isBlank()) {
+            throw new NotFoundException("userIdは必須入力項目です。");
+        }
+        if (requestDto.getDisplayName() == null || requestDto.getDisplayName().isBlank()) {
+            throw new NotFoundException("user名は必須入力項目です。");
+        }
+        if (requestDto.getRole() == null) {
+            throw new NotFoundException("Roleは必須入力項目です。");
         }
         return true;
     }
 
     private boolean canUpdateUser(
             UserRequestDto requestDto,
-            Principal principal) {
+            User playUser) {
         log.info("start");
-        User playUser = getUserByPrincipal(principal);
         if (!playUser.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        return true;
-    }
-
-    private boolean canChangeRole(
-            UserRequestDto requestDto,
-            Principal principal) {
-        log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        if (!playUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        return true;
-    }
-
-    private boolean canDeactivateUser(Principal principal) {
-        log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        if (!playUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        return true;
-    }
-
-    private boolean canActivateUser(Principal principal) {
-        log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        if (!playUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        return true;
-    }
-
-    private boolean canResetPassword(Principal principal) {
-        log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        if (!playUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        return true;
-    }
-
-    private boolean canUserSaved(
-            User user,
-            Principal principal) {
-        log.info("start");
-        User playUser = getUserByPrincipal(principal);
-        if (!playUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        return true;
-    }
-
-    private boolean canGetUserManagementViewData(
-            Principal principal) {
-        log.info("start");
-        User targetUser = getUserByPrincipal(principal);
-        if (!targetUser.isActive()) {
-            throw new UnauthorizedException("有効なユーザーではありません。");
-        }
-        if (targetUser.getRole() != UserRole.ADMIN) {
+        if (playUser.getRole() != UserRole.ADMIN) {
             throw new UnauthorizedException("権限が不足しています。");
         }
         return true;
     }
+
+    private boolean canDeactivateUser(User targetUser, User playUser) {
+        log.info("start");
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (playUser.getRole() != UserRole.ADMIN) {
+            throw new UnauthorizedException("権限が不足しています。");
+        }
+        if (!targetUser.isActive()) {
+            throw new InvalidStateException("対象のユーザーは既に停止中です。");
+        }
+        return true;
+    }
+
+    private boolean canActivateUser(User targetUser, User playUser) {
+        log.info("start");
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (playUser.getRole() != UserRole.ADMIN) {
+            throw new UnauthorizedException("権限が不足しています。");
+        }
+        if (targetUser.isActive()) {
+            throw new InvalidStateException("対象のユーザーは既に有効になっています。");
+        }
+        return true;
+    }
+
+    private boolean canResetPassword(User playUser) {
+        log.info("start");
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (playUser.getRole() != UserRole.ADMIN) {
+            throw new UnauthorizedException("権限が不足しています。");
+        }
+        return true;
+    }
+
+    public boolean isUserIdTaken(UserRequestDto requestDto) {
+        log.info("start");
+        if (requestDto.getId() == null) {
+            return userRepository.existsByLoginId(requestDto.getLoginId());
+        }
+        return userRepository.existsByLoginIdAndIdNot(requestDto.getLoginId(), requestDto.getId());
+    }
+
 }

@@ -3,6 +3,7 @@ package com.example.manual.entity;
 import java.time.LocalDateTime;
 
 import com.example.manual.enums.UserRole;
+import com.example.manual.exception.NotFoundException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -90,7 +91,7 @@ public class User {
     this.loginId = loginId;
   }
 
-  private void setUserRole(UserRole role) {
+  private void setRole(UserRole role) {
     this.role = role;
   }
 
@@ -120,17 +121,25 @@ public class User {
     User user = new User();
     user.setLoginId(loginId);
     user.setDisplayName(displayName);
-    user.setUserRole(role);
+    user.setRole(role);
     user.activate();
     user.markCreatedNow();
     user.markUpdatedNow();
     return user;
   }
 
-  public static UserRole applyRole(UserRole role) {
-    User targetUser = new User();
-    targetUser.setUserRole(role);
-    return targetUser.getRole();
+  public void changeRole(UserRole role) {
+    if (role == null) {
+      throw new IllegalArgumentException("role is required");
+    }
+    this.role = role;
+  }
+
+  public void changeLoginId(String loginId) {
+    if (loginId == null || loginId.isBlank()) {
+      throw new NotFoundException("userIdがありません。");
+    }
+    this.loginId = loginId;
   }
 
 }

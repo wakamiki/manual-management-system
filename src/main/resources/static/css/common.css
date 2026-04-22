@@ -54,7 +54,7 @@ a {
 
 a:hover,
 a:focus {
-  color: var(--color-text-on-primary);
+  color: var(--color-primary);
   text-decoration: none;
   background-color: transparent;
   border: none;

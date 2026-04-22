@@ -21,12 +21,29 @@
   font-weight: 600;
 }
 
+
 .admin-mode-title {
   background-color: #5cb1bb;
   border-bottom: 1px solid #ffffff;
   color: #ffffff;
   font-weight: 600;
   padding: .5rem 1rem;
+}
+
+.admin-mode-select {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  margin: 0.3em 0.2em 0em 0.2em;
+  color: #56969d;
+  background-color: #dcebee;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.90em;
+}
+
+.admin-button-primry {
+  background-color: #5cb1bb;
+  border-color: #5cb1bb;
 }
 
 .admin-form-actions,
@@ -119,6 +136,10 @@
   background-color: #56969d;
   border-color: #56969d;
   color: #ffffff;
+}
+
+.user-table.table> :not(:last-child)> :last-child>* {
+  border-bottom-color: #dee2e6;
 }
 
 @media (max-width: 991.98px) {
