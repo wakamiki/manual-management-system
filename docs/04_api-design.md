@@ -40,8 +40,8 @@ Version: 01.03.17
 - POST `/users/{userId}/deactivate`
 - POST `/users/{userId}/activate`
 - POST `/users/{userId}/reset-password`
-- GET `/users/users/{userId}/change-password`
-- POST `/users/users/{userId}/change-password`
+- GET `/users/{userId}/change-password`
+- POST `/users/{userId}/action/change-password`
 - GET `/users/{userId}/operation-histories`
 
 ### 1-4. Auth API

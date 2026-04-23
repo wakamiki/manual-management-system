@@ -131,12 +131,9 @@ Version: 01.09.13
 - 資格情報通知のフラッシュメッセージ表示（手動クローズ + コピー操作）を追加
 
 ## 今後の予定
-- 検索系メソッドの完成
-- DTO と Service シグネチャの整合
-- Notification Entity / Service 実装
-- MyPage DTO 実装
 - Validation と例外ハンドリングの整備
-- `loginId` を起点にしたユーザー取得処理の整理
+- pageネーション実装
+- 業務の流れに沿ってテスト実施
 
 ## 更新履歴
 | Version | Date | 内容 |
