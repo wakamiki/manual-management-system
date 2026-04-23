@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.manual.dto.PasswordChangeRequestDto;
 import com.example.manual.dto.UserFormDto;
 import com.example.manual.dto.UserRequestDto;
 import com.example.manual.service.UserService;
@@ -66,6 +67,14 @@ public class UserController {
     }
   }
 
+  // パスワード変更画面
+  @GetMapping("/users/{userId}/change-password")
+  public String showChangePasswordPage(@PathVariable Long id, Principal principal, Model model) {
+    log.info("start");
+    userService.showChangePasswordPage(id, principal);
+    return "password-change";
+  }
+
   // =============================================
   // DB処理
   // =============================================
@@ -78,17 +87,20 @@ public class UserController {
       Model model) {
     log.info("start");
     try {
-      if (userService.createUser(
-          requestDto, principal)) {
+      if (userService.isUserIdTaken(requestDto)) {
         String duplicateMessage = "userIDは既に使われています。別のuserIDを入力してください。";
         model.addAttribute("duplicateMessage", duplicateMessage);
         UserFormDto formDto = userService.concertToUserFormDto(requestDto, principal);
         model.addAttribute("formDto", formDto);
         return "user-management";
       }
-
-      message.addFlashAttribute("message", "新規ユーザーを作成しました。");
-      message.addFlashAttribute("messageType", "success");
+      String password = userService.createUser(
+          requestDto, principal);
+      String issuedInitialPassword = String.format("新規ユーザーを登録完了。初期パスワードを発行しました。");
+      message.addFlashAttribute("message", issuedInitialPassword);
+      message.addFlashAttribute("messageType", "warning");
+      message.addFlashAttribute("isCredentialNotice", true);
+      message.addFlashAttribute("issuedPassword", password);
       return "redirect:/users";
     } catch (Exception e) {
       message.addFlashAttribute("message", "処理中にエラーが発生しました。");
@@ -173,23 +185,45 @@ public class UserController {
       @PathVariable Long id) {
     log.info("start");
     try {
-      // アクティブのみ adminのみ実行可
       // 自分自身のリセット禁止 一時パスを通知で渡す
       // 初回ログインで強制パスワード変更要請
       // 監査ログを記録 操作者・対象・日時・理由を保存
       // 連続実行抑止: 連続リセットを制限
       // 操作タイプ＋理由をoperationhistoriesに残す
       // 操作者 対象ユーザー 実行日時 理由や変更内容
-      // 採番idで対象ユーザー取得が安全
       // 監査 誰が誰をリセットしたかログに残す
-      userService.resetPassword(principal, id);
-      message.addFlashAttribute("message", "処理に成功しました。");
-      message.addFlashAttribute("messageType", "success");
-      return "RedirectAttributes:/users";
+      String password = userService.resetPassword(
+          principal, id);
+      String issuedInitialPassword = String.format("パスワードを再発行しました。");
+      message.addFlashAttribute("message", issuedInitialPassword);
+      message.addFlashAttribute("messageType", "warning");
+      message.addFlashAttribute("isCredentialNotice", true);
+      message.addFlashAttribute("issuedPassword", password);
+      return "redirect:/users";
     } catch (Exception e) {
       message.addFlashAttribute("message", "処理中にエラーが発生しました。");
       message.addFlashAttribute("messageType", "error");
-      return "RedirectAttributes:/users";
+      return "redirect:/users";
+    }
+  }
+
+  @PostMapping("/users/{userId}/change-password")
+  public String changePassword(
+      @Valid @ModelAttribute PasswordChangeRequestDto passwordDto,
+      Principal principal,
+      @PathVariable Long id,
+      RedirectAttributes message) {
+    log.info("start");
+    try {
+      userService.changePassword(principal, id, passwordDto);
+      // 操作者 実行日時
+      message.addFlashAttribute("message", "パスワードを変更しました。");
+      message.addFlashAttribute("messageType", "success");
+      return "redirect:/index";
+    } catch (Exception e) {
+      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
+      message.addFlashAttribute("messageType", "error");
+      return "redirect:/index";
     }
   }
 

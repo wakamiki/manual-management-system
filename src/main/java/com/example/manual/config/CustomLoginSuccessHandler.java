@@ -2,12 +2,13 @@ package com.example.manual.config;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import com.example.manual.entity.User;
 import com.example.manual.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,12 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
             userService.updateLastLoginAt(loginId);
         } catch (Exception e) {
             log.warn("Failed to update lastLoginAt. loginId={}", loginId, e);
+        }
+        User playUser = userService.getUserByLoginId(loginId);
+        if (playUser.isPasswordChangeRequired()) {
+            // パスワード変更画面
+            response.sendRedirect(request.getContextPath() + "/users/" + playUser.getId() + "/change-password");
+            return;
         }
         response.sendRedirect(request.getContextPath() + "/manuals/index");
     }

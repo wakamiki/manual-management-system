@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.16
-更新日: 2026-04-21
+Version: 01.06.18
+更新日: 2026-04-23
 
 ---
 
@@ -60,6 +60,15 @@ Version: 01.06.16
 - 停止中ユーザーは操作不可
 - 使用停止カテゴリは新規選択不可
 - GUEST は DB保存を伴う操作を実行不可
+
+### 3-4. パスワード運用ルール（2026-04-23）
+- パスワードは保存時に `PasswordEncoder`（BCrypt）でハッシュ化する
+- ログイン照合は Spring Security 標準フローに委譲する（手動照合しない）
+- ユーザー新規作成時は初期パスワードを自動生成する
+- 初期パスワードはフラッシュメッセージで一時表示し、一覧や詳細へ常時表示しない
+- 初期パスワード通知は手動で閉じるまで表示し、通常メッセージの自動消去対象から除外する
+- `passwordChangeRequired` が true のユーザーはログイン成功後に変更画面へ遷移させる
+- パスワード変更完了後は `passwordChangeRequired` を false に戻す
 ---
 
 ## 4. ステータス仕様
@@ -132,6 +141,16 @@ Version: 01.06.16
 - 更新時は対象IDを除外して `existsByCategoryNameAndIdNot(...)` で判定する
 - 重複検知時のみ確認ダイアログ（confirm）を表示し、確認後に同導線で再送する
 
+### 5-6. 管理画面の遷移/送信ルール（2026-04-22）
+- 一覧から編集モードへ切り替える操作は GET で扱う
+  - User: `GET /users/{userId}/action`
+  - Category: `GET /categories/{categoryId}/action`
+- 登録/更新/停止/復帰など DB 更新を伴う操作は POST で扱う
+- `redirect:/...` は更新処理後に使用し、画面表示（同一リクエスト）はテンプレート名返却で扱う
+- 管理画面フォームは `th:object` を起点に `th:field="*{...}"` を使う
+- `th:object` 配下で `formDto.` を再指定しない（`${}` と `*{}` の混在を避ける）
+- `targetUser` / `targetCategory` を参照する表示条件では null ガードを必須とする
+
 ### 5-3. ID 命名方針
 - Entity 主キーは `id`
 - コード上の引数や DTO では意味付き ID 名を使う
@@ -174,6 +193,7 @@ Version: 01.06.16
 - `role`
 - `isActive`
 - `lastLoginAt`
+- `passwordChangeRequired`
 
 ### 6-5. Category
 - 部署名

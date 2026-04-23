@@ -1,17 +1,22 @@
 package com.example.manual.service;
 
 import java.security.Principal;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.manual.dto.PasswordChangeRequestDto;
 import com.example.manual.dto.UserDetailDto;
 import com.example.manual.dto.UserFormDto;
 import com.example.manual.dto.UserRequestDto;
@@ -27,12 +32,16 @@ import com.example.manual.repository.UserRepository;
 @Service
 public class UserService {
 
+    private final PasswordEncoder passwordEncoder;
+
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // =============================================
@@ -72,6 +81,7 @@ public class UserService {
 
     public UserFormDto showUserUpdateMode(
             Principal principal, Long userId) {
+        log.info("start");
         User playUser = getUserByPrincipal(principal);
         User targetUser = getUserById(userId);
         if (!canShowUpdateMode(playUser)) {
@@ -83,6 +93,15 @@ public class UserService {
         formDto.setMode(ViewMode.EDIT);
 
         return formDto;
+    }
+
+    public void showChangePasswordPage(Long id, Principal principal) {
+        log.info("start");
+        User playUser = getUserByPrincipal(principal);
+        User targetUser = getUserById(id);
+        if (!canShowChangePasswordPage(playUser, targetUser)) {
+            throw new InvalidStateException("判定エラー");
+        }
     }
 
     // =============================================
@@ -99,7 +118,7 @@ public class UserService {
     }
 
     // TODO: 監査ログ追加予定
-    public boolean createUser(
+    public String createUser(
             UserRequestDto requestDto,
             Principal principal) {
         log.info("start");
@@ -107,17 +126,15 @@ public class UserService {
         if (!canCreateUser(requestDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        // 重複チェック
-        if (isUserIdTaken(requestDto)) {
-            return true;
-        }
         User targetUser = User.createNew(
                 requestDto.getLoginId(),
                 requestDto.getDisplayName(),
                 requestDto.getRole());
 
-        userRepository.save(targetUser);
-        return false;
+        // パスワードエンコード
+        String newPassWord = newCreatePasswordSave(targetUser);
+
+        return newPassWord;
     }
 
     // TODO: 監査ログ追加予定
@@ -184,12 +201,44 @@ public class UserService {
         if (!canResetPassword(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        // 処理記入
-        String newPassword = "newpass";
-        targetUser.setPassword("newpass");
+
         targetUser.markUpdatedNow();
-        userRepository.save(targetUser);
+        String newPassword = newCreatePasswordSave(targetUser);
         return newPassword;
+    }
+
+    // TODO:監査ログ
+    public void changePassword(
+            Principal principal,
+            Long id,
+            PasswordChangeRequestDto passwordDto) {
+        log.info("start");
+        User playUser = getUserByPrincipal(principal);
+        User targetUser = getUserById(id);
+        if (!canChangePassword(playUser, targetUser, passwordDto)) {
+            throw new InvalidStateException("判定エラー");
+        }
+        targetUser.markUpdatedNow();
+        encodePasswordSave(passwordDto.getNewPassword(), targetUser);
+    }
+
+    private String newCreatePasswordSave(User targetUser) {
+        log.info("start");
+
+        String newPassword = generateInitialPassword();
+        String encodePassword = passwordEncoder.encode(newPassword);
+        targetUser.setPassword(encodePassword);
+        targetUser.markPasswordChangeRequired();
+        userRepository.save(targetUser);
+
+        // TODO: 監査ログ記録
+        return newPassword;
+    }
+
+    private void encodePasswordSave(String newPassword, User targetUser) {
+        String encodePassword = passwordEncoder.encode(newPassword);
+        targetUser.setPassword(encodePassword);
+        userRepository.save(targetUser);
     }
 
     // =============================================
@@ -255,11 +304,13 @@ public class UserService {
     }
 
     private Long getAllUserCount() {
+        log.info("start");
         Long count = userRepository.count();
         return count;
     }
 
     private String getActivateLabel(boolean isActive) {
+        log.info("start");
         if (isActive) {
             String label = "使用中";
             return label;
@@ -269,8 +320,35 @@ public class UserService {
         }
     }
 
-    private String encodePassword(String raw) {
-        return raw; // 今は平文、後で passwordEncoder.encode(raw) に差し替え
+    private String generateInitialPassword() {
+        log.info("start");
+        String upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        String lower = "abcdefghijkmnopqrstuvwxyz";
+        String digit = "23456789";
+        String symbol = "!@#$&";
+
+        String all = upper + lower + digit + symbol;
+
+        SecureRandom random = new SecureRandom();
+        List<Character> password = new ArrayList<>();
+
+        // 必須
+        password.add(upper.charAt(random.nextInt(upper.length())));
+        password.add(lower.charAt(random.nextInt(digit.length())));
+        password.add(digit.charAt(random.nextInt(digit.length())));
+
+        for (int i = 0; i < 9; i++) {
+            password.add(all.charAt(random.nextInt(all.length())));
+        }
+
+        // シャッフル
+        Collections.shuffle(password);
+
+        StringBuilder result = new StringBuilder();
+        for (char c : password) {
+            result.append(c);
+        }
+        return result.toString();
     }
 
     // =========================================
@@ -387,6 +465,20 @@ public class UserService {
         return true;
     }
 
+    private boolean canShowChangePasswordPage(User playUser, User targetUser) {
+        log.info("start");
+        if (Objects.equals(playUser.getId(), targetUser.getId())) {
+            throw new InvalidStateException("パスワード変更は本人のみ変更可能です。");
+        }
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (playUser.getRole() == UserRole.GUEST) {
+            throw new UnauthorizedException("ゲストユーザーにはパスワード変更の権限がありません。");
+        }
+        return true;
+    }
+
     private boolean canCreateUser(
             UserRequestDto requestDto,
             User playUser) {
@@ -468,6 +560,35 @@ public class UserService {
             return userRepository.existsByLoginId(requestDto.getLoginId());
         }
         return userRepository.existsByLoginIdAndIdNot(requestDto.getLoginId(), requestDto.getId());
+    }
+
+    private boolean canChangePassword(
+            User playUser,
+            User targetUser,
+            PasswordChangeRequestDto passwordDto) {
+        log.info("start");
+        if (Objects.equals(playUser.getId(), targetUser.getId())) {
+            throw new InvalidStateException("パスワード変更は本人のみ変更可能です。");
+        }
+        if (!playUser.isActive()) {
+            throw new UnauthorizedException("有効なユーザーではありません。");
+        }
+        if (playUser.getRole() == UserRole.GUEST) {
+            throw new UnauthorizedException("ゲストユーザーにはパスワード変更の権限がありません。");
+        }
+        if (passwordDto.getConfirmPassword() == null ||
+                passwordDto.getCurrentPassword() == null ||
+                passwordDto.getNewPassword() == null ||
+                passwordDto.getConfirmPassword().isBlank() ||
+                passwordDto.getCurrentPassword().isBlank() ||
+                passwordDto.getNewPassword().isBlank()) {
+            throw new NotFoundException("入力されていない項目があります。");
+        }
+        if (!Objects.equals(passwordDto.getConfirmPassword(), passwordDto.getNewPassword())) {
+            throw new InvalidStateException("新しいパスワードと確認用パスワードが違っています。");
+        }
+
+        return true;
     }
 
 }

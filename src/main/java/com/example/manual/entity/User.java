@@ -38,6 +38,8 @@ public class User {
   private LocalDateTime lastLoginAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  @Column(nullable = false)
+  boolean passwordChangeRequired;
 
   // getter
   public Long getId() {
@@ -75,6 +77,10 @@ public class User {
   public LocalDateTime getUpdatedAt() {
 
     return this.updatedAt;
+  }
+
+  public boolean isPasswordChangeRequired() {
+    return passwordChangeRequired;
   }
 
   // setter
@@ -115,6 +121,14 @@ public class User {
 
   public void markUpdatedNow() {
     this.updatedAt = LocalDateTime.now();
+  }
+
+  public void markPasswordChangeRequired() {
+    this.passwordChangeRequired = true;
+  }
+
+  public void clearPasswordChangeRequired() {
+    this.passwordChangeRequired = false;
   }
 
   public static User createNew(String loginId, String displayName, UserRole role) {

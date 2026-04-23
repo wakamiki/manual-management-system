@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.14  
-更新日: 2026-04-21
+Version: 01.03.16  
+更新日: 2026-04-23
 
 ---
 
@@ -25,20 +25,23 @@ Version: 01.03.14
 - POST `/manuals/{manualId}/actions/restore`
 
 ### 1-2. Category API
-- GET `/categories/category-management`
+- GET `/categories`
+- GET `/categories/{categoryId}/action`
 - POST `/categories/create`
-- POST `/categories/update`
-- GET `/categories/{categoryId}/deactivate`
-- GET `/categories/{categoryId}/activate`
+- POST `/categories/{categoryId}/update`
+- POST `/categories/{categoryId}/deactivate`
+- POST `/categories/{categoryId}/activate`
 
 ### 1-3. User API
 - GET `/users`
-- GET `/users/{userId}`
-- POST `/users`
-- POST `/users/update`
-- GET `/users/{userId}/deactivate`
-- GET `/users/{userId}/activate`
+- GET `/users/{userId}/action`
+- POST `/users/create`
+- POST `/users/{userId}/update`
+- POST `/users/{userId}/deactivate`
+- POST `/users/{userId}/activate`
 - POST `/users/{userId}/reset-password`
+- GET `/users/{userId}/change-password`
+- POST `/users/{userId}/change-password`
 - GET `/users/{userId}/operation-histories`
 
 ### 1-4. Auth API
@@ -60,6 +63,8 @@ Version: 01.03.14
 - Request DTO / Response DTO を使い分ける
 - View エンドポイントと JSON API を混在させない
 - 画面表示では `Model` に詰める属性名を固定し、テンプレート参照と一致させる
+- 一覧からのモード切替は GET、保存系は POST に分離する
+- 保存系は PRG（Post/Redirect/Get）を前提に `redirect:/...` を使用する
 
 ### 2-1A. Service 分離方針
 - 読み込み系ユースケースは `ManualQueryService` へ集約する
@@ -70,6 +75,7 @@ Version: 01.03.14
 ### 2-2. バリデーション
 - DTO の形式チェックは `@Valid` で行う
 - 業務ルール依存の判定は Service で行う
+- パスワード変更入力は専用DTO（`PasswordChangeRequestDto`）で受ける
 
 ### 2-3. 例外ハンドリング
 - ControllerAdvice で共通エラーレスポンスへ変換する
@@ -170,6 +176,7 @@ Version: 01.03.14
 - `UserRequestDto`
 - `CategoryFormDto`
 - `UserFormDto`
+- `PasswordChangeRequestDto`
 
 ### 4-2. Response DTO
 - `ManualResponseDto`
@@ -212,6 +219,14 @@ Version: 01.03.14
   - createdManualList
   - draftManualList
 
+### 4-5. PasswordChangeRequestDto
+- `currentPassword`
+- `newPassword`
+- `confirmPassword`
+- 文字数: 8〜32
+- 文字種: 大文字 / 小文字 / 数字を各1文字以上
+- 許可文字: `A-Za-z0-9!@#$%^&*()_-+=`
+
 ---
 
 ## 5. 通知ルール
@@ -245,6 +260,9 @@ Version: 01.03.14
 - `listDto` は一覧表示データの参照起点
 - `manualSearchConditionDto` は検索条件の保持参照起点
 - `th:each` で複製される UI 要素に static id を使わない
+- `th:object` 配下では `th:field="*{...}"` を使う
+- `th:field="${...}"` は使わない
+- `th:object` 配下で `formDto.` を重ねて参照しない
 - `EL1007E` 発生時は以下の順に確認する
   1. Controller が対象 Model 属性を追加しているか
   2. DTO の中身が null ではないか
