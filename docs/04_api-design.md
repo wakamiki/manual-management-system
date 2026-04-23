@@ -1,6 +1,6 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.16  
+Version: 01.03.17  
 更新日: 2026-04-23
 
 ---
@@ -40,8 +40,8 @@ Version: 01.03.16
 - POST `/users/{userId}/deactivate`
 - POST `/users/{userId}/activate`
 - POST `/users/{userId}/reset-password`
-- GET `/users/{userId}/change-password`
-- POST `/users/{userId}/change-password`
+- GET `/users/users/{userId}/change-password`
+- POST `/users/users/{userId}/change-password`
 - GET `/users/{userId}/operation-histories`
 
 ### 1-4. Auth API
@@ -65,6 +65,7 @@ Version: 01.03.16
 - 画面表示では `Model` に詰める属性名を固定し、テンプレート参照と一致させる
 - 一覧からのモード切替は GET、保存系は POST に分離する
 - 保存系は PRG（Post/Redirect/Get）を前提に `redirect:/...` を使用する
+- 認証成功後の遷移は `CustomLoginSuccessHandler` で制御する
 
 ### 2-1A. Service 分離方針
 - 読み込み系ユースケースは `ManualQueryService` へ集約する
@@ -226,6 +227,11 @@ Version: 01.03.16
 - 文字数: 8〜32
 - 文字種: 大文字 / 小文字 / 数字を各1文字以上
 - 許可文字: `A-Za-z0-9!@#$%^&*()_-+=`
+
+### 4-6. 資格情報通知（フラッシュ）
+- `reset-password` / `create` 成功時はフラッシュメッセージで一時パスワードを通知する
+- 通常メッセージは自動消去、資格情報通知は手動クローズまで保持する
+- 資格情報通知にはコピー操作を付与する
 
 ---
 
