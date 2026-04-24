@@ -3,51 +3,61 @@ package com.example.manual.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ManualIndexDto {
   public ManualIndexDto() {
 
   }
 
-  private List<ManualResponseDto> manuals= new ArrayList<>();
+  private List<ManualResponseDto> manuals = new ArrayList<>();
+  private PagingDto pagingDto;
   private List<CategoryResponseDto> activeCategories = new ArrayList<>();
-  private List<CategoryResponseDto> inactiveCategories= new ArrayList<>();
-  private List<ManualResponseDto> defaultStatuses= new ArrayList<>();
+  private List<CategoryResponseDto> inactiveCategories = new ArrayList<>();
+  private List<ManualResponseDto> defaultStatuses = new ArrayList<>();
   private IndexSummaryDto summaryDto;
   private UserResponseDto userDto;
+  private ManualSearchConditionDto condition;
 
- //getter
+  // getter
 
- public List<ManualResponseDto> getManuals() {
-   return this.manuals;
- }
+  public ManualSearchConditionDto getCondition() {
+    return condition;
+  }
 
- public List<CategoryResponseDto> getActiveCategories() {
-   return this.activeCategories;
- }
+  public List<ManualResponseDto> getManuals() {
+    return this.manuals;
+  }
 
- public List<CategoryResponseDto> getInactiveCategories() {
-   return this.inactiveCategories;
- }
+  public List<CategoryResponseDto> getActiveCategories() {
+    return this.activeCategories;
+  }
 
- public List<ManualResponseDto> getDefaultStatuses() {
-   return this.defaultStatuses;
- }
+  public List<CategoryResponseDto> getInactiveCategories() {
+    return this.inactiveCategories;
+  }
 
- public IndexSummaryDto getSummaryDto() {
-   return this.summaryDto;
- }
+  public List<ManualResponseDto> getDefaultStatuses() {
+    return this.defaultStatuses;
+  }
 
- public UserResponseDto getUserDto() {
-   return this.userDto;
- }
+  public IndexSummaryDto getSummaryDto() {
+    return this.summaryDto;
+  }
 
+  public UserResponseDto getUserDto() {
+    return this.userDto;
+  }
 
+  public PagingDto getPagingDto() {
+    return pagingDto;
+  }
 
-  //setter
+  // setter
+
+  public void setCondition(ManualSearchConditionDto condition) {
+    this.condition = condition;
+  }
   public void setManuals(
-    List<ManualResponseDto>manuals
-  ) {
+      List<ManualResponseDto> manuals) {
     this.manuals = manuals;
   }
 
@@ -69,5 +79,9 @@ public class ManualIndexDto {
 
   public void setUserDto(UserResponseDto userDto) {
     this.userDto = userDto;
+  }
+
+  public void setPagingDto(PagingDto pagingDto) {
+    this.pagingDto = pagingDto;
   }
 }

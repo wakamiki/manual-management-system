@@ -31,7 +31,7 @@
   --color-text-on-primary-muted: rgba(247, 251, 252, 0.88);
   --color-text-on-primary-border: rgba(247, 251, 252, 0.7);
 
-  --color-bg-draft: #EAF59A;
+  --color-bg-draft: #bfd22f;
   --color-bg-pending: #62ACF5;
   --color-bg-approved: #197F67;
   --color-bg-archive: #BF96F4;
@@ -83,8 +83,7 @@ a.list-group-item-action:focus {
 
 .page-title-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-center;
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
@@ -137,7 +136,7 @@ a.list-group-item-action:focus {
 }
 
 .badge-status.draft {
-  background-color: #EAF59A;
+  background-color: #bfd22f;
   color: #ffffff;
 }
 

@@ -12,6 +12,7 @@ public class UserFormDto {
   }
 
   private List<UserDetailDto> allUserDto;
+  private PagingDto pagingDto;
   private ViewMode mode = ViewMode.CREATE;
   private UserResponseDto playUser;
   private UserDetailDto targetUser = new UserDetailDto();
@@ -43,6 +44,10 @@ public class UserFormDto {
     return userCount;
   }
 
+  public PagingDto getPagingDto() {
+    return pagingDto;
+  }
+
   // setter
   public void setTargetUser(UserDetailDto targetUser) {
     this.targetUser = targetUser;
@@ -66,5 +71,9 @@ public class UserFormDto {
 
   public void setUserCount(Long userCount) {
     this.userCount = userCount;
+  }
+
+  public void setPagingDto(PagingDto pagingDto) {
+    this.pagingDto = pagingDto;
   }
 }

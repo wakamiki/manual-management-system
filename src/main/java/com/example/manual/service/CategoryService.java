@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryFormDto;
 import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
+import com.example.manual.dto.PagingDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.User;
@@ -22,6 +19,12 @@ import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.NotFoundException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.CategoryRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CategoryService {
@@ -45,37 +48,38 @@ public class CategoryService {
 
   // category-management表示
   public CategoryFormDto showCategoryManagement(
-      Principal principal) {
-    log.info("start");
-    User playUser = userService.getUserByPrincipal(principal);
-    if (!canShowCategoryManagement(playUser)) {
-      throw new InvalidStateException("判定エラー");
-    }
-    List<Category> categories = categoryRepository.findAllByOrderByDisplayOrderAsc();
-    CategoryFormDto categoryDto = toCategoryFormDto(playUser, categories);
+  Principal principal,Pageable pageable) {
+  log.info("start");
+  User playUser = userService.getUserByPrincipal(principal);
+  if (!canShowCategoryManagement(playUser)) {
+  throw new InvalidStateException("判定エラー");
+  }
+  Page<Category> categories =
+  categoryRepository.findAllByOrderByDisplayOrderAsc(pageable);
+  CategoryFormDto categoryDto = toCategoryFormDto(playUser,categories);
 
-    return categoryDto;
+  return categoryDto;
   }
 
   public CategoryFormDto showCategoryUpdateMode(
-      Principal principal, Long categoryId) {
-    User playUser = userService.getUserByPrincipal(principal);
-    if (!canShowCategoryUpdateMode(playUser)) {
-      throw new InvalidStateException("判定エラー");
-    }
-    Category category = getCategoryById(categoryId);
-    CategoryDetailDto detailDto = new CategoryDetailDto();
-    detailDto.setId(categoryId);
-    detailDto.setCategoryName(category.getCategoryName());
-    detailDto.setDisplayOrder(category.getDisplayOrder());
-    detailDto.setActive(category.isActive());
-    detailDto.setActiveLabel(getActiveLabel(category.isActive()));
-    detailDto.setUpdatedAt(category.getUpdatedAt());
-    CategoryFormDto formDto = showCategoryManagement(principal);
-    formDto.setMode(ViewMode.EDIT);
-    formDto.setTargetCategory(detailDto);
+  Principal principal, Long categoryId,Pageable pageable) {
+  User playUser = userService.getUserByPrincipal(principal);
+  if (!canShowCategoryUpdateMode(playUser)) {
+  throw new InvalidStateException("判定エラー");
+  }
+  Category category = getCategoryById(categoryId);
+  CategoryDetailDto detailDto = new CategoryDetailDto();
+  detailDto.setId(categoryId);
+  detailDto.setCategoryName(category.getCategoryName());
+  detailDto.setDisplayOrder(category.getDisplayOrder());
+  detailDto.setActive(category.isActive());
+  detailDto.setActiveLabel(getActiveLabel(category.isActive()));
+  detailDto.setUpdatedAt(category.getUpdatedAt());
+  CategoryFormDto formDto = showCategoryManagement(principal,pageable);
+  formDto.setMode(ViewMode.EDIT);
+  formDto.setTargetCategory(detailDto);
 
-    return formDto;
+  return formDto;
   }
 
   // ============================================
@@ -169,9 +173,9 @@ public class CategoryService {
   // 取得系
   // ===============================================
 
-  public List<Category> getAllCategories() {
-    log.info("start");
-    return categoryRepository.findAllByOrderByCategoryNameAsc();
+  public Page<Category> getAllCategories(Pageable pageable) {
+  log.info("start");
+  return categoryRepository.findAllByOrderByCategoryNameAsc(pageable);
   }
 
   public Category getCategoryById(Long categoryId) {
@@ -276,8 +280,9 @@ public class CategoryService {
     return categoryDto;
   }
 
-  private CategoryFormDto toCategoryFormDto(User playUser, List<Category> categories) {
+  private CategoryFormDto toCategoryFormDto(User playUser, Page<Category> categories) {
     List<CategoryDetailDto> responseDtos = new ArrayList<>();
+    PagingDto pagingDto = PagingDto.from(categories);
     for (Category category : categories) {
       CategoryDetailDto responseDto = new CategoryDetailDto();
       responseDto.setActive(category.isActive());
@@ -290,6 +295,7 @@ public class CategoryService {
     }
 
     CategoryFormDto categoryDto = new CategoryFormDto();
+    categoryDto.setPagingDto(pagingDto);
     categoryDto.setCategoryListDto(responseDtos);
     categoryDto.setPlayUser(userService.toCreatedUserDto(playUser));
     categoryDto.setMode(ViewMode.CREATE);
@@ -297,8 +303,9 @@ public class CategoryService {
     return categoryDto;
   }
 
-  public CategoryFormDto convertToCategoryFormDto(CategoryRequestDto requestDto, Principal principal) {
-    CategoryFormDto formDto = showCategoryManagement(principal);
+  public CategoryFormDto convertToCategoryFormDto(CategoryRequestDto
+  requestDto, Principal principal, Pageable pageable) {
+    CategoryFormDto formDto = showCategoryManagement(principal, pageable);
     User playUser = userService.getUserByPrincipal(principal);
     UserResponseDto userDto = userService.toCreatedUserDto(playUser);
     CategoryDetailDto detailDto = new CategoryDetailDto();

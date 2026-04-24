@@ -1,7 +1,7 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.12  
-更新日: 2026-04-23
+Version: 01.03.13  
+更新日: 2026-04-24
 
 ---
 
@@ -177,6 +177,34 @@ Version: 01.03.12
 | AUTH-005 | 異常 | ADMIN 以外がユーザー管理 | 実行不可 |
 | AUTH-006 | 正常 | GUEST の一覧/詳細/検索 | 閲覧操作のみ実行可能 |
 | AUTH-007 | 異常 | GUEST の更新系操作 | 非活性または拒否される |
+| AUTH-008 | 正常 | 本人がパスワード変更 | 実行可能 |
+| AUTH-009 | 異常 | 本人以外のパスワード変更 | 実行不可 |
+| AUTH-010 | 正常 | ADMIN が他ユーザーのパスワード初期化 | 実行可能 |
+| AUTH-011 | 異常 | ADMIN 以外のパスワード初期化 | 実行不可 |
+
+### 7-2. 認可ルール対応（docs/04 2-2B 同期）
+| No | 種別 | テスト観点 | 期待結果 |
+| --- | --- | --- | --- |
+| AUTH-012 | 正常 | Manual 編集（作成者 + DRAFT） | 実行可能 |
+| AUTH-013 | 正常 | Manual 編集（作成者 + PENDING） | 実行可能 |
+| AUTH-014 | 異常 | Manual 編集（非作成者） | 実行不可 |
+| AUTH-015 | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
+| AUTH-016 | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
+| AUTH-017 | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
+| AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
+| AUTH-019 | 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
+| AUTH-020 | 異常 | Manual 承認（作成者本人） | 実行不可 |
+| AUTH-021 | 異常 | Manual 承認（PENDING以外） | 実行不可 |
+| AUTH-022 | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
+| AUTH-023 | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
+| AUTH-024 | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
+| AUTH-025 | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
+| AUTH-026 | 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
+| AUTH-027 | 異常 | Category 管理画面表示（ADMIN以外） | 実行不可 |
+| AUTH-028 | 正常 | Category 作成/更新/停止/復帰（ADMIN） | 実行可能 |
+| AUTH-029 | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
+| AUTH-030 | 正常 | USER/APPROVER の権限外操作UI | ボタン非表示 |
+| AUTH-031 | 正常 | GUEST の権限外操作UI | 非活性表示 + 理由表示 |
 
 ---
 
@@ -251,7 +279,9 @@ Version: 01.03.12
 | PWD-006 | 異常 | 文字種要件未達（大文字/小文字/数字不足） | バリデーションエラー表示 |
 | PWD-007 | 正常 | 初期パスワード通知表示 | 自動消去されず手動で閉じるまで表示される |
 | PWD-008 | 正常 | 初期パスワードコピー操作 | クリップボードへコピーされる |
-| PWD-009 | 正常 | パスワード変更画面URL遷移 | `GET /users/users/{userId}/change-password` で画面表示される |
+| PWD-009 | 正常 | パスワード変更画面URL遷移（本人） | `GET /users/change-password` で画面表示される |
+| PWD-010 | 正常 | パスワード変更実行URL（本人） | `POST /users/action/change-password` で更新される |
+| PWD-011 | 正常 | パスワード初期化実行URL（管理者） | `POST /users/{userId}/reset-password` で初期化される |
 
 ---
 

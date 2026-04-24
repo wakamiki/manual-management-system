@@ -2,17 +2,19 @@ package com.example.manual.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.example.manual.entity.Category;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
   // 全件取得（カテゴリ名昇順）
-  List<Category> findAllByOrderByCategoryNameAsc();
+  Page<Category> findAllByOrderByCategoryNameAsc(Pageable pageable);
 
   // 全件取得(displayOrder昇順)
-  List<Category> findAllByOrderByDisplayOrderAsc();
+  Page<Category>findAllByOrderByDisplayOrderAsc(Pageable pageable);
 
   // active==trueのカテゴリ全件取得(displayOrder昇順)
   List<Category> findByIsActiveTrueOrderByDisplayOrderAsc();

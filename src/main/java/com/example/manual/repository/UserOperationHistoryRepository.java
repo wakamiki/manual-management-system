@@ -1,6 +1,9 @@
 package com.example.manual.repository;
 
-public class UserOperationHistoryRepository {
+import com.example.manual.entity.UserOperationHistory;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserOperationHistoryRepository extends JpaRepository<UserOperationHistory, Long> {
 
 }
-

@@ -33,7 +33,8 @@
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
 
-    <div class="alert manual-detail-alert mt-0 mb-2" role="alert" th:if="${message != null}" th:classappend="${
+    <div class="alert manual-detail-alert mt-0 mb-2" role="alert" id="flashMessage" th:if="${message != null}"
+      th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'

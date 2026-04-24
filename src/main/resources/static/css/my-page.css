@@ -34,10 +34,10 @@
 }
 
 .overview-summary {
-    display: flex;
+  display: flex;
   flex-wrap: wrap;
   gap: 0px;
-      flex-direction: column;
+  flex-direction: column;
 }
 
 
@@ -100,10 +100,10 @@
   border: 1px solid #c6dadd;
   border-radius: 14px;
   background-color: var(--color-bg-surface);
-    display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .overview-tile-rollback {
@@ -162,11 +162,11 @@
   background-color: var(--color-bg-surface);
 }
 
-.tab-content > .tab-pane {
+.tab-content>.tab-pane {
   display: none;
 }
 
-.tab-content > .active {
+.tab-content>.active {
   display: block;
 }
 
@@ -309,7 +309,19 @@
   line-height: 1.45;
 }
 
+.page-title-bar.mypage-title-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  column-gap: 12px;
+  align-items: start;
+}
+
+.mypage-close-btn {
+  align-self: center;
+}
+
 @media (max-width: 767.98px) {
+
   .notification-overview .card-body,
   .tab-pane-body {
     padding: 18px;

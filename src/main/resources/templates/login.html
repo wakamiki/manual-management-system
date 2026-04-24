@@ -19,7 +19,7 @@
           <p class="text-muted mb-0">Manual Management System</p>
         </div>
 
-        <div class="alert login-alert" role="alert" th:if="${message != null}" th:classappend="${
+        <div class="alert login-alert" role="alert" id="flashMessage" th:if="${message != null}" th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'

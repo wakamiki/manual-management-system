@@ -13,14 +13,11 @@ public class UserRequestDto {
   private Long id;
   @NotBlank
   private String loginId;
-
   @NotBlank
   @Size(max = 50)
   private String displayName;
-
   @NotNull
   private UserRole role;
-
   @NotNull
   private Boolean isActive;
 

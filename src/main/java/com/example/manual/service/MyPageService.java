@@ -22,15 +22,12 @@ public class MyPageService {
 
   private final UserService userService;
   private final ManualQueryService query;
-  private final ManualPermissionService permission;
 
   public MyPageService(UserService userService,
-      ManualQueryService manualQueryService,
-      ManualPermissionService permission) {
+      ManualQueryService manualQueryService) {
 
     this.userService = userService;
     this.query = manualQueryService;
-    this.permission = permission;
   }
 
   // ================================================
@@ -39,50 +36,32 @@ public class MyPageService {
 
   // myPage表示
   public MyPageDto showMyPage(Principal principal) {
-    log.info("start");
-    User playUser = userService.getUserByPrincipal(principal);
-    if (!canShowMyPage(playUser)) {
-      throw new InvalidStateException("判定エラー");
-    }
-    MyPageDto pageDto = new MyPageDto();
-    pageDto.setCreatedManualList(getUserCreatedManual(principal));
-    pageDto.setPendingManualList(getPendingManual(playUser));
-    pageDto.setRollbackManualList(getRollbackManual(playUser));
-    pageDto.setRollbackCount(query.countMyRollbackManual(principal));
-    pageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
-    pageDto.setUserDto(userService.toCreatedUserDto(playUser));
+  log.info("start");
+  User playUser = userService.getUserByPrincipal(principal);
+  if (!canShowMyPage(playUser)) {
+  throw new InvalidStateException("判定エラー");
+  }
+  MyPageDto myPageDto = new MyPageDto();
 
-    return pageDto;
+  List<Manual> myCreatedManuals = query.findMyCreatedManuals(principal);
+  List<ManualResponseDto> userCreatedDtos = query.buildIndexWithManualsPage(myCreatedManuals);
+  myPageDto.setCreatedManualList(userCreatedDtos);
+
+  List<Manual> createdRollbackManuals = query.findCreatedRollbackManuals(playUser);
+  List<ManualResponseDto> rollbackDtos = query.buildIndexWithManualsPage(createdRollbackManuals);
+  myPageDto.setRollbackManualList(rollbackDtos);
+
+  if (playUser.getRole() == UserRole.APPROVER || playUser.getRole() == UserRole.ADMIN) {
+    List<Manual> pendingManuals = query.findPendingManuals(playUser);
+    List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals);
+    myPageDto.setPendingManualList(pendingDtos);
+    myPageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
   }
 
-  public List<ManualResponseDto> getRollbackManual(User user) {
-    log.info("start");
-    // 差し戻しマニュアルタブ
-    List<Manual> manuals = query.findCreatedRollbackManuals(user);
+  myPageDto.setRollbackCount(query.countMyRollbackManual(principal));
+  myPageDto.setUserDto(userService.toCreatedUserDto(playUser));
 
-    List<ManualResponseDto> responseDtos = query.buildIndexWithManuals(manuals);
-    return responseDtos;
-  }
-
-  public List<ManualResponseDto> getUserCreatedManual(Principal principal) {
-    log.info("start");
-    // 自分作成マニュアルタブ
-    List<Manual> manuals = query.findMyCreatedManuals(principal);
-
-    List<ManualResponseDto> responseDtos = query.buildIndexWithManuals(manuals);
-    return responseDtos;
-  }
-
-  public List<ManualResponseDto> getPendingManual(User user) {
-    log.info("start");
-    // 承認待ちマニュアルタブ
-    if (!canGetPendingManual(user)) {
-      throw new InvalidStateException("判定エラー");
-    }
-    List<Manual> manuals = query.findPendingManuals(user);
-
-    List<ManualResponseDto> responseDtos = query.buildIndexWithManuals(manuals);
-    return responseDtos;
+  return myPageDto;
   }
 
   // =================================================
@@ -98,12 +77,4 @@ public class MyPageService {
     return true;
   }
 
-  public boolean canGetPendingManual(User user) {
-    log.info("start");
-    // admin/approver
-    if (user.getRole() != UserRole.APPROVER && user.getRole() != UserRole.ADMIN) {
-      throw new UnauthorizedException("承認権限がありません。");
-    }
-    return true;
-  }
 }

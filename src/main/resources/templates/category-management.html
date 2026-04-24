@@ -20,7 +20,8 @@
       <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
     </header>
 
-    <div class="alert category-management-alert mb-4" role="alert" th:if="${message != null}" th:classappend="${
+    <div class="alert category-management-alert mb-4" id="flashMessage" role="alert" th:if="${message != null}"
+      th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'
@@ -115,13 +116,22 @@
               </tbody>
             </table>
           </div>
-          <nav class="admin-pagination" aria-label="カテゴリ一覧ページ切り替え">
+          <nav class="admin-pagination" aria-label="カテゴリ一覧ページ切り替え" th:if="${formDto.pagingDto.totalPages>0}">
             <ul class="pagination justify-content-center mb-0">
-              <li class="page-item disabled"><span class="page-link">前へ</span></li>
-              <li class="page-item active"><span class="page-link">1</span></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">次へ</a></li>
+              <li class="page-item" th:classappend="${!formDto.pagingDto.hasPrevious} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${formDto.pagingDto.currentPage-1},
+                size=${formDto.pagingDto.pageSize})}">前へ</a>
+              </li>
+              <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,formDto.pagingDto.totalPages - 1)}"
+                th:classappend="${pageNum == formDto.pagingDto.currentPage} ? 'active'">
+                <a class="page-link" th:text="${pageNum+1}"
+                  th:href="@{/categories(page=${pageNum},size=${formDto.pagingDto.pageSize})}">1
+                </a>
+              </li>
+              <li class="page-item" th:classappend="${!formDto.pagingDto.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${formDto.pagingDto.currentPage+1},
+                size=${formDto.pagingDto.pageSize})}">次へ</a>
+              </li>
             </ul>
           </nav>
         </div>

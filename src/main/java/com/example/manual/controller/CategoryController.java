@@ -4,6 +4,8 @@ import java.security.Principal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +40,11 @@ public class CategoryController {
   // category-management表示
   @GetMapping
   public String showCategoryManagement(
-      Principal principal, Model model) {
+      Principal principal,
+      @PageableDefault(size = 10) Pageable pageable,
+      Model model) {
     log.info("start");
-    CategoryFormDto formDto = categoryService.showCategoryManagement(principal);
+    CategoryFormDto formDto = categoryService.showCategoryManagement(principal, pageable);
     model.addAttribute("formDto", formDto);
     return "category-management";
   }
@@ -51,19 +55,14 @@ public class CategoryController {
       Principal principal,
       @PathVariable Long categoryId,
       RedirectAttributes message,
+      @PageableDefault(size = 10) Pageable pageable,
       Model model) {
     log.info("start");
-    try {
-      CategoryFormDto formDto = categoryService.showCategoryUpdateMode(principal, categoryId);
-      model.addAttribute("formDto", formDto);
-      message.addFlashAttribute("message", "カテゴリーを取得しました。");
-      message.addFlashAttribute("messageType", "success");
-      return "category-management";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "category-management";
-    }
+    CategoryFormDto formDto = categoryService.showCategoryUpdateMode(principal, categoryId, pageable);
+    model.addAttribute("formDto", formDto);
+    message.addFlashAttribute("message", "カテゴリーを取得しました。");
+    message.addFlashAttribute("messageType", "success");
+    return "category-management";
   }
 
   // =============================================
@@ -75,29 +74,24 @@ public class CategoryController {
       @Valid @ModelAttribute CategoryRequestDto requestDto,
       Principal principal,
       RedirectAttributes message,
-      Model model) {
+      Model model,
+      Pageable pageable) {
     log.info("start");
-    try {
-      if (categoryService.createCategory(
-          requestDto, principal)) {
-        boolean duplicate = true;
-        String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
-        model.addAttribute("duplicate", duplicate);
-        model.addAttribute("duplicateMessage", duplicateMessage);
-        CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal);
-        model.addAttribute("formDto", formDto);
-        return "category-management";
-      }
-
-      message.addFlashAttribute(
-          "message", "新しいカテゴリーを作成しました。");
-      message.addFlashAttribute("messageType", "success");
-      return "redirect:/categories";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "カテゴリー作成に失敗しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "redirect:/categories";
+    if (categoryService.createCategory(
+        requestDto, principal)) {
+      boolean duplicate = true;
+      String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
+      model.addAttribute("duplicate", duplicate);
+      model.addAttribute("duplicateMessage", duplicateMessage);
+      CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal, pageable);
+      model.addAttribute("formDto", formDto);
+      return "category-management";
     }
+
+    message.addFlashAttribute(
+        "message", "新しいカテゴリーを作成しました。");
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
   }
 
   @PostMapping("/{categoryId}/update")
@@ -105,28 +99,22 @@ public class CategoryController {
       @Valid @ModelAttribute CategoryRequestDto requestDto,
       Principal principal,
       RedirectAttributes message,
-      Model model) {
+      Model model,
+      Pageable pageable) {
     log.info("start");
-    try {
-      if (categoryService.updateCategory(requestDto, principal)) {
-        boolean duplicate = true;
-        String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
-        model.addAttribute("duplicate", duplicate);
-        model.addAttribute("duplicateMessage", duplicateMessage);
-        CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal);
-        model.addAttribute("formDto", formDto);
-        return "category-management";
-      }
-      message.addFlashAttribute(
-          "message", "カテゴリーを更新しました。");
-      message.addFlashAttribute("messageType", "success");
-      return "redirect:/categories";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "更新に失敗しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "redirect:/categories";
+    if (categoryService.updateCategory(requestDto, principal)) {
+      boolean duplicate = true;
+      String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
+      model.addAttribute("duplicate", duplicate);
+      model.addAttribute("duplicateMessage", duplicateMessage);
+      CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal, pageable);
+      model.addAttribute("formDto", formDto);
+      return "category-management";
     }
-
+    message.addFlashAttribute(
+        "message", "カテゴリーを更新しました。");
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
   }
 
   @PostMapping("/{categoryId}/deactivate")
@@ -135,17 +123,11 @@ public class CategoryController {
       @PathVariable Long categoryId,
       RedirectAttributes message) {
     log.info("start");
-    try {
-      categoryService.deactivateCategory(principal, categoryId);
-      message.addFlashAttribute(
-          "message", "選択カテゴリーを使用停止にしました。");
-      message.addFlashAttribute("messageType", "success");
-      return "redirect:/categories";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "使用停止に失敗しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "redirect:/categories";
-    }
+    categoryService.deactivateCategory(principal, categoryId);
+    message.addFlashAttribute(
+        "message", "選択カテゴリーを使用停止にしました。");
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
   }
 
   @PostMapping("/{categoryId}/activate")
@@ -154,17 +136,11 @@ public class CategoryController {
       @PathVariable Long categoryId,
       RedirectAttributes message) {
     log.info("start");
-    try {
-      categoryService.activateCategory(principal, categoryId);
-      message.addFlashAttribute(
-          "message", "選択カテゴリーを有効にしました。");
-      message.addFlashAttribute("messageType", "success");
-      return "redirect:/categories";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "カテゴリー有効に失敗しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "redirect:/categories";
-    }
+    categoryService.activateCategory(principal, categoryId);
+    message.addFlashAttribute(
+        "message", "選択カテゴリーを有効にしました。");
+    message.addFlashAttribute("messageType", "success");
+    return "redirect:/categories";
   }
 
   public void getAllCategories() {

@@ -10,6 +10,7 @@ public class CategoryFormDto {
   }
 
   private List<CategoryDetailDto> categoryListDto;
+  private PagingDto PagingDto;
   private ViewMode mode;
   private UserResponseDto playUser;
   private CategoryDetailDto targetCategory;
@@ -31,6 +32,10 @@ public class CategoryFormDto {
     return targetCategory;
   }
 
+  public PagingDto getPagingDto() {
+    return PagingDto;
+  }
+
   // setter
   public void setCategoryListDto(List<CategoryDetailDto> categoryListDto) {
     this.categoryListDto = categoryListDto;
@@ -46,6 +51,10 @@ public class CategoryFormDto {
 
   public void setTargetCategory(CategoryDetailDto targetCategory) {
     this.targetCategory = targetCategory;
+  }
+
+  public void setPagingDto(PagingDto pagingDto) {
+    PagingDto = pagingDto;
   }
 
 }

@@ -1,7 +1,7 @@
 ﻿# 03_screen-design.md
 
-Version: 01.06.16  
-更新日: 2026-04-23
+Version: 01.06.17  
+更新日: 2026-04-24
 
 ---
 
@@ -389,7 +389,7 @@ Version: 01.06.16
   - 必須未入力
   - 新規/確認パスワード不一致
   - 形式不正（文字数/文字種/許可文字）
-- 現在実装の到達URLは `GET /users/users/{userId}/change-password` を使用する
+- 現在実装の到達URLは `GET /users/change-password` を使用する
 
 ---
 

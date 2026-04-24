@@ -45,6 +45,7 @@ public class MyPageDto {
     return userDto;
   }
 
+
   // setter
   public void setRollbackManualList(List<ManualResponseDto> rollbackManualList) {
     this.rollbackManualList = rollbackManualList;

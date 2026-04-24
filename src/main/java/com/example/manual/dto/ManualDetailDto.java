@@ -30,7 +30,6 @@ public class ManualDetailDto {
   private boolean canCopy;
   private boolean canGuest;
 
-
   // getter
   public Long getManualId() {
     return this.manualId;

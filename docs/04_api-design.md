@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.17  
-更新日: 2026-04-23
+Version: 01.03.18  
+更新日: 2026-04-24
 
 ---
 
@@ -40,8 +40,8 @@ Version: 01.03.17
 - POST `/users/{userId}/deactivate`
 - POST `/users/{userId}/activate`
 - POST `/users/{userId}/reset-password`
-- GET `/users/{userId}/change-password`
-- POST `/users/{userId}/action/change-password`
+- GET `/users/change-password`
+- POST `/users/action/change-password`
 - GET `/users/{userId}/operation-histories`
 
 ### 1-4. Auth API
@@ -78,8 +78,55 @@ Version: 01.03.17
 - 業務ルール依存の判定は Service で行う
 - パスワード変更入力は専用DTO（`PasswordChangeRequestDto`）で受ける
 
+### 2-2A. パスワード操作の権限制御
+- パスワード変更（`GET/POST /users/change-password`）は本人のみ実行可能とする
+- パスワード初期化（`POST /users/{userId}/reset-password`）は管理者のみ実行可能とする
+- 変更対象ユーザーは画面入力値ではなく認証情報（`Principal`）基準で判定する
+
+### 2-2B. 認可ルール表（確定版 / 2026-04-24）
+
+#### 共通前提
+- 無効ユーザー（`isActive=false`）は全画面で拒否する
+- 権限NG時はメッセージ付きで詳細画面へリダイレクトする
+- 判定は Service で実施し、画面表示制御は補助として扱う
+
+#### Manual 系
+| 操作 | role | isOwner | status | 追加条件 | 判定 |
+| --- | --- | --- | --- | --- | --- |
+| 一覧 / 検索 / 詳細閲覧 | 全ロール | 不問 | 不問 | 有効ユーザー | 許可 |
+| 編集 | 全ロール | 作成者のみ | DRAFT / PENDING | - | 許可 |
+| 複製 | 全ロール | 不問 | PENDING / APPROVED / ARCHIVED | DRAFT は不可（編集で対応） | 許可 |
+| マニュアル公開（申請） | 全ロール | 作成者のみ | DRAFT | - | 許可 |
+| 承認 | ADMIN / APPROVER | 作成者以外 | PENDING | - | 許可 |
+| 差し戻し | ADMIN / APPROVER | 作成者以外 | PENDING | 更新履歴必須 | 許可 |
+| アーカイブ | ADMIN / APPROVER | 不問 | APPROVED / PENDING / DRAFT | 更新履歴必須 | 許可 |
+| 復帰 | ADMIN / APPROVER | 不問 | ARCHIVED | カテゴリ有効のみ確認（作成者一致不要） / 更新履歴必須 | 許可 |
+
+#### User 系
+| 操作 | role | 追加条件 | 判定 |
+| --- | --- | --- | --- |
+| ユーザー管理画面表示 | ADMIN | 有効ユーザー | 許可 |
+| ユーザー作成 / 更新 / 停止 / 復帰 | ADMIN | 有効ユーザー | 許可 |
+| パスワード初期化（reset-password） | ADMIN | 対象 userId 指定 | 許可 |
+| パスワード変更（change-password） | 本人のみ（全ロール共通） | Principal と変更対象が一致 | 許可 |
+
+#### Category 系
+| 操作 | role | 追加条件 | 判定 |
+| --- | --- | --- | --- |
+| カテゴリ管理画面表示 | ADMIN | 有効ユーザー | 許可 |
+| カテゴリ作成 / 更新 / 停止 / 復帰 | ADMIN | 有効ユーザー | 許可 |
+| 同名カテゴリ作成 / 更新 | ADMIN | 重複時は confirm 表示後に続行可 | 許可（確認付き） |
+
+#### 画面表示制御方針（補助）
+| 利用者 | 方針 |
+| --- | --- |
+| USER / APPROVER | 作業を迷わせないため、権限外ボタンは非表示 |
+| GUEST | 理由を伝えるため、権限外ボタンは非活性 + 理由表示 |
+
 ### 2-3. 例外ハンドリング
-- ControllerAdvice で共通エラーレスポンスへ変換する
+- `@ControllerAdvice`（`GlobalExceptionHandler`）で画面系例外を集約処理する
+- 画面系はフラッシュメッセージ（`message` / `messageType`）を付与してリダイレクトする
+- Controller 側での個別 `try-catch` は最小化し、Service で throw した例外を共通処理へ委譲する
 - 主な例外候補
   - `NotFoundException`
   - `UnauthorizedException`
