@@ -79,7 +79,8 @@ Version: 01.03.18
 - パスワード変更入力は専用DTO（`PasswordChangeRequestDto`）で受ける
 
 ### 2-2A. パスワード操作の権限制御
-- パスワード変更（`GET/POST /users/change-password`）は本人のみ実行可能とする
+- パスワード変更画面表示（`GET /users/change-password`）は本人のみ実行可能とする
+- パスワード変更実行（`POST /users/action/change-password`）は本人のみ実行可能とする
 - パスワード初期化（`POST /users/{userId}/reset-password`）は管理者のみ実行可能とする
 - 変更対象ユーザーは画面入力値ではなく認証情報（`Principal`）基準で判定する
 
