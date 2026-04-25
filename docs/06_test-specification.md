@@ -1,6 +1,6 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.14  
+Version: 01.03.15  
 更新日: 2026-04-25
 
 ---
@@ -210,6 +210,8 @@ Version: 01.03.14
 | AUTH-029 | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
 | AUTH-030 | 正常 | USER/APPROVER の権限外操作UI | ボタン非表示 |
 | AUTH-031 | 正常 | GUEST のユーザー管理画面表示制御 | `userId` / `lastLoginAt` / `操作` 列が非表示、更新系ボタンは非活性 |
+| AUTH-032 | 正常 | ゲストログイン（環境変数設定あり） | `POST /login/guest` でログインし `/manuals/index` へ遷移する |
+| AUTH-033 | 異常 | ゲストログイン（環境変数未設定/不正） | `/login` に戻りエラーメッセージが表示される |
 
 ---
 
@@ -287,6 +289,7 @@ Version: 01.03.14
 | PWD-009 | 正常 | パスワード変更画面URL遷移（本人） | `GET /users/change-password` で画面表示される |
 | PWD-010 | 正常 | パスワード変更実行URL（本人） | `POST /users/action/change-password` で更新される |
 | PWD-011 | 正常 | パスワード初期化実行URL（管理者） | `POST /users/{userId}/reset-password` で初期化される |
+| PWD-012 | 正常 | 初期化後の再変更確認 | 初期化PWでログイン後に新PWへ変更でき、次回ログインは新PWのみ成功する |
 
 ---
 
