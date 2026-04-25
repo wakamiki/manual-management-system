@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryFormDto;
-import com.example.manual.dto.CategoryRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
+import com.example.manual.dto.CategoryViewDto;
 import com.example.manual.dto.PagingDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.Category;
@@ -20,12 +26,6 @@ import com.example.manual.exception.NotFoundException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.CategoryRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 @Service
 public class CategoryService {
 
@@ -33,13 +33,16 @@ public class CategoryService {
 
   public final CategoryRepository categoryRepository;
   public final UserService userService;
+  public final UserPermissionService userPermissionService;
 
   public CategoryService(
       CategoryRepository categoryRepository,
-      UserService userService) {
+      UserService userService,
+      UserPermissionService userPermissionService) {
 
     this.categoryRepository = categoryRepository;
     this.userService = userService;
+    this.userPermissionService = userPermissionService;
   }
 
   // =============================================
@@ -47,39 +50,29 @@ public class CategoryService {
   // =============================================
 
   // category-management表示
-  public CategoryFormDto showCategoryManagement(
-  Principal principal,Pageable pageable) {
-  log.info("start");
-  User playUser = userService.getUserByPrincipal(principal);
-  if (!canShowCategoryManagement(playUser)) {
-  throw new InvalidStateException("判定エラー");
-  }
-  Page<Category> categories =
-  categoryRepository.findAllByOrderByDisplayOrderAsc(pageable);
-  CategoryFormDto categoryDto = toCategoryFormDto(playUser,categories);
+  public CategoryViewDto showCategoryManagement(
+      Principal principal, Pageable pageable) {
+    log.info("start");
+    User playUser = userService.getUserByPrincipal(principal);
+    if (!canShowCategoryManagement(playUser)) {
+      throw new InvalidStateException("判定エラー");
+    }
+    Page<Category> categories = categoryRepository.findAllByOrderByDisplayOrderAsc(pageable);
+    CategoryViewDto categoryDto = toCategoryViewDto(playUser, categories);
 
-  return categoryDto;
+    return categoryDto;
   }
 
-  public CategoryFormDto showCategoryUpdateMode(
-  Principal principal, Long categoryId,Pageable pageable) {
-  User playUser = userService.getUserByPrincipal(principal);
-  if (!canShowCategoryUpdateMode(playUser)) {
-  throw new InvalidStateException("判定エラー");
-  }
-  Category category = getCategoryById(categoryId);
-  CategoryDetailDto detailDto = new CategoryDetailDto();
-  detailDto.setId(categoryId);
-  detailDto.setCategoryName(category.getCategoryName());
-  detailDto.setDisplayOrder(category.getDisplayOrder());
-  detailDto.setActive(category.isActive());
-  detailDto.setActiveLabel(getActiveLabel(category.isActive()));
-  detailDto.setUpdatedAt(category.getUpdatedAt());
-  CategoryFormDto formDto = showCategoryManagement(principal,pageable);
-  formDto.setMode(ViewMode.EDIT);
-  formDto.setTargetCategory(detailDto);
+  public CategoryViewDto showCategoryUpdateMode(
+      Principal principal, Long categoryId, Pageable pageable) {
+    User playUser = userService.getUserByPrincipal(principal);
+    if (!canShowCategoryUpdateMode(playUser)) {
+      throw new InvalidStateException("判定エラー");
+    }
+    CategoryViewDto viewDto = showCategoryManagement(principal, pageable);
+    viewDto.setMode(ViewMode.EDIT);
 
-  return formDto;
+    return viewDto;
   }
 
   // ============================================
@@ -87,24 +80,24 @@ public class CategoryService {
   // ============================================
 
   public boolean createCategory(
-      CategoryRequestDto requestDto,
+      CategoryFormDto formDto,
       Principal principal) {
     log.info("start");
     User playUser = userService.getUserByPrincipal(principal);
-    if (!canCreateCategory(requestDto, playUser)) {
+    if (!canCreateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    if (requestDto.isConfirmed()) {
+    if (formDto.isConfirmed()) {
       // カテゴリー名重複了承 チェック回避処理
-    } else if (isCategoryNameTaken(requestDto)) {
+    } else if (isCategoryNameTaken(formDto)) {
       // カテゴリー名重複チェック
       return true;
     }
 
-    int targetOrder = requestDto.getDisplayOrder();
+    int targetOrder = formDto.getDisplayOrder();
     shiftUpOrderNumbers(targetOrder, null);
     Category category = new Category();
-    category.setCategoryName(requestDto.getCategoryName());
+    category.setCategoryName(formDto.getCategoryName());
     category.setDisplayOrder(targetOrder);
     category.markCreatedNow();
     category.markUpdatedNow();
@@ -114,30 +107,31 @@ public class CategoryService {
   }
 
   public boolean updateCategory(
-      CategoryRequestDto requestDto,
+      CategoryFormDto formDto,
       Principal principal) {
     log.info("start");
     User playUser = userService.getUserByPrincipal(principal);
-    if (!canUpdateCategory(requestDto, playUser)) {
+    if (!canUpdateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    if (requestDto.isConfirmed()) {
+    if (formDto.isConfirmed()) {
       // カテゴリー名重複了承 チェック回避処理
-    } else if (isCategoryNameTaken(requestDto)) {
+    } else if (isCategoryNameTaken(formDto)) {
       // カテゴリー名重複チェック
+      formDto.setConfirmed(true);
       return true;
     }
 
-    Category category = findCategoryOrThrow(requestDto.getId());
+    Category category = findCategoryOrThrow(formDto.getId());
     int currentOrder = category.getDisplayOrder();
-    int targetOrder = requestDto.getDisplayOrder();
+    int targetOrder = formDto.getDisplayOrder();
     if (targetOrder < currentOrder) {
       shiftUpOrderNumbers(targetOrder, currentOrder - 1);
     } else if (targetOrder > currentOrder) {
       shiftDownOrderNumbers(currentOrder + 1, targetOrder);
     }
 
-    category.setCategoryName(requestDto.getCategoryName());
+    category.setCategoryName(formDto.getCategoryName());
     category.setDisplayOrder(targetOrder);
     category.markUpdatedNow();
     categoryRepository.save(category);
@@ -174,8 +168,8 @@ public class CategoryService {
   // ===============================================
 
   public Page<Category> getAllCategories(Pageable pageable) {
-  log.info("start");
-  return categoryRepository.findAllByOrderByCategoryNameAsc(pageable);
+    log.info("start");
+    return categoryRepository.findAllByOrderByCategoryNameAsc(pageable);
   }
 
   public Category getCategoryById(Long categoryId) {
@@ -280,7 +274,7 @@ public class CategoryService {
     return categoryDto;
   }
 
-  private CategoryFormDto toCategoryFormDto(User playUser, Page<Category> categories) {
+  private CategoryViewDto toCategoryViewDto(User playUser, Page<Category> categories) {
     List<CategoryDetailDto> responseDtos = new ArrayList<>();
     PagingDto pagingDto = PagingDto.from(categories);
     for (Category category : categories) {
@@ -294,32 +288,36 @@ public class CategoryService {
       responseDtos.add(responseDto);
     }
 
-    CategoryFormDto categoryDto = new CategoryFormDto();
+    CategoryViewDto categoryDto = new CategoryViewDto();
     categoryDto.setPagingDto(pagingDto);
     categoryDto.setCategoryListDto(responseDtos);
     categoryDto.setPlayUser(userService.toCreatedUserDto(playUser));
+    categoryDto.setCanGuest(userPermissionService.isGuest(playUser));
     categoryDto.setMode(ViewMode.CREATE);
 
     return categoryDto;
   }
 
-  public CategoryFormDto convertToCategoryFormDto(CategoryRequestDto
-  requestDto, Principal principal, Pageable pageable) {
-    CategoryFormDto formDto = showCategoryManagement(principal, pageable);
+  public CategoryViewDto convertToCategoryViewDto(CategoryFormDto formDto, Principal principal,
+      Pageable pageable) {
+    CategoryViewDto viewDto = showCategoryManagement(principal, pageable);
     User playUser = userService.getUserByPrincipal(principal);
     UserResponseDto userDto = userService.toCreatedUserDto(playUser);
-    CategoryDetailDto detailDto = new CategoryDetailDto();
-    detailDto.setId(requestDto.getId());
-    detailDto.setCategoryName(requestDto.getCategoryName());
-    detailDto.setDisplayOrder(requestDto.getDisplayOrder());
-
-    formDto.setPlayUser(userDto);
-    formDto.setTargetCategory(detailDto);
-    if (requestDto.getId() == null) {
-      formDto.setMode(ViewMode.CREATE);
+    viewDto.setPlayUser(userDto);
+    if (formDto.getId() == null) {
+      viewDto.setMode(ViewMode.CREATE);
     } else {
-      formDto.setMode(ViewMode.EDIT);
+      viewDto.setMode(ViewMode.EDIT);
     }
+    return viewDto;
+  }
+
+  public CategoryFormDto toFormDto(Long categoryId) {
+    Category category = getCategoryById(categoryId);
+    CategoryFormDto formDto = new CategoryFormDto();
+    formDto.setId(category.getId());
+    formDto.setDisplayOrder(category.getDisplayOrder());
+    formDto.setCategoryName(category.getCategoryName());
     return formDto;
   }
 
@@ -338,12 +336,12 @@ public class CategoryService {
   }
 
   // カテゴリー名重複チェック
-  private boolean isCategoryNameTaken(CategoryRequestDto requestDto) {
+  private boolean isCategoryNameTaken(CategoryFormDto formDto) {
     log.info("start");
-    if (requestDto.getId() == null) {
-      return categoryRepository.existsByCategoryName(requestDto.getCategoryName());
+    if (formDto.getId() == null) {
+      return categoryRepository.existsByCategoryName(formDto.getCategoryName());
     }
-    return categoryRepository.existsByCategoryNameAndIdNot(requestDto.getCategoryName(), requestDto.getId());
+    return categoryRepository.existsByCategoryNameAndIdNot(formDto.getCategoryName(), formDto.getId());
   }
 
   private boolean canShowCategoryManagement(User playUser) {
@@ -368,35 +366,35 @@ public class CategoryService {
     return true;
   }
 
-  private boolean canCreateCategory(CategoryRequestDto requestDto, User playUser) {
+  private boolean canCreateCategory(CategoryFormDto formDto, User playUser) {
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
     if (playUser.isActive() != true) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
-    if (requestDto.getCategoryName() == null ||
-        requestDto.getCategoryName().isBlank()) {
+    if (formDto.getCategoryName() == null ||
+        formDto.getCategoryName().isBlank()) {
       throw new InvalidStateException("カテゴリー名は必須項目です。");
     }
-    if (requestDto.getDisplayOrder() == null) {
+    if (formDto.getDisplayOrder() == null) {
       throw new InvalidStateException("displayOrderは必須項目です。");
     }
     return true;
   }
 
-  private boolean canUpdateCategory(CategoryRequestDto requestDto, User playUser) {
+  private boolean canUpdateCategory(CategoryFormDto formDto, User playUser) {
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
     if (playUser.isActive() != true) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
-    if (requestDto.getCategoryName() == null ||
-        requestDto.getCategoryName().isBlank()) {
+    if (formDto.getCategoryName() == null ||
+        formDto.getCategoryName().isBlank()) {
       throw new InvalidStateException("カテゴリー名は必須項目です。");
     }
-    if (requestDto.getDisplayOrder() == null) {
+    if (formDto.getDisplayOrder() == null) {
       throw new InvalidStateException("displayOrderは必須項目です。");
     }
     return true;

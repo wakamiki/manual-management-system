@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.manual.dto.PasswordChangeRequestDto;
-import com.example.manual.dto.UserRequestDto;
+import com.example.manual.dto.UserFormDto;
 import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
@@ -71,7 +71,7 @@ public class UserPermissionService {
   }
 
   public boolean canCreateUser(
-      UserRequestDto requestDto,
+      UserFormDto formDto,
       User playUser) {
     log.info("start");
 
@@ -81,20 +81,20 @@ public class UserPermissionService {
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
-    if (requestDto.getLoginId() == null || requestDto.getLoginId().isBlank()) {
+    if (formDto.getLoginId() == null || formDto.getLoginId().isBlank()) {
       throw new NotFoundException("userIdは必須入力項目です。");
     }
-    if (requestDto.getDisplayName() == null || requestDto.getDisplayName().isBlank()) {
+    if (formDto.getDisplayName() == null || formDto.getDisplayName().isBlank()) {
       throw new NotFoundException("user名は必須入力項目です。");
     }
-    if (requestDto.getRole() == null) {
+    if (formDto.getRole() == null) {
       throw new NotFoundException("Roleは必須入力項目です。");
     }
     return true;
   }
 
   public boolean canUpdateUser(
-      UserRequestDto requestDto,
+      UserFormDto formDto,
       User playUser) {
     log.info("start");
     if (!playUser.isActive()) {
@@ -145,12 +145,12 @@ public class UserPermissionService {
     return true;
   }
 
-  public boolean isUserIdTaken(UserRequestDto requestDto) {
+  public boolean isUserIdTaken(UserFormDto formDto) {
     log.info("start");
-    if (requestDto.getId() == null) {
-      return userRepository.existsByLoginId(requestDto.getLoginId());
+    if (formDto.getId() == null) {
+      return userRepository.existsByLoginId(formDto.getLoginId());
     }
-    return userRepository.existsByLoginIdAndIdNot(requestDto.getLoginId(), requestDto.getId());
+    return userRepository.existsByLoginIdAndIdNot(formDto.getLoginId(), formDto.getId());
   }
 
   public boolean canChangePassword(
@@ -176,5 +176,13 @@ public class UserPermissionService {
     }
 
     return true;
+  }
+
+  public boolean isGuest(User playUser) {
+    log.info("start");
+    if (playUser.getRole() == UserRole.GUEST) {
+      return true;
+    }
+    return false;
   }
 }

@@ -12,12 +12,12 @@
 
 <body>
   <main class="container admin-page">
-    <header class="page-title-bar">
+    <header class="page-title-bar admin-title-bar">
       <div>
-        <h1 class="h4 mb-1">カテゴリ管理</h1>
-        <p class="mb-0 text-muted">カテゴリ名変更時は業務内容が変わらない時のみ使用してください。</p>
+        <h1 class="h4 mb-1 d-flex">カテゴリ管理</h1>
+        <p class="mb-0 text-muted d-flex">カテゴリ名変更時は業務内容が変わらない時のみ使用してください。</p>
       </div>
-      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
+      <button onclick="window.close()" class="btn btn-outline-secondary admin-close-btn">閉じる</button>
     </header>
 
     <div class="alert category-management-alert mb-4" id="flashMessage" role="alert" th:if="${message != null}"
@@ -31,14 +31,14 @@
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(formDto.mode.name())}">
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(viewDto.mode.name())}">
           カテゴリー新規作成モード</div>
-        <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(formDto.mode.name())}">
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(viewDto.mode.name())}">
           カテゴリー更新モード</div>
 
         <div class="form-mode-info d-flex justify-content-end"
-          th:if="${formDto.mode != null and 'EDIT'.equals(formDto.mode.name())}">
-          <span class="admin-mode-select" th:text="|編集中:${formDto.targetCategory.categoryName}|">
+          th:if="${viewDto.mode != null and 'EDIT'.equals(viewDto.mode.name())}">
+          <span class="admin-mode-select" th:text="|編集中:${viewDto.targetCategory.categoryName}|">
             編集中:
           </span>
           <a class="admin-mode-select" th:href="@{/categories}">
@@ -50,34 +50,34 @@
           <form th:object="${formDto}" th:action="@{/categories/create}" method="post"
             th:onsubmit="${duplicate} ? 'return confirm(&quot;同名のカテゴリがあります。このまま更新しますか？&quot;);' : 'return true;'">
 
-            <div class="mb-2" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}">
+            <div class="mb-2" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}">
               <label for="categoryId" class="form-label">categoryId</label>
               <input id="categoryId" type="text" class="form-control"
-                th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}" th:value="*{targetCategory.id}"
-                readonly>
+                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}" th:value="*{id}" readonly>
             </div>
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
-              <input id="categoryName" type="text" class="form-control" th:field="*{targetCategory.categoryName}">
+              <input id="categoryName" type="text" class="form-control" th:field="*{categoryName}">
             </div>
             <div class="mb-4">
               <label for="displayOrder" class="form-label">displayOrder</label>
-              <input id="displayOrder" type="number" class="form-control" th:field="*{targetCategory.displayOrder}"
-                value="1" min="1" placeholder="指定の番号に割り込み">
+              <input id="displayOrder" type="number" class="form-control" th:field="*{displayOrder}" value="1" min="1"
+                placeholder="指定の番号に割り込み">
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
-                th:if="*{targetCategory != null or 'CREATE'.equals(mode.name())}"
-                th:formaction="@{/categories/create}">新規登録</button>
+                th:if="${formDto != null or 'CREATE'.equals(viewDto.mode.name())}" th:formaction="@{/categories/create}"
+                th:disabled="${viewDto.canGuest}">新規登録</button>
               <button type="submit" class="btn btn-outline-primary"
-                th:if="*{targetCategory != null and 'EDIT'.equals(mode.name())}"
-                th:formaction="@{/categories/{categoryId}/update(categoryId=*{targetCategory.id})}">変更</button>
-              <button type="submit" class="btn btn-outline-danger" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name()) and
-              targetCategory.isActive==true}"
-                th:formaction="@{/categories/{categoryId}/deactivate(categoryId=*{targetCategory.id})}">使用停止</button>
-              <button type="submit" class="btn btn-outline-secondary" th:if="*{targetCategory != null and 'EDIT'.equals(mode.name()) and
-              targetCategory.isActive==false}"
-                th:formaction="@{/categories/{categoryId}/activate(categoryId=*{targetCategory.id})}">復帰</button>
+                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}"
+                th:formaction="@{/categories/{categoryId}/update(categoryId=*{id})}"
+                th:disabled="${viewDto.canGuest}">変更</button>
+              <button type="submit" class="btn btn-outline-danger" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name()) and
+              formDto.isActive==true}" th:formaction="@{/categories/{categoryId}/deactivate(categoryId=*{id})}"
+                th:disabled="${viewDto.canGuest}">使用停止</button>
+              <button type="submit" class="btn btn-outline-secondary" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name()) and
+              formDto.isActive==false}" th:formaction="@{/categories/{categoryId}/activate(categoryId=*{id})}"
+                th:disabled="${viewDto.canGuest}">復帰</button>
             </div>
           </form>
         </div>
@@ -100,7 +100,7 @@
                   <th scope="col">操作</th>
                 </tr>
               </thead>
-              <tbody th:each="category:${formDto.categoryListDto}">
+              <tbody th:each="category:${viewDto.categoryListDto}">
                 <tr>
                   <td th:text="${category.id}">01</td>
                   <td th:text="${category.categoryName}">営業部</td>
@@ -116,21 +116,21 @@
               </tbody>
             </table>
           </div>
-          <nav class="admin-pagination" aria-label="カテゴリ一覧ページ切り替え" th:if="${formDto.pagingDto.totalPages>0}">
+          <nav class="admin-pagination" aria-label="カテゴリ一覧ページ切り替え" th:if="${viewDto.pagingDto.totalPages>0}">
             <ul class="pagination justify-content-center mb-0">
-              <li class="page-item" th:classappend="${!formDto.pagingDto.hasPrevious} ? 'disabled'">
-                <a class="page-link" th:href="@{/categories(page=${formDto.pagingDto.currentPage-1},
-                size=${formDto.pagingDto.pageSize})}">前へ</a>
+              <li class="page-item" th:classappend="${!viewDto.pagingDto.hasPrevious} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${viewDto.pagingDto.currentPage-1},
+                size=${viewDto.pagingDto.pageSize})}">前へ</a>
               </li>
-              <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,formDto.pagingDto.totalPages - 1)}"
-                th:classappend="${pageNum == formDto.pagingDto.currentPage} ? 'active'">
+              <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,viewDto.pagingDto.totalPages - 1)}"
+                th:classappend="${pageNum == viewDto.pagingDto.currentPage} ? 'active'">
                 <a class="page-link" th:text="${pageNum+1}"
-                  th:href="@{/categories(page=${pageNum},size=${formDto.pagingDto.pageSize})}">1
+                  th:href="@{/categories(page=${pageNum},size=${viewDto.pagingDto.pageSize})}">1
                 </a>
               </li>
-              <li class="page-item" th:classappend="${!formDto.pagingDto.hasNext} ? 'disabled'">
-                <a class="page-link" th:href="@{/categories(page=${formDto.pagingDto.currentPage+1},
-                size=${formDto.pagingDto.pageSize})}">次へ</a>
+              <li class="page-item" th:classappend="${!viewDto.pagingDto.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{/categories(page=${viewDto.pagingDto.currentPage+1},
+                size=${viewDto.pagingDto.pageSize})}">次へ</a>
               </li>
             </ul>
           </nav>

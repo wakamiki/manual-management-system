@@ -1,79 +1,68 @@
 package com.example.manual.dto;
 
-import java.util.List;
-
 import com.example.manual.enums.UserRole;
-import com.example.manual.enums.ViewMode;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class UserFormDto {
-
   public UserFormDto() {
-
   }
 
-  private List<UserDetailDto> allUserDto;
-  private PagingDto pagingDto;
-  private ViewMode mode = ViewMode.CREATE;
-  private UserResponseDto playUser;
-  private UserDetailDto targetUser = new UserDetailDto();
-  private List<UserRole> allRole;
-  private Long userCount;
+  private Long id;
+  @NotBlank
+  private String loginId;
+  @NotBlank
+  @Size(max = 50)
+  private String displayName;
+  @NotNull
+  private UserRole role;
+
+  private boolean isActive = true;
 
   // getter
-  public List<UserDetailDto> getAllUserDto() {
-    return allUserDto;
+  public Long getId() {
+    return id;
   }
 
-  public ViewMode getMode() {
-    return mode;
+  public String getLoginId() {
+    return this.loginId;
   }
 
-  public UserResponseDto getPlayUser() {
-    return playUser;
+  public String getDisplayName() {
+    return this.displayName;
   }
 
-  public UserDetailDto getTargetUser() {
-    return targetUser;
+  public UserRole getRole() {
+    return this.role;
   }
 
-  public List<UserRole> getAllRole() {
-    return allRole;
-  }
+  public boolean getIsActive() {
 
-  public Long getUserCount() {
-    return userCount;
-  }
-
-  public PagingDto getPagingDto() {
-    return pagingDto;
+    return this.isActive;
   }
 
   // setter
-  public void setTargetUser(UserDetailDto targetUser) {
-    this.targetUser = targetUser;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public void setPlayUser(UserResponseDto playUser) {
-    this.playUser = playUser;
+  public void setLoginId(String loginId) {
+    this.loginId = loginId;
   }
 
-  public void setMode(ViewMode mode) {
-    this.mode = mode;
+  public void setDisplayName(String displayName) {
+
+    this.displayName = displayName;
   }
 
-  public void setAllUserDto(List<UserDetailDto> allUserDto) {
-    this.allUserDto = allUserDto;
+  public void setRole(UserRole role) {
+    this.role = role;
   }
 
-  public void setAllRole(List<UserRole> allRole) {
-    this.allRole = allRole;
+  public void setIsActive(boolean isActive) {
+    this.isActive = isActive;
   }
 
-  public void setUserCount(Long userCount) {
-    this.userCount = userCount;
-  }
-
-  public void setPagingDto(PagingDto pagingDto) {
-    this.pagingDto = pagingDto;
-  }
 }

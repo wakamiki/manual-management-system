@@ -28,7 +28,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/h2-console/**",
                                                                 "/login",
                                                                 "/css/**",
-                                                                "/js/**")
+                                                                "/js/**",
+                                                                "/login/guest")
                                                 .permitAll()
                                                 .anyRequest()
                                                 .authenticated())

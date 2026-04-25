@@ -15,6 +15,7 @@ public class MyPageDto {
   private int pendingUnCreatedCount = 0;
   private String userRoleLabel;
   private UserResponseDto userDto;
+  private boolean canGuest;
 
   // getter
   public List<ManualResponseDto> getRollbackManualList() {
@@ -45,6 +46,9 @@ public class MyPageDto {
     return userDto;
   }
 
+  public boolean isCanGuest() {
+    return canGuest;
+  }
 
   // setter
   public void setRollbackManualList(List<ManualResponseDto> rollbackManualList) {
@@ -73,6 +77,10 @@ public class MyPageDto {
 
   public void setUserDto(UserResponseDto userDto) {
     this.userDto = userDto;
+  }
+
+  public void setCanGuest(boolean canGuest) {
+    this.canGuest = canGuest;
   }
 
 }

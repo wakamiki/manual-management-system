@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.18  
-更新日: 2026-04-24
+Version: 01.03.19  
+更新日: 2026-04-25
 
 ---
 
@@ -221,8 +221,6 @@ Version: 01.03.18
 - `ManualDraftRequestDto`
 - `ManualCopyRequestDto`
 - `ManualSearchConditionDto`
-- `CategoryRequestDto`
-- `UserRequestDto`
 - `CategoryFormDto`
 - `UserFormDto`
 - `PasswordChangeRequestDto`
@@ -233,6 +231,8 @@ Version: 01.03.18
 - `ManualDetailDto`
 - `CategoryResponseDto`
 - `UserResponseDto`
+- `CategoryViewDto`
+- `UserViewDto`
 
 ### 4-2A. 管理画面フォーム mode
 - `ViewMode` を `CREATE / EDIT` で扱う

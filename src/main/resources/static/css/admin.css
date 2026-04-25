@@ -69,6 +69,17 @@
   white-space: nowrap;
 }
 
+.page-title-bar.admin-title-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  column-gap: 12px;
+  align-items: start;
+}
+
+.admin-close-btn {
+  align-self: center;
+}
+
 .admin-status.is-active {
   background-color: rgba(116, 168, 134, 0.18);
   color: #4f7d60;

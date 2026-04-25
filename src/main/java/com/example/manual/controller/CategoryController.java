@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.CategoryFormDto;
-import com.example.manual.dto.CategoryRequestDto;
+import com.example.manual.dto.CategoryViewDto;
 import com.example.manual.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -44,7 +44,9 @@ public class CategoryController {
       @PageableDefault(size = 10) Pageable pageable,
       Model model) {
     log.info("start");
-    CategoryFormDto formDto = categoryService.showCategoryManagement(principal, pageable);
+    CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
+    CategoryFormDto formDto = new CategoryFormDto();
+    model.addAttribute("viewDto", viewDto);
     model.addAttribute("formDto", formDto);
     return "category-management";
   }
@@ -58,8 +60,10 @@ public class CategoryController {
       @PageableDefault(size = 10) Pageable pageable,
       Model model) {
     log.info("start");
-    CategoryFormDto formDto = categoryService.showCategoryUpdateMode(principal, categoryId, pageable);
+    CategoryFormDto formDto = categoryService.toFormDto(categoryId);
     model.addAttribute("formDto", formDto);
+    CategoryViewDto viewDto = categoryService.showCategoryUpdateMode(principal, categoryId, pageable);
+    model.addAttribute("viewDto", viewDto);
     message.addFlashAttribute("message", "カテゴリーを取得しました。");
     message.addFlashAttribute("messageType", "success");
     return "category-management";
@@ -71,20 +75,21 @@ public class CategoryController {
 
   @PostMapping("/create")
   public String createCategory(
-      @Valid @ModelAttribute CategoryRequestDto requestDto,
+      @Valid @ModelAttribute CategoryFormDto formDto,
       Principal principal,
       RedirectAttributes message,
       Model model,
       Pageable pageable) {
     log.info("start");
     if (categoryService.createCategory(
-        requestDto, principal)) {
+        formDto, principal)) {
       boolean duplicate = true;
       String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
       model.addAttribute("duplicate", duplicate);
       model.addAttribute("duplicateMessage", duplicateMessage);
-      CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal, pageable);
+      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(formDto, principal, pageable);
       model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
       return "category-management";
     }
 
@@ -96,19 +101,20 @@ public class CategoryController {
 
   @PostMapping("/{categoryId}/update")
   public String updateCategory(
-      @Valid @ModelAttribute CategoryRequestDto requestDto,
+      @Valid @ModelAttribute CategoryFormDto formDto,
       Principal principal,
       RedirectAttributes message,
       Model model,
       Pageable pageable) {
     log.info("start");
-    if (categoryService.updateCategory(requestDto, principal)) {
+    if (categoryService.updateCategory(formDto, principal)) {
       boolean duplicate = true;
       String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
       model.addAttribute("duplicate", duplicate);
       model.addAttribute("duplicateMessage", duplicateMessage);
-      CategoryFormDto formDto = categoryService.convertToCategoryFormDto(requestDto, principal, pageable);
+      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(formDto, principal, pageable);
       model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
       return "category-management";
     }
     message.addFlashAttribute(

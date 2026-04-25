@@ -17,7 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.PasswordChangeRequestDto;
 import com.example.manual.dto.UserFormDto;
-import com.example.manual.dto.UserRequestDto;
+import com.example.manual.dto.UserViewDto;
 import com.example.manual.service.UserPermissionService;
 import com.example.manual.service.UserService;
 
@@ -48,7 +48,9 @@ public class UserController {
       Principal principal, Model model,
       @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
-    UserFormDto formDto = userService.showUserManagementPage(principal, pageable);
+    UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
+    UserFormDto formDto = new UserFormDto();
+    model.addAttribute("viewDto", viewDto);
     model.addAttribute("formDto", formDto);
     return "user-management";
   }
@@ -62,17 +64,13 @@ public class UserController {
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
-    try {
-      UserFormDto formDto = userService.showUserUpdateMode(principal, userId, pageable);
-      model.addAttribute("formDto", formDto);
-      message.addFlashAttribute("message", "ユーザーを取得しました。");
-      message.addFlashAttribute("messageType", "success");
-      return "user-management";
-    } catch (Exception e) {
-      message.addFlashAttribute("message", "処理中にエラーが発生しました。");
-      message.addFlashAttribute("messageType", "error");
-      return "user-management";
-    }
+    UserViewDto viewDto = userService.showUserUpdateMode(principal, userId, pageable);
+    UserFormDto formDto = userService.toFormData(userId);
+    model.addAttribute("viewDto", viewDto);
+    model.addAttribute("formDto", formDto);
+    message.addFlashAttribute("message", "ユーザーを取得しました。");
+    message.addFlashAttribute("messageType", "success");
+    return "user-management";
   }
 
   // パスワード変更画面
@@ -91,20 +89,21 @@ public class UserController {
   public String createUser(
       RedirectAttributes message,
       Principal principal,
-      @Valid @ModelAttribute UserRequestDto requestDto,
+      @Valid @ModelAttribute UserFormDto formDto,
       Model model,
       Pageable pageable) {
     log.info("start");
 
-    if (userPermissionService.isUserIdTaken(requestDto)) {
+    if (userPermissionService.isUserIdTaken(formDto)) {
       String duplicateMessage = "userIDは既に使われています。別のuserIDを入力してください。";
       model.addAttribute("duplicateMessage", duplicateMessage);
-      UserFormDto formDto = userService.concertToUserFormDto(requestDto, principal, pageable);
+      UserViewDto viewDto = userService.concertToUserViewDto(formDto, principal, pageable);
+      model.addAttribute("viewDto", viewDto);
       model.addAttribute("formDto", formDto);
       return "user-management";
     }
     String password = userService.createUser(
-        requestDto, principal);
+        formDto, principal);
     String issuedInitialPassword = String.format("新規ユーザーを登録完了。初期パスワードを発行しました。");
     message.addFlashAttribute("message", issuedInitialPassword);
     message.addFlashAttribute("messageType", "success");
@@ -118,15 +117,17 @@ public class UserController {
       RedirectAttributes message,
       Principal principal,
       @PathVariable Long userId,
-      @Valid @ModelAttribute UserRequestDto requestDto,
+      @Valid @ModelAttribute UserFormDto formDto,
       Model model,
       Pageable pageable) {
     log.info("start");
 
-    if (userService.updateUser(requestDto, principal, userId)) {
+    if (userService.updateUser(formDto, principal, userId)) {
       String duplicateMessage = "userIDは既に使われています。別のuserIDを入力してください。";
       model.addAttribute("duplicateMessage", duplicateMessage);
-      UserFormDto formDto = userService.concertToUserFormDto(requestDto, principal, pageable);
+      UserViewDto viewDto = userService.concertToUserViewDto(formDto, principal, pageable);
+      model.addAttribute("viewDto", viewDto);
+      formDto = userService.toFormData(userId);
       model.addAttribute("formDto", formDto);
       return "user-management";
     }
@@ -140,9 +141,9 @@ public class UserController {
       RedirectAttributes message,
       Principal principal,
       @PathVariable Long userId,
-      @Valid @ModelAttribute UserRequestDto requestDto) {
+      @Valid @ModelAttribute UserFormDto formDto) {
     log.info("start");
-    userService.deactivateUser(principal, requestDto, userId);
+    userService.deactivateUser(principal, formDto, userId);
     message.addFlashAttribute("message", "ユーザーを停止しました。");
     message.addFlashAttribute("messageType", "success");
     return "redirect:/users";
@@ -153,7 +154,7 @@ public class UserController {
       RedirectAttributes message,
       @PathVariable Long userId,
       Principal principal,
-      @Valid @ModelAttribute UserRequestDto requestDto) {
+      @Valid @ModelAttribute UserFormDto formDto) {
     log.info("start");
     userService.activateUser(principal, userId);
     message.addFlashAttribute("message", "ユーザーを有効にしました。");

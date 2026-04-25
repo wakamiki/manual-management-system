@@ -12,22 +12,24 @@
 
 <body>
   <main class="container admin-page">
-    <header class="page-title-bar">
+    <header class="page-title-bar admin-title-bar">
       <div>
-        <h1 class="h4 mb-1">ユーザー管理</h1>
-        <p class="mb-0 text-muted">ユーザー情報、権限、利用状態を管理します。</p>
+        <h1 class="h4 mb-1 d-flex">ユーザー管理</h1>
+        <p class="mb-0 text-muted d-flex">ユーザー情報、権限、利用状態を管理します。</p>
       </div>
-      <button onclick="window.close()" class="btn btn-outline-secondary">閉じる</button>
+      <button onclick="window.close()" class="btn btn-outline-secondary admin-close-btn">閉じる</button>
     </header>
 
-    <div id="flashMessage" class="alert user-manegement-alert mb-4" role="alert" th:if="${message != null and (isCredentialNotice == null or !isCredentialNotice)}" th:classappend="${
+    <div id="flashMessage" class="alert user-manegement-alert mb-4" role="alert"
+      th:if="${message != null and (isCredentialNotice == null or !isCredentialNotice)}" th:classappend="${
        messageType == 'success' ? ' alert-success' :
        messageType == 'error'   ? ' alert-danger'  :
        messageType == 'warning' ? ' alert-warning' : ' alert-info'
      }" th:text="${message != null and !#strings.isEmpty(message) ? message : ''}">
       ユーザーを新規作成しました。
     </div>
-    <div id="credentialNotice" class="alert alert-warning user-manegement-alert mb-4" role="alert" th:if="${isCredentialNotice}">
+    <div id="credentialNotice" class="alert alert-warning user-manegement-alert mb-4" role="alert"
+      th:if="${isCredentialNotice}">
       <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
           <div class="fw-semibold mb-1" th:text="${message}">初期パスワードを発行しました。</div>
@@ -44,14 +46,14 @@
 
     <section class="admin-layout">
       <div class="card admin-form-card">
-        <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(formDto.mode.name())}">
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(viewDto.mode.name())}">
           ユーザー新規作成モード</div>
-        <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(formDto.mode.name())}">
+        <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(viewDto.mode.name())}">
           ユーザー更新モード</div>
 
         <div class="form-mode-info d-flex justify-content-end"
-          th:if="${formDto.mode != null and 'EDIT'.equals(formDto.mode.name())}">
-          <span class="admin-mode-select" th:text="|編集中:${formDto.targetUser.loginId}|">
+          th:if="${viewDto.mode != null and 'EDIT'.equals(viewDto.mode.name())}">
+          <span class="admin-mode-select" th:text="|編集中:${formDto.loginId}|">
             編集中:
           </span>
           <a class="admin-mode-select" th:href="@{/users}">
@@ -60,41 +62,44 @@
         </div>
 
         <div class="card-body">
-          <form th:object="${formDto}" th:action="@{/users/create}" method="post">
-            <div class="mb-3" th:if="*{'EDIT'.equals(mode.name())}">
+          <form th:object="${viewDto}" th:action="@{/users/create}" method="post">
+            <div class="mb-3" th:if="${'EDIT'.equals(viewDto.mode.name())}">
               <label for="id" class="form-label">id</label>
-              <input id="id" type="text" class="form-control" th:value="*{targetUser.id}" readonly>
+              <input id="id" type="hidden" class="form-control" th:if="${'EDIT'.equals(viewDto.mode.name())}"
+                th:field="*{id}" readonly>
             </div>
             <div class="mb-3">
               <label for="userId" class="form-label">userId</label>
-              <input id="userId" type="text" class="form-control" th:field="*{targetUser.loginId}">
+              <input id="userId" type="text" class="form-control" th:field="*{loginId}">
             </div>
             <div class="mb-3">
               <label for="displayName" class="form-label">displayName</label>
-              <input id="displayName" type="text" class="form-control" th:field="*{targetUser.displayName}">
+              <input id="displayName" type="text" class="form-control" th:field="*{displayName}">
             </div>
             <div class="mb-4">
               <label for="role" class="form-label">role</label>
-              <select id="role" class="form-select" th:field="*{targetUser.role}">
-                <option th:each="role:*{allRole}" th:text="${role}" th:value="${role}">USER</option>
+              <select id="role" class="form-select" th:field="*{role}">
+                <option th:each="role:${viewDto.allRole}" th:text="${role}" th:value="${role}">USER</option>
               </select>
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
-                th:if="${formDto.targetUser != null or 'CREATE'.equals(formDto.mode.name())}"
-                th:formaction="@{/users/create}">新規作成</button>
+                th:if="${formDto != null or 'CREATE'.equals(viewDto.mode.name())}" th:formaction="@{/users/create}"
+                th:disabled="${viewDto.canGuest}">新規作成</button>
               <button type="submit" class="btn btn-outline-primary"
-                th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name())}"
-                th:formaction="@{/users/{userId}/update(userId=${formDto.targetUser.id})}">更新</button>
-              <button type="submit" class="btn btn-outline-danger" th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name()) and
-              formDto.targetUser.isActive==true}"
-                th:formaction="@{/users/{userId}/deactivate(userId=${formDto.targetUser.id})}">停止</button>
-              <button type="submit" class="btn btn-outline-secondary" th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name()) and
-              formDto.targetUser.isActive==false}"
-                th:formaction="@{/users/{userId}/activate(userId=${formDto.targetUser.id})}">復帰</button>
+                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}"
+                th:formaction="@{/users/{userId}/update(userId=${formDto.id})}"
+                th:disabled="${viewDto.canGuest}">更新</button>
+              <button type="submit" class="btn btn-outline-danger" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name()) and
+              formDto.isActive==true}" th:formaction="@{/users/{userId}/deactivate(userId=${formDto.id})}"
+                th:disabled="${viewDto.canGuest}">停止</button>
+              <button type="submit" class="btn btn-outline-secondary" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name()) and
+              formDto.isActive==false}" th:formaction="@{/users/{userId}/activate(userId=${formDto.id})}"
+                th:disabled="${viewDto.canGuest}">復帰</button>
               <button type="submit" class="btn btn-outline-warning"
-                th:if="${formDto.targetUser != null and 'EDIT'.equals(formDto.mode.name())}"
-                th:formaction="@{/users/{userId}/reset-password(userId=${formDto.targetUser.id})}">パスワードリセット</button>
+                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}"
+                th:formaction="@{/users/{userId}/reset-password(userId=${formDto.id})}"
+                th:disabled="${viewDto.canGuest}">パスワードリセット</button>
             </div>
           </form>
         </div>
@@ -103,7 +108,7 @@
       <div class="card admin-table-card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span>USER一覧</span>
-          <span class="admin-note" th:text="|全${formDto.userCount}件|">全 4 件</span>
+          <span class="admin-note" th:text="|全${viewDto.userCount}件|">全 4 件</span>
         </div>
         <div class="card-body">
           <div class="table-responsive">
@@ -118,7 +123,7 @@
                   <th scope="col" class="user-table-head">操作</th>
                 </tr>
               </thead>
-              <tbody th:each="user:${formDto.allUserDto}">
+              <tbody th:each="user:${viewDto.allUserDto}">
                 <tr>
                   <td th:text="${user.loginId}">admin01</td>
                   <td th:text="${user.displayName}">管理 太郎</td>
@@ -139,27 +144,21 @@
               </tbody>
             </table>
           </div>
-          <nav class="admin-pagination" aria-label="ユーザー一覧ページ切り替え"
-          th:if="${formDto.pagingDto.totalPages>0}">
+          <nav class="admin-pagination" aria-label="ユーザー一覧ページ切り替え" th:if="${viewDto.pagingDto.totalPages>0}">
             <ul class="pagination justify-content-center mb-0">
-              <li class="page-item"
-              th:classappend="${!formDto.pagingDto.hasPrevious} ? 'disabled'">
-              <a class="page-link"
-              th:href="@{/users(page=${formDto.pagingDto.currentPage-1},
-                size=${formDto.pagingDto.pageSize})}">前へ</a>
+              <li class="page-item" th:classappend="${!viewDto.pagingDto.hasPrevious} ? 'disabled'">
+                <a class="page-link" th:href="@{/users(page=${viewDto.pagingDto.currentPage-1},
+                size=${viewDto.pagingDto.pageSize})}">前へ</a>
               </li>
-              <li class="page-item"
-              th:each="pageNum : ${#numbers.sequence(0,formDto.pagingDto.totalPages - 1)}"
-              th:classappend="${pageNum == formDto.pagingDto.currentPage} ? 'active'">
-              <a class="page-link"
-               th:text="${pageNum+1}"
-                th:href="@{/users(page=${pageNum},size=${formDto.pagingDto.pageSize})}">1</a>
+              <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,viewDto.pagingDto.totalPages - 1)}"
+                th:classappend="${pageNum == viewDto.pagingDto.currentPage} ? 'active'">
+                <a class="page-link" th:text="${pageNum+1}"
+                  th:href="@{/users(page=${pageNum},size=${viewDto.pagingDto.pageSize})}">1</a>
               </li>
-              <li class="page-item"
-              th:classappend="${!formDto.pagingDto.hasNext} ? 'disabled'">
-              <a class="page-link"
-              th:href="@{/users(page=${formDto.pagingDto.currentPage+1},
-                size=${formDto.pagingDto.pageSize})}">次へ</a></li>
+              <li class="page-item" th:classappend="${!viewDto.pagingDto.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{/users(page=${viewDto.pagingDto.currentPage+1},
+                size=${viewDto.pagingDto.pageSize})}">次へ</a>
+              </li>
             </ul>
           </nav>
         </div>

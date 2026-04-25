@@ -21,8 +21,8 @@ import com.example.manual.dto.PagingDto;
 import com.example.manual.dto.PasswordChangeRequestDto;
 import com.example.manual.dto.UserDetailDto;
 import com.example.manual.dto.UserFormDto;
-import com.example.manual.dto.UserRequestDto;
 import com.example.manual.dto.UserResponseDto;
+import com.example.manual.dto.UserViewDto;
 import com.example.manual.entity.User;
 import com.example.manual.enums.UserRole;
 import com.example.manual.enums.ViewMode;
@@ -55,7 +55,7 @@ public class UserService {
     // =============================================
 
     // user-management表示
-    public UserFormDto showUserManagementPage(
+    public UserViewDto showUserManagementPage(
             Principal principal, Pageable pageable) {
         log.info("start");
         User playUser = getUserByPrincipal(principal);
@@ -76,31 +76,29 @@ public class UserService {
             responseDto.setActiveLabel(getActivateLabel(user.isActive()));
             userResponseDto.add(responseDto);
         }
-        UserFormDto formDto = new UserFormDto();
-        formDto.setPagingDto(pagingDto);
-        formDto.setAllUserDto(userResponseDto);
-        formDto.setPlayUser(toCreatedUserDto(playUser));
+        UserViewDto viewDto = new UserViewDto();
+        viewDto.setPagingDto(pagingDto);
+        viewDto.setAllUserDto(userResponseDto);
+        viewDto.setPlayUser(toCreatedUserDto(playUser));
         List<UserRole> roleList = Arrays.asList(UserRole.values());
-        formDto.setAllRole(roleList);
-        formDto.setUserCount(getAllUserCount());
-        formDto.setMode(ViewMode.CREATE);
-        return formDto;
+        viewDto.setAllRole(roleList);
+        viewDto.setUserCount(getAllUserCount());
+        viewDto.setCanGuest(userPermission.isGuest(playUser));
+        viewDto.setMode(ViewMode.CREATE);
+        return viewDto;
     }
 
-    public UserFormDto showUserUpdateMode(
+    public UserViewDto showUserUpdateMode(
             Principal principal, Long userId, Pageable pageable) {
         log.info("start");
         User playUser = getUserByPrincipal(principal);
-        User targetUser = getUserById(userId);
         if (!userPermission.canShowUpdateMode(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
-        UserDetailDto detailDto = toCreatedUserDetailDto(targetUser);
-        UserFormDto formDto = showUserManagementPage(principal, pageable);
-        formDto.setTargetUser(detailDto);
-        formDto.setMode(ViewMode.EDIT);
+        UserViewDto viewDto = showUserManagementPage(principal, pageable);
+        viewDto.setMode(ViewMode.EDIT);
 
-        return formDto;
+        return viewDto;
     }
 
     public void showChangePasswordPage(Principal principal) {
@@ -125,17 +123,17 @@ public class UserService {
     }
 
     public String createUser(
-            UserRequestDto requestDto,
+            UserFormDto formDto,
             Principal principal) {
         log.info("start");
         User playUser = getUserByPrincipal(principal);
-        if (!userPermission.canCreateUser(requestDto, playUser)) {
+        if (!userPermission.canCreateUser(formDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         User targetUser = User.createNew(
-                requestDto.getLoginId(),
-                requestDto.getDisplayName(),
-                requestDto.getRole());
+                formDto.getLoginId(),
+                formDto.getDisplayName(),
+                formDto.getRole());
 
         // パスワードエンコード
         String newPassword = generateInitialPassword();
@@ -146,22 +144,22 @@ public class UserService {
     }
 
     public boolean updateUser(
-            UserRequestDto requestDto,
+            UserFormDto formDto,
             Principal principal,
             Long id) {
         log.info("start");
         User playUser = getUserByPrincipal(principal);
-        if (!userPermission.canUpdateUser(requestDto, playUser)) {
+        if (!userPermission.canUpdateUser(formDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         // ログインID重複チェック
-        if (userPermission.isUserIdTaken(requestDto)) {
+        if (userPermission.isUserIdTaken(formDto)) {
             return true;
         } // TODO:変更事項があるかチェック
         User targetUser = getUserById(id);
-        targetUser.changeLoginId(requestDto.getLoginId());
-        targetUser.changeRole(requestDto.getRole());
-        targetUser.setDisplayName(requestDto.getDisplayName());
+        targetUser.changeLoginId(formDto.getLoginId());
+        targetUser.changeRole(formDto.getRole());
+        targetUser.setDisplayName(formDto.getDisplayName());
         targetUser.markUpdatedNow();
         User savedUser = userRepository.save(targetUser);
         operation.recordUpdateUser(savedUser, playUser);
@@ -170,7 +168,7 @@ public class UserService {
 
     public void deactivateUser(
             Principal principal,
-            UserRequestDto requestDto,
+            UserFormDto formDto,
             Long id) {
         log.info("start");
         User targetUser = getUserById(id);
@@ -400,21 +398,26 @@ public class UserService {
     }
 
     // 重複チェック時に値を返すためDTO詰め替え
-    public UserFormDto concertToUserFormDto(
-            UserRequestDto requestDto,
+    public UserViewDto concertToUserViewDto(
+            UserFormDto formDto,
             Principal principal, Pageable pageable) {
-        UserFormDto formDto = showUserManagementPage(principal, pageable);
-        UserDetailDto detailDto = new UserDetailDto();
-        detailDto.setId(requestDto.getId());
-        detailDto.setLoginId(requestDto.getLoginId());
-        detailDto.setDisplayName(requestDto.getDisplayName());
-        detailDto.setRole(requestDto.getRole());
-        formDto.setTargetUser(detailDto);
-        if (requestDto.getId() == null) {
-            formDto.setMode(ViewMode.CREATE);
+        UserViewDto viewDto = showUserManagementPage(principal, pageable);
+        if (formDto.getId() == null) {
+            viewDto.setMode(ViewMode.CREATE);
         } else {
-            formDto.setMode(ViewMode.EDIT);
+            viewDto.setMode(ViewMode.EDIT);
         }
+        return viewDto;
+    }
+
+    public UserFormDto toFormData(Long userId) {
+        User targetUser = getUserById(userId);
+        UserFormDto formDto = new UserFormDto();
+        formDto.setId(targetUser.getId());
+        formDto.setDisplayName(targetUser.getDisplayName());
+        formDto.setLoginId(targetUser.getLoginId());
+        formDto.setRole(targetUser.getRole());
+        formDto.setIsActive(targetUser.isActive());
         return formDto;
     }
 

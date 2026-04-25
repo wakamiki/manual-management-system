@@ -1,60 +1,55 @@
 package com.example.manual.dto;
 
-import java.util.List;
-
-import com.example.manual.enums.ViewMode;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CategoryFormDto {
+
   public CategoryFormDto() {
 
   }
 
-  private List<CategoryDetailDto> categoryListDto;
-  private PagingDto PagingDto;
-  private ViewMode mode;
-  private UserResponseDto playUser;
-  private CategoryDetailDto targetCategory;
+  @NotBlank
+  @Size(max = 50)
+  private String categoryName;
+  @NotNull
+  private Integer displayOrder;
+  private Long id;
+  private boolean confirmed = false;
 
   // getter
-  public List<CategoryDetailDto> getCategoryListDto() {
-    return categoryListDto;
+
+  public Long getId() {
+    return this.id;
   }
 
-  public ViewMode getMode() {
-    return mode;
+  public String getCategoryName() {
+    return this.categoryName;
   }
 
-  public UserResponseDto getPlayUser() {
-    return playUser;
+  public Integer getDisplayOrder() {
+    return this.displayOrder;
   }
 
-  public CategoryDetailDto getTargetCategory() {
-    return targetCategory;
-  }
-
-  public PagingDto getPagingDto() {
-    return PagingDto;
+  public boolean isConfirmed() {
+    return confirmed;
   }
 
   // setter
-  public void setCategoryListDto(List<CategoryDetailDto> categoryListDto) {
-    this.categoryListDto = categoryListDto;
+  public void setCategoryName(String categoryName) {
+    this.categoryName = categoryName;
   }
 
-  public void setMode(ViewMode mode) {
-    this.mode = mode;
+  public void setDisplayOrder(Integer displayOrder) {
+    this.displayOrder = displayOrder;
   }
 
-  public void setPlayUser(UserResponseDto playUser) {
-    this.playUser = playUser;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public void setTargetCategory(CategoryDetailDto targetCategory) {
-    this.targetCategory = targetCategory;
+  public void setConfirmed(boolean confirmed) {
+    this.confirmed = confirmed;
   }
-
-  public void setPagingDto(PagingDto pagingDto) {
-    PagingDto = pagingDto;
-  }
-
 }

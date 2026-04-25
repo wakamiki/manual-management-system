@@ -45,6 +45,10 @@
 
               <button type="submit" class="btn btn-primary w-100">ログイン</button>
             </form>
+            <form id="guestLoginForm" th:action="@{/login/guest}" method="post" style="display:none;">
+              <a th:href="@{/login/guest}">ゲストユーザーでログインする。</a>
+              <div>マニュアル作成が出来ませんが検索、画面を見ることが出来ます。</div>
+            </form>
           </div>
         </div>
       </div>
