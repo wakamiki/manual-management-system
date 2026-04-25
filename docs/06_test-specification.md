@@ -1,7 +1,7 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.13  
-更新日: 2026-04-24
+Version: 01.03.14  
+更新日: 2026-04-25
 
 ---
 
@@ -179,7 +179,7 @@ Version: 01.03.13
 | AUTH-002 | 正常 | APPROVER が承認 | 実行可能 |
 | AUTH-003 | 異常 | 作成者本人が承認 | 実行不可 |
 | AUTH-004 | 異常 | USER が承認 | 実行不可 |
-| AUTH-005 | 異常 | ADMIN 以外がユーザー管理 | 実行不可 |
+| AUTH-005 | 正常 | ADMIN/GUEST がユーザー管理画面表示 | 実行可能（GUESTは閲覧のみ） |
 | AUTH-006 | 正常 | GUEST の一覧/詳細/検索 | 閲覧操作のみ実行可能 |
 | AUTH-007 | 異常 | GUEST の更新系操作 | 非活性または拒否される |
 | AUTH-008 | 正常 | 本人がパスワード変更 | 実行可能 |
@@ -205,11 +205,11 @@ Version: 01.03.13
 | AUTH-024 | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
 | AUTH-025 | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
 | AUTH-026 | 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
-| AUTH-027 | 異常 | Category 管理画面表示（ADMIN以外） | 実行不可 |
+| AUTH-027 | 正常 | Category 管理画面表示（GUEST） | 実行可能（閲覧のみ） |
 | AUTH-028 | 正常 | Category 作成/更新/停止/復帰（ADMIN） | 実行可能 |
 | AUTH-029 | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
 | AUTH-030 | 正常 | USER/APPROVER の権限外操作UI | ボタン非表示 |
-| AUTH-031 | 正常 | GUEST の権限外操作UI | 非活性表示 + 理由表示 |
+| AUTH-031 | 正常 | GUEST のユーザー管理画面表示制御 | `userId` / `lastLoginAt` / `操作` 列が非表示、更新系ボタンは非活性 |
 
 ---
 
