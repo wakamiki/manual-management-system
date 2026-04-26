@@ -1352,13 +1352,17 @@ Dtoは初めに大体の感覚で作っておくよりも必要な時にファ�
 ## 2026-04-26
 
 ### 作業概要
-手動テストを継続し、マニュアル公開ボタンの送信不具合を修正した。  
-あわせて、本文表示の改行保持（index / manual-detail / my-page）を実装し、テスト資料とAPI資料の整合を更新した。
+手動テストを継続し、マニュアル公開ボタンの送信不具合と `@Valid` 周辺のエラーを修正した。  
+あわせて、本文表示の改行保持（index / manual-detail / my-page）を実装し、テスト資料とAPI資料の整合を更新した。  
+可読性改善として Manual 系 Controller の分割作業も完了した。
 
 ### 実施内容
 - `manual-detail` の「マニュアル公開」ボタンをフォームPOST化し、`/manuals/{manualId}/actions/submit` へ送信するよう修正
 - `ManualCommandController` の submit を `POST` 受けに統一し、詳細画面へリダイレクトする導線に修正
 - `ManualCommandService` に submit 処理を追加し、DRAFT→PENDING遷移・通知作成を実装
+- テスト実施中に発生した valid / null 系エラーを修正
+- `@Valid` と `BindingResult` の引数順を見直し、想定どおり画面へ戻る動作へ修正
+- 見通しが悪くなっていた Manual Controller を責務単位で分割
 - 本文表示に `manual-content-preserve` を適用
   - `manual-detail`
   - `index`（アコーディオン内本文）
@@ -1366,10 +1370,18 @@ Dtoは初めに大体の感覚で作っておくよりも必要な時にファ�
 - `docs/06_test-result.md` の 2026-04-26 ログを一本化し、明日実施項目を更新
 - `docs/04_api-design.md` のエンドポイント一覧を現コードに合わせて更新
 - `docs/03_screen-design.md` / `docs/06_test-specification.md` に改行表示・参照先の整合を反映
+- テスト結果・仕様資料（`docs/06`）の更新内容を整理
 
-### 学び
+### 振り返り
+テスト実施→validエラー→修正中→manualコントローラーが見にくい→コントローラー分割作業終了、の流れで進行した。  
+`@Valid` の直後に `BindingResult` の引数を置かないと想定どおりの挙動にならないことに気づいた。  
+引数の順番は自由だと思っていたが、Spring MVC のバインド処理順に依存することを実作業で理解した。
+
+### 学び・改善点
 - `type="submit"` ボタンはフォーム外だと送信されないため、画面ボタン仕様とControllerマッピングをセットで確認する必要がある
 - 仕様資料は「機能実装直後」に最小差分で更新すると、テスト時の期待値ズレを減らせる
+- `@Valid` 付き引数の直後に `BindingResult` を置く必要がある
+- Controller が見にくくなった段階で早めに責務分割したほうが、後続修正の速度と安全性が上がる
 
 ### 次回着手予定
 - ゲストログイン（環境変数あり/なし）導線の最終テスト
