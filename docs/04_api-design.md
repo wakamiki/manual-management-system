@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.19  
-更新日: 2026-04-25
+Version: 01.03.20  
+更新日: 2026-04-26
 
 ---
 
@@ -9,17 +9,23 @@ Version: 01.03.19
 
 ### 1-1. Manual API
 - GET `/manuals/index`
-- GET `/manuals/{manualId}/edit`
-- GET `/manuals/{manualId}/create`
+- GET `/manuals/index/my-created`
+- GET `/manuals/index/my-pending`
+- GET `/manuals/index/new-updatedAt`
+- GET `/manuals/{manualId}/detail`
+- GET `/manuals/create`
 - GET `/manuals/{manualId}/actions/copy`
 - GET `/manuals/{manualId}/actions/edit`
-- POST `/manuals/{manualId}/actions/save-draft`
+- POST `/manuals/create/draft`
+- POST `/manuals/create/pending`
 - POST `/manuals/{manualId}/actions/save-draft-copy`
-- POST `/manuals/{manualId}/actions/submit-pending`
+- POST `/manuals/{manualId}/actions/save-pending-copy`
+- POST `/manuals/{manualId}/actions/edit-toDraft`
+- POST `/manuals/{manualId}/actions/save-draft-edit`
 - POST `/manuals/{manualId}/actions/edit-to-pending`
+- POST `/manuals/{manualId}/actions/save-pending-edit`
 - POST `/manuals/{manualId}/actions/submit`
 - POST `/manuals/{manualId}/actions/approve`
-- POST `/manuals/{manualId}/actions/approve-with-comment`
 - POST `/manuals/{manualId}/actions/rollback`
 - POST `/manuals/{manualId}/actions/archive`
 - POST `/manuals/{manualId}/actions/restore`
@@ -48,6 +54,7 @@ Version: 01.03.19
 - GET `/`
 - GET `/login`
 - POST `/login`（Spring Security）
+- POST `/login/guest`
 - POST `/logout`（Spring Security）
 
 ### 1-5. My Page API
@@ -106,7 +113,7 @@ Version: 01.03.19
 #### User 系
 | 操作 | role | 追加条件 | 判定 |
 | --- | --- | --- | --- |
-| ユーザー管理画面表示 | ADMIN | 有効ユーザー | 許可 |
+| ユーザー管理画面表示 | ADMIN / GUEST | 有効ユーザー | 許可（GUESTは閲覧のみ） |
 | ユーザー作成 / 更新 / 停止 / 復帰 | ADMIN | 有効ユーザー | 許可 |
 | パスワード初期化（reset-password） | ADMIN | 対象 userId 指定 | 許可 |
 | パスワード変更（change-password） | 本人のみ（全ロール共通） | Principal と変更対象が一致 | 許可 |
@@ -114,7 +121,7 @@ Version: 01.03.19
 #### Category 系
 | 操作 | role | 追加条件 | 判定 |
 | --- | --- | --- | --- |
-| カテゴリ管理画面表示 | ADMIN | 有効ユーザー | 許可 |
+| カテゴリ管理画面表示 | ADMIN / GUEST | 有効ユーザー | 許可（GUESTは閲覧のみ） |
 | カテゴリ作成 / 更新 / 停止 / 復帰 | ADMIN | 有効ユーザー | 許可 |
 | 同名カテゴリ作成 / 更新 | ADMIN | 重複時は confirm 表示後に続行可 | 許可（確認付き） |
 
@@ -169,7 +176,7 @@ Version: 01.03.19
 - 一覧のアコーディオン collapse は行ごとに id をユニーク化する
 
 ### 3-2. 詳細取得
-- GET `/manuals/{manualId}`
+- GET `/manuals/{manualId}/detail`
 - 詳細返却項目は以下を含めてよい
   - manualId
   - categoryName
@@ -204,6 +211,12 @@ Version: 01.03.19
 - rollback
 - archive
 - restore
+- 実行エンドポイントは以下を使用する
+  - `POST /manuals/{manualId}/actions/submit`
+  - `POST /manuals/{manualId}/actions/approve`
+  - `POST /manuals/{manualId}/actions/rollback`
+  - `POST /manuals/{manualId}/actions/archive`
+  - `POST /manuals/{manualId}/actions/restore`
 - UI 上は rollback / archive / restore を詳細画面のインライン入力で `changeNote` 入力後に確定してよい
 - approve は確認ダイアログを出し、必要に応じてインライン入力で履歴コメントを受け取ってよい
 - restore 対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする

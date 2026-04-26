@@ -2,6 +2,7 @@ package com.example.manual.dto;
 
 import com.example.manual.enums.FormMode;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -11,8 +12,10 @@ public class ManualEditFormDto {
   }
 
   @Size(max = 100)
+  @NotBlank(message = "titleは必須です。")
   private String title;
   @Size(max = 10000)
+  @NotBlank(message = "contentは必須です。")
   private String content;
   @NotNull(message = "カテゴリは必須です。")
   private Long categoryId;

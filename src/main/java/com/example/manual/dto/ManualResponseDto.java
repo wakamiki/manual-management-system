@@ -1,4 +1,5 @@
 package com.example.manual.dto;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,100 +11,106 @@ public class ManualResponseDto {
   public ManualResponseDto() {
   }
 
-private Long manualId;
-private String title="";
-private String content="";
-private UserResponseDto createdUserDto;
-private ManualStatus status;
-private String statusLabel;
-private LocalDateTime createdAt;
-private LocalDateTime updatedAt;
-private CategoryResponseDto categoryDto;
-private List<ManualHistoryDto> histories = new ArrayList<>();
+  private Long manualId;
+  private String title = "";
+  private String content = "";
+  private UserResponseDto createdUserDto;
+  private ManualStatus status;
+  private String statusLabel;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
+  private CategoryResponseDto categoryDto;
+  private boolean canEdit = false;
+  private List<ManualHistoryDto> histories = new ArrayList<>();
 
+  public Long getManualId() {
+    return this.manualId;
+  }
 
+  public String getTitle() {
+    return this.title;
+  }
 
-public Long getManualId() {
-  return this.manualId;
-}
+  public String getContent() {
+    return this.content;
+  }
 
-public String getTitle() {
-  return this.title;
-}
+  public ManualStatus getStatus() {
+    return this.status;
+  }
 
-public String getContent() {
-  return this.content;
-}
+  public LocalDateTime getCreatedAt() {
+    return this.createdAt;
+  }
 
-public ManualStatus getStatus() {
-  return this.status;
-}
+  public LocalDateTime getUpdatedAt() {
+    return this.updatedAt;
+  }
 
-public LocalDateTime getCreatedAt() {
-  return this.createdAt;
-}
+  public List<ManualHistoryDto> getHistories() {
+    return this.histories;
+  }
 
-public LocalDateTime getUpdatedAt() {
-  return this.updatedAt;
-}
+  public UserResponseDto getCreatedUserDto() {
+    return this.createdUserDto;
+  }
 
-public List<ManualHistoryDto> getHistories() {
-  return this.histories;
-}
+  public CategoryResponseDto getCategoryDto() {
+    return this.categoryDto;
+  }
 
-public UserResponseDto getCreatedUserDto() {
-  return this.createdUserDto;
-}
+  public String getStatusLabel() {
+    return this.statusLabel;
+  }
 
-public CategoryResponseDto getCategoryDto(){
-  return this.categoryDto;
-}
+  public boolean isCanEdit() {
+    return canEdit;
+  }
 
-public String getStatusLabel(){
-  return this.statusLabel;
-}
+  // setter
 
+  public void setManualId(long manualId) {
+    this.manualId = manualId;
+  }
 
-//setter
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-public void setManualId(long manualId) {
-  this.manualId = manualId;
-}
+  public void setContent(String content) {
+    this.content = content;
+  }
 
-public void setTitle(String title) {
-  this.title = title;
-}
+  public void setStatus(ManualStatus status) {
+    this.status = status;
+  }
 
-public void setContent(String content) {
-  this.content = content;
-}
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
 
-public void setStatus(ManualStatus status) {
-  this.status = status;
-}
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 
-public void setCreatedAt(LocalDateTime createdAt) {
-  this.createdAt = createdAt;
-}
+  public void setHistories(List<ManualHistoryDto> histories) {
+    this.histories = histories;
+  }
 
-public void setUpdatedAt(LocalDateTime updatedAt) {
-  this.updatedAt = updatedAt;
-}
+  public void setCreatedUserDto(UserResponseDto createdUserDto) {
+    this.createdUserDto = createdUserDto;
+  }
 
-public void setHistories(List<ManualHistoryDto> histories) {
-  this.histories = histories;
-}
+  public void setCategoryDto(CategoryResponseDto categoryDto) {
+    this.categoryDto = categoryDto;
+  }
 
-public void setCreatedUserDto(UserResponseDto createdUserDto) {
-  this.createdUserDto = createdUserDto;
-}
+  public void setStatusLabel(String statusLabel) {
+    this.statusLabel = statusLabel;
+  }
 
-public void setCategoryDto(CategoryResponseDto categoryDto) {
-  this.categoryDto = categoryDto;
-}
-
-public void setStatusLabel(String statusLabel){
-  this.statusLabel=statusLabel;
-}
+  public void setCanEdit(boolean canEdit) {
+    this.canEdit = canEdit;
+  }
 
 }

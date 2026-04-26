@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.Notification;
@@ -79,6 +80,7 @@ public class NotificationService {
     // ========================================================
 
     // マニュアル承認時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
+    @Transactional
     public void deletePendingApprovalNotificationsByManualId(
             Long manualId) {
         log.info("start");
@@ -87,6 +89,7 @@ public class NotificationService {
     }
 
     // 差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
+    @Transactional
     public void deleteRollbackNotification(Long manualId, User user) {
         log.info("start");
         // 通知のあるユーザーがPENDINGしたときに実行
@@ -152,8 +155,7 @@ public class NotificationService {
     private boolean canCreateSubmitNotifications(Principal principal) {
         log.info("start");
         User user = userService.getUserByPrincipal(principal);
-        if (user.getRole() != UserRole.APPROVER &&
-                user.getRole() != UserRole.ADMIN) {
+        if (user.getRole() == UserRole.GUEST) {
             throw new InvalidStateException("権限が不足しています。");
         }
         if (!isActiveUser(principal)) {

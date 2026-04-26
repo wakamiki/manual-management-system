@@ -1,6 +1,6 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.17  
+Version: 01.03.18  
 更新日: 2026-04-26
 
 ---
@@ -10,7 +10,7 @@ Version: 01.03.17
 - 無印: 未実施
 
 ### 0-1. 実施ログ参照先
-- 2026-04-26 追記ログ: `docs/06_test-result.md` の「テストログ（2026-04-26 追記・管理者/USER）」
+- 2026-04-26 実施ログ: `docs/06_test-result.md` の「実施ログ（2026-04-26）」
 
 ---
 
@@ -119,30 +119,30 @@ Version: 01.03.17
 ### 5-1. 新規作成
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-001 | 正常 | title / content / category 入力 | DRAFT で保存される |
+| MAN-001 ✅| 正常 | title / content / category 入力 | DRAFT で保存される |
 | MAN-002 ✅ | 異常 | category 未選択 | エラー表示 |
-| MAN-003 | 異常 | title 100文字超過 | エラー表示 |
-| MAN-004 | 正常 | 公開ボタン押下 | PENDING で保存される |
-| MAN-005 | 異常 | title 未選択 | エラー表示 |
+| MAN-003 ✅| 異常 | title 100文字超過 | エラー表示 |
+| MAN-004 ✅| 正常 | 公開ボタン押下 | PENDING で保存される |
+| MAN-005 ✅| 異常 | title 未選択 | エラー表示 |
 | MAN-006 ✅ | 正常 | 下書き保存ボタン押下 | DRAFT で保存される |
-| MAN-007 | 正常 | カテゴリ選択 | アクティブカテゴリのみ表示 |
+| MAN-007 ✅| 正常 | カテゴリ選択 | アクティブカテゴリのみ表示 |
 
 ### 5-2. 更新
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
 | MAN-008 ✅ | 正常 | DRAFT 更新 | 更新成功 |
 | MAN-009 ✅ | 正常 | changeNote 入力 | 履歴保存 |
-| MAN-010 | 正常 | PENDING の下書きに保存 | DRAFT に戻せる |
-| MAN-011 | 異常 | APPROVED 編集 | 業務ルールに従い制御(編集出来ない) |
+| MAN-010 ✅| 正常 | PENDING の下書きに保存 | DRAFT に戻せる |
+| MAN-011 ✅| 異常 | APPROVED 編集 | 業務ルールに従い制御(編集出来ない) |
 
 ### 5-3. 一覧 / 詳細
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-012 | 正常 | 一覧取得 | PENDING/APPROVED全件表示 |
+| MAN-012 ✅| 正常 | 一覧取得 | PENDING/APPROVED全件表示 |
 | MAN-013 | 正常 | keyword 検索 | 本文title内条件一致のみ表示 |
 | MAN-014 | 正常 | category 複数選択 + status 複数選択で絞り込み | 条件一致のみ表示 |
 | MAN-015 | 正常 | 0件 | 結果0件表示 |
-| MAN-016 | 正常 | 詳細の更新日時表示 | 時間まで表示される |
+| MAN-016 ✅ | 正常 | 詳細の更新日時表示 | 時間まで表示される |
 | MAN-016A | 正常 | 初期表示の status 条件 | PENDING / APPROVED のみ選択済で表示される |
 | MAN-016B | 正常 | 一覧の常時表示項目 | manualId / title / status / updatedAt / createdByUser / category が表示される |
 | MAN-016C | 正常 | 一覧のアコーディオン展開表示 | content / 更新履歴 が表示される |
@@ -155,8 +155,9 @@ Version: 01.03.17
 | MAN-016J | 正常 | statuses 値保持 | 検索後にステータスチェック状態が保持される |
 | MAN-016K | 正常 | アコーディオンID一意 | 複数行で各行が個別に開閉できる |
 | MAN-016L | 異常 | 表示データnull | Model 未設定時に EL エラーを検知できる |
-| MAN-016M | 正常 | Controller分割後の詳細導線 | `GET /manuals/{manualId}/detail` で詳細画面が表示される |
+| MAN-016M ✅ | 正常 | Controller分割後の詳細導線 | `GET /manuals/{manualId}/detail` で詳細画面が表示される |
 | MAN-016N | 正常 | Controller分割後の編集/複製導線 | `GET /manuals/{manualId}/actions/edit` / `copy` が表示される |
+| MAN-016O | 正常 | 本文の改行表示 | index / manual-detail / my-page で改行が保持される |
 
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
@@ -176,7 +177,7 @@ Version: 01.03.17
 | ST-001 ✅ | 正常 | DRAFT → PENDING | 遷移成功 |
 | ST-002 | 正常 | DRAFT → ARCHIVED | 遷移成功 |
 | ST-003 | 正常 | PENDING → APPROVED | 遷移成功 |
-| ST-004 | 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
+| ST-004  ✅| 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
 | ST-005 | 正常 | PENDING → ARCHIVED | 遷移成功 |
 | ST-006 | 正常 | APPROVED → ARCHIVED | 遷移成功 |
 | ST-007 | 正常 | ARCHIVED → APPROVED | 復帰成功 |
@@ -187,8 +188,8 @@ Version: 01.03.17
 ## 7. 権限
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| AUTH-001 | 正常 | USER が作成 | 実行可能 |
-| AUTH-002 | 正常 | APPROVER が承認 | 実行可能 |
+| AUTH-001 ✅| 正常 | USER が作成 | 実行可能 |
+| AUTH-002 ✅| 正常 | APPROVER が承認 | 実行可能 |
 | AUTH-003 | 異常 | 作成者本人が承認 | 実行不可 |
 | AUTH-004 | 異常 | USER が承認 | 実行不可 |
 | AUTH-005 ✅ | 正常 | ADMIN/GUEST がユーザー管理画面表示 | 実行可能（GUESTは閲覧のみ） |
@@ -202,14 +203,14 @@ Version: 01.03.17
 ### 7-2. 認可ルール対応（docs/04 2-2B 同期）
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| AUTH-012 | 正常 | Manual 編集（作成者 + DRAFT） | 実行可能 |
-| AUTH-013 | 正常 | Manual 編集（作成者 + PENDING） | 実行可能 |
+| AUTH-012 ✅| 正常 | Manual 編集（作成者 + DRAFT） | 実行可能 |
+| AUTH-013 ✅| 正常 | Manual 編集（作成者 + PENDING） | 実行可能 |
 | AUTH-014 | 異常 | Manual 編集（非作成者） | 実行不可 |
 | AUTH-015 | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
 | AUTH-016 | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
 | AUTH-017 ✅ | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
 | AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
-| AUTH-019 | 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
+| AUTH-019 ✅| 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
 | AUTH-020 | 異常 | Manual 承認（作成者本人） | 実行不可 |
 | AUTH-021 | 異常 | Manual 承認（PENDING以外） | 実行不可 |
 | AUTH-022 | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
@@ -241,7 +242,7 @@ Version: 01.03.17
 | NT-009 | 正常 | 差し戻し一覧 | `isRolledBack = true` の全件が表示される |
 | NT-010 | 正常 | 承認待ち一覧 | `PENDING` かつ自分以外の全件が表示される |
 | NT-011 | 正常 | 通知の既読化 | 既読ボタン操作で既読になる |
-| NT-012 | 正常 | 承認時の通知削除 | 対象マニュアルの `PENDING_APPROVAL` 通知が全削除される |
+| NT-012 ✅ | 正常 | 承認時の通知削除 | 対象マニュアルの `PENDING_APPROVAL` 通知が全削除される |
 
 ---
 

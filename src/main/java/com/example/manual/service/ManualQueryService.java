@@ -7,6 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.IndexSummaryDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -27,15 +36,6 @@ import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
 import com.example.manual.repository.ManualSpecification;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ManualQueryService {
@@ -70,21 +70,21 @@ public class ManualQueryService {
 
   // index表示
   public ManualIndexDto showIndex(
-  Principal principal,
-  Page<Manual> manuals,
-  ManualSearchConditionDto condition) {
-  log.info("start");
-  // 標準表示項目取得
-  ManualIndexDto listDto = buildIndexCommonData(principal);
-  // 一覧リスト ページ毎に分ける必要有
-  PagingDto pagingDto = PagingDto.from(manuals);
-  List<ManualResponseDto> ManualDtos = buildIndexWithManualsPage(manuals);
+      Principal principal,
+      Page<Manual> manuals,
+      ManualSearchConditionDto condition) {
+    log.info("start");
+    // 標準表示項目取得
+    ManualIndexDto listDto = buildIndexCommonData(principal);
+    // 一覧リスト ページ毎に分ける必要有
+    PagingDto pagingDto = PagingDto.from(manuals);
+    List<ManualResponseDto> ManualDtos = buildIndexWithManualsPage(manuals, userService.getUserByPrincipal(principal));
 
-  listDto.setManuals(ManualDtos);
-  listDto.setPagingDto(pagingDto);
-  listDto.setCondition(condition);
+    listDto.setManuals(ManualDtos);
+    listDto.setPagingDto(pagingDto);
+    listDto.setCondition(condition);
 
-  return listDto;
+    return listDto;
   }
 
   // ============================================
@@ -154,40 +154,37 @@ public class ManualQueryService {
 
   // index 検索表示 取得
   public Page<Manual> findManualsBySearch(
-  ManualSearchConditionDto condition,
-  Principal principal,
-  Pageable pageable) {
-  log.info("start");
-  User targetUser = userService.getUserByPrincipal(principal);
-  if (!permission.canFindManualsBySearch(targetUser)) {
-  throw new UnauthorizedException("判定エラー");
-  }
+      ManualSearchConditionDto condition,
+      Principal principal,
+      Pageable pageable) {
+    log.info("start");
+    User targetUser = userService.getUserByPrincipal(principal);
+    if (!permission.canFindManualsBySearch(targetUser)) {
+      throw new UnauthorizedException("判定エラー");
+    }
 
-  Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
+    Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
 
-  Specification<Manual> keywordSpec =
-  ManualSpecification.containsKeyword(condition.getKeyword());
-  if (keywordSpec != null) {
-  specification = specification.and(keywordSpec);
-  }
+    Specification<Manual> keywordSpec = ManualSpecification.containsKeyword(condition.getKeyword());
+    if (keywordSpec != null) {
+      specification = specification.and(keywordSpec);
+    }
 
-  Specification<Manual> categorySpec =
-  ManualSpecification.hasCategoryIds(condition.getCategoryIds());
-  if (categorySpec != null) {
-  specification = specification.and(categorySpec);
-  }
+    Specification<Manual> categorySpec = ManualSpecification.hasCategoryIds(condition.getCategoryIds());
+    if (categorySpec != null) {
+      specification = specification.and(categorySpec);
+    }
 
-  Specification<Manual> statusSpec =
-  ManualSpecification.hasStatuses(condition.getStatuses());
-  if (statusSpec != null) {
-  specification = specification.and(statusSpec);
-  }
-  pageable = PageRequest.of(Math.max(pageable.getPageNumber(), 0), 10,
-  Sort.by(Sort.Direction.DESC, "updatedAt"));
-  Page<Manual> manualList = manualRepository.findAll(
-  specification, pageable);
+    Specification<Manual> statusSpec = ManualSpecification.hasStatuses(condition.getStatuses());
+    if (statusSpec != null) {
+      specification = specification.and(statusSpec);
+    }
+    pageable = PageRequest.of(Math.max(pageable.getPageNumber(), 0), 10,
+        Sort.by(Sort.Direction.DESC, "updatedAt"));
+    Page<Manual> manualList = manualRepository.findAll(
+        specification, pageable);
 
-  return manualList;
+    return manualList;
   }
 
   // status一覧を返す
@@ -200,21 +197,19 @@ public class ManualQueryService {
 
   // MyPege 差し戻し（自分作成）のデータを渡す。
   public List<Manual> findCreatedRollbackManuals(User user) {
-  log.info("start");
-  List<Manual> rollbackList =
-  manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
-  user);
+    log.info("start");
+    List<Manual> rollbackList = manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
+        user);
 
-  return rollbackList;
+    return rollbackList;
   }
 
   // MyPege PENDINGの全マニュアル（自分作成以外）のデータを渡す。
   public List<Manual> findPendingManuals(User user) {
-  log.info("start");
-  List<Manual> pendingManualList =
-  manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
-  user, ManualStatus.PENDING);
-  return pendingManualList;
+    log.info("start");
+    List<Manual> pendingManualList = manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
+        user, ManualStatus.PENDING);
+    return pendingManualList;
   }
 
   // index 自分作成分のマニュアルデータ一覧を返す。
@@ -229,28 +224,26 @@ public class ManualQueryService {
   public List<Manual> findMyCreatedManuals(Principal principal) {
     log.info("start");
     User targetUser = userService.getUserByPrincipal(principal);
-   List<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
+    List<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
         targetUser);
     return manualList;
   }
 
   // index 自分作成PENDINGのデータ一覧を返す。
-  public Page<Manual> findMyPendingManuals(Principal principal,Pageable pageable) {
-  log.info("start");
-  User targetUser = userService.getUserByPrincipal(principal);
-  Page<Manual> manualList =
-  manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
-  targetUser, ManualStatus.PENDING, pageable);
-  return manualList;
+  public Page<Manual> findMyPendingManuals(Principal principal, Pageable pageable) {
+    log.info("start");
+    User targetUser = userService.getUserByPrincipal(principal);
+    Page<Manual> manualList = manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
+        targetUser, ManualStatus.PENDING, pageable);
+    return manualList;
   }
 
   // index 最近７日間の更新のデータ一覧を返す。
   public Page<Manual> findRecentlyUpdatedManuals(Pageable pageable) {
-  log.info("start");
-  Page<Manual> manualList =
-  manualRepository.findByUpdatedAtAfterOrderByUpdatedAtDesc(
-  LocalDateTime.now().minusDays(7), pageable);
-  return manualList;
+    log.info("start");
+    Page<Manual> manualList = manualRepository.findByUpdatedAtAfterOrderByUpdatedAtDesc(
+        LocalDateTime.now().minusDays(7), pageable);
+    return manualList;
   }
 
   // index count自分作成PENDINGの数を返す。
@@ -343,33 +336,34 @@ public class ManualQueryService {
   // ============================
 
   public ManualEditFormDto toManualFormInputDto(Manual manual, User playUser,
-  FormMode mode) {
-  log.info("start");
-  ManualEditFormDto formDto = new ManualEditFormDto();
-  if (playUser.getRole() == UserRole.GUEST) {
-  formDto.setGuest(true);
-  }
-  formDto.setManualId(manual.getId());
-  CategoryResponseDto categoryDto =
-  categoryService.toCategoryDto(manual.getCategory());
-  formDto.setCategoryName((categoryDto.getCategoryName()));
-  formDto.setCategoryId(categoryDto.getId());
-  formDto.setContent(manual.getContent());
-  formDto.setTitle(manual.getTitle());
-  formDto.setMode(mode);
-  if (mode == FormMode.copy) {
-  formDto.setModeLabel("複製");
-  } else if (mode == FormMode.edit) {
-  formDto.setModeLabel("編集");
-  }
-  return formDto;
+      FormMode mode) {
+    log.info("start");
+    ManualEditFormDto formDto = new ManualEditFormDto();
+    if (playUser.getRole() == UserRole.GUEST) {
+      formDto.setGuest(true);
+    }
+    formDto.setManualId(manual.getId());
+    CategoryResponseDto categoryDto = categoryService.toCategoryDto(manual.getCategory());
+    formDto.setCategoryName((categoryDto.getCategoryName()));
+    formDto.setCategoryId(categoryDto.getId());
+    formDto.setContent(manual.getContent());
+    formDto.setTitle(manual.getTitle());
+    formDto.setMode(mode);
+    if (mode == FormMode.copy) {
+      formDto.setModeLabel("複製");
+    } else if (mode == FormMode.edit) {
+      formDto.setModeLabel("編集");
+    }
+    return formDto;
   }
 
-  public List<ManualResponseDto> buildIndexWithManualsPage(Page<Manual> manualList)
-  {
+  public List<ManualResponseDto> buildIndexWithManualsPage(Page<Manual> manualList, User playUser) {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
+      if (permission.canEditManual(manual, playUser)) {
+        responseDto.setCanEdit(true);
+      }
       responseDto.setManualId(manual.getId());
       responseDto.setTitle(manual.getTitle());
       responseDto.setContent(manual.getContent());
@@ -388,10 +382,13 @@ public class ManualQueryService {
     return responseDtos;
   }
 
-  public List<ManualResponseDto> buildIndexWithManualsPage(List<Manual> manualList) {
+  public List<ManualResponseDto> buildIndexWithManualsPage(List<Manual> manualList, User playUser) {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
+      if (permission.canEditManual(manual, playUser)) {
+        responseDto.setCanEdit(true);
+      }
       responseDto.setManualId(manual.getId());
       responseDto.setTitle(manual.getTitle());
       responseDto.setContent(manual.getContent());

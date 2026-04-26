@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.manual.dto.ManualActionRequestDto;
+import com.example.manual.dto.ManualDraftDto;
 import com.example.manual.dto.ManualEditFormDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
@@ -50,7 +51,7 @@ public class ManualCommandService {
 
   // 新規作成保存（DRAFT）
   public void saveDraftForCreate(
-      ManualEditFormDto formDto,
+      ManualDraftDto formDto,
       Principal principal) {
     log.info("start");
     Manual manual = new Manual();
@@ -100,7 +101,7 @@ public class ManualCommandService {
   // 複製編集保存(DRAFT)
   public void saveDraftForCopy(
       Long manualId,
-      ManualEditFormDto formDto,
+      ManualDraftDto formDto,
       Principal principal) {
     log.info("start");
     Manual manual = query.findManualOrThrow(manualId);
@@ -165,7 +166,7 @@ public class ManualCommandService {
   // 編集マニュアル公開(Draft)
   public void editToDraft(
       Long manualId,
-      ManualEditFormDto formDto,
+      ManualDraftDto formDto,
       Principal principal) {
     log.info("start");
     Manual manual = query.findManualOrThrow(manualId);
@@ -218,7 +219,7 @@ public class ManualCommandService {
     notificationService.createSubmitNotifications(principal, savedManual);
   }
 
-  // 承認
+  // 公開
   public void submitManual(
       Long manualId,
       Principal principal) {

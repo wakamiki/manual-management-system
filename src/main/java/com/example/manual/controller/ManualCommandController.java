@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +18,7 @@ import com.example.manual.dto.ApproveRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
+import com.example.manual.dto.ManualDraftDto;
 import com.example.manual.dto.ManualEditFormDto;
 import com.example.manual.service.ManualCommandService;
 import com.example.manual.service.ManualQueryService;
@@ -46,7 +46,7 @@ public class ManualCommandController {
         // 新規作成DRAFT保存
         @PostMapping("/create/draft")
         public String saveDraftForCreate(
-                        @Valid @ModelAttribute ManualEditFormDto formDto,
+                        @Valid @ModelAttribute ManualDraftDto formDto,
                         BindingResult bindingResult,
                         Principal principal,
                         RedirectAttributes message,
@@ -88,7 +88,6 @@ public class ManualCommandController {
                 commandService.createPendingManual(formDto, principal);
                 message.addFlashAttribute("message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
-
                 return "redirect:/manuals/create";
         }
 
@@ -96,7 +95,7 @@ public class ManualCommandController {
         @PostMapping("/{manualId}/actions/save-draft-copy")
         public String saveDraftForCopy(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualEditFormDto formDto,
+                        @Valid @ModelAttribute ManualDraftDto formDto,
                         BindingResult bindingResult,
                         RedirectAttributes message,
                         Principal principal,
@@ -156,7 +155,7 @@ public class ManualCommandController {
         @PostMapping({ "/{manualId}/actions/edit-toDraft", "/{manualId}/actions/save-draft-edit" })
         public String editToDraft(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualEditFormDto formDto,
+                        @Valid @ModelAttribute ManualDraftDto formDto,
                         BindingResult bindingResult,
                         RedirectAttributes message,
                         Principal principal,

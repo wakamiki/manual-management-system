@@ -238,7 +238,7 @@ public class ManualPermissionService {
             throw new InvalidStateException(
                     "承認ができるのはステータス:PENDINGのマニュアルのみです。");
         }
-        if (!isOwner(manual.getCreatedByUser(), playUser)) {
+        if (isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアルの承認をすることは出来ません。");
         }
@@ -310,7 +310,7 @@ public class ManualPermissionService {
         }
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
-                    "使用中カテゴリでのみ復帰が出来ます。");
+                    "選択できるのは使用中カテゴリのみです。");
         }
         return true;
     }
@@ -328,7 +328,7 @@ public class ManualPermissionService {
                     "使用停止中のカテゴリーが選択されています。");
         }
         if (!isTitleAndContent(formDto.getTitle(), formDto.getContent())) {
-
+            throw new InvalidStateException("必須項目が入力されていません。");
         }
         return true;
     }

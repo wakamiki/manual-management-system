@@ -76,9 +76,6 @@
       <button type="button" class="btn btn-outline-success" id="approveButton" th:if="${detailDto.canApprove}"
         th:disabled="${detailDto.canGuest}" data-action="approve"
         th:data-url="@{/manuals/{manualId}/actions/approve(manualId=${detailDto.manualId})}">承認</button>
-      <small class="text-muted" th:if="${detailDto.canApprove}">
-        承認時: ダイアログで「更新履歴を入力して承認(OKボタン)」または「そのまま承認(キャンセルボタン)」を選択できます。
-      </small>
 
       <button type="button" class="btn btn-outline-warning js-open-inline-panel" data-action="rollback"
         th:data-url="@{/manuals/{manualId}/actions/rollback(manualId=${detailDto.manualId})}"

@@ -47,16 +47,16 @@ public class MyPageService {
     MyPageDto myPageDto = new MyPageDto();
 
     List<Manual> myCreatedManuals = query.findMyCreatedManuals(principal);
-    List<ManualResponseDto> userCreatedDtos = query.buildIndexWithManualsPage(myCreatedManuals);
+    List<ManualResponseDto> userCreatedDtos = query.buildIndexWithManualsPage(myCreatedManuals, playUser);
     myPageDto.setCreatedManualList(userCreatedDtos);
 
     List<Manual> createdRollbackManuals = query.findCreatedRollbackManuals(playUser);
-    List<ManualResponseDto> rollbackDtos = query.buildIndexWithManualsPage(createdRollbackManuals);
+    List<ManualResponseDto> rollbackDtos = query.buildIndexWithManualsPage(createdRollbackManuals, playUser);
     myPageDto.setRollbackManualList(rollbackDtos);
 
     if (playUser.getRole() == UserRole.APPROVER || playUser.getRole() == UserRole.ADMIN) {
       List<Manual> pendingManuals = query.findPendingManuals(playUser);
-      List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals);
+      List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals, playUser);
       myPageDto.setPendingManualList(pendingDtos);
       myPageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
     }

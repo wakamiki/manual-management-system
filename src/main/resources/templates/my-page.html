@@ -198,7 +198,8 @@
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
                       rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細</a>
                     <a th:href="@{/manuals/{manualId}/actions/edit(manualId=${manual.manualId})}" target="_blank"
-                      rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">編集</a>
+                      rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm"
+                      th:if="${manual.canEdit}">編集</a>
                   </div>
                 </div>
               </article>
