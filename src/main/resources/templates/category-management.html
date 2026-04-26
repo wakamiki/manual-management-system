@@ -59,12 +59,16 @@
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
               <input id="categoryName" type="text" class="form-control" th:field="*{categoryName}"
-                th:errors="*{displayOrder}">
+                th:classappend="${#fields.hasErrors('categoryName')} ? ' is-invalid'">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('categoryName')}" th:errors="*{categoryName}">
+              </div>
             </div>
             <div class="mb-4">
               <label for="displayOrder" class="form-label">displayOrder</label>
               <input id="displayOrder" type="number" class="form-control" th:field="*{displayOrder}" min="1"
-                placeholder="指定の番号に割り込み" th:errors="*{displayOrder}">
+                placeholder="指定の番号に割り込み" th:classappend="${#fields.hasErrors('displayOrder')} ? ' is-invalid'">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('displayOrder')}" th:errors="*{displayOrder}">
+              </div>
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"

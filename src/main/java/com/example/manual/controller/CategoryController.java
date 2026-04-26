@@ -77,9 +77,9 @@ public class CategoryController {
   @PostMapping("/create")
   public String createCategory(
       @Valid @ModelAttribute CategoryFormDto formDto,
+      BindingResult bindingResult,
       Principal principal,
       RedirectAttributes message,
-      BindingResult bindingResult,
       Model model,
       Pageable pageable) {
     log.info("start");
@@ -87,7 +87,7 @@ public class CategoryController {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
-      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
       return "category-management";
     }
@@ -113,9 +113,9 @@ public class CategoryController {
   @PostMapping("/{categoryId}/update")
   public String updateCategory(
       @Valid @ModelAttribute CategoryFormDto formDto,
+      BindingResult bindingResult,
       Principal principal,
       RedirectAttributes message,
-      BindingResult bindingResult,
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
@@ -123,7 +123,7 @@ public class CategoryController {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
-      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
       return "category-management";
     }

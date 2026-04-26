@@ -139,7 +139,9 @@ public class ManualQueryController {
     public String goToNewCreatePage(Principal principal, Model model) {
         log.info("start");
         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
+        ManualEditFormDto formDto = new ManualEditFormDto();
         model.addAttribute("categoryDto", categoryDto);
+        model.addAttribute("formDto", formDto);
         return "manual-create";
     }
 

@@ -219,6 +219,22 @@ public class ManualCommandService {
   }
 
   // 承認
+  public void submitManual(
+      Long manualId,
+      Principal principal) {
+    log.info("start");
+    Manual manual = query.findManualOrThrow(manualId);
+    User playUser = userService.getUserByPrincipal(principal);
+    if (!permission.canPending(manual, playUser)) {
+      throw new UnauthorizedException("判定エラー");
+    }
+    manual.submitPENDING();
+    manual.markUpdatedNow();
+    Manual savedManual = manualRepository.save(manual);
+    notificationService.createSubmitNotifications(principal, savedManual);
+  }
+
+  // 承認
   public void approveManual(
       Long manualId,
       String changeNote,

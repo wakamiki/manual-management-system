@@ -1,6 +1,8 @@
 package com.example.manual.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -15,7 +17,8 @@ public class CategoryFormDto {
   @Size(max = 50)
   private String categoryName;
   @NotNull(message = "displayOrderは必須です。")
-  @Size(max = 1000)
+  @Min(value = 1, message = "displayOrderは1以上で入力してください。")
+  @Max(value = 1000, message = "displayOrderは1000以下で入力してください。")
   private Integer displayOrder;
   private boolean isActive;
   private boolean confirmed = false;

@@ -28,34 +28,38 @@
       新規マニュアルの作成内容を入力してください。
     </div>
 
-    <form class="card" th:action="@{/manuals/create/draft}" method="post">
+    <form class="card" th:object="${formDto}" th:action="@{/manuals/create/draft}" method="post">
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control" name="title" value="${formDto.title}"
+          <input id="title" type="text" class="form-control" th:field="*{title}"
             placeholder="タイトルを入力してください" maxlength="100">
           <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">本文</label>
-          <textarea id="content" class="form-control" name="content" rows="8" maxlength="10000"
-            placeholder="本文を入力してください" value="${formDto.content}"></textarea>
+          <textarea id="content" class="form-control" th:field="*{content}" rows="8" maxlength="10000"
+            placeholder="本文を入力してください"></textarea>
           <div class="text-count" data-for="content" data-max="10000">0 / 10000</div>
         </div>
         <div class="mb-3">
           <label for="category" class="form-label">カテゴリ</label>
-          <select id="category" class="form-select" name="categoryId">
-            <option th:each="activeCategory:${formDto}" th:text="${activeCategory.categoryName}"
-              th:value="${activeCategory.id}" th:errors="${activeCategory.id}">営業部
+          <select id="category" class="form-select" th:field="*{categoryId}"
+            th:classappend="${#fields.hasErrors('categoryId')} ? ' is-invalid'">
+            <option value="">選択してください</option>
+            <option th:each="activeCategory:${categoryDto}" th:text="${activeCategory.categoryName}"
+              th:value="${activeCategory.id}">営業部
             </option>
           </select>
+          <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">
+          </div>
         </div>
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary" th:disabled="${formDto.canGuest}">下書きに保存</button>
+        <button type="submit" class="btn btn-primary" th:disabled="${formDto.guest}">下書きに保存</button>
         <button type="submit" th:formaction="@{/manuals/create/pending}" formmethod="post"
-          class="btn btn-outline-primary" th:disabled="${formDto.canGuest}">マニュアル公開</button>
+          class="btn btn-outline-primary" th:disabled="${formDto.guest}">マニュアル公開</button>
       </div>
     </form>
   </main>

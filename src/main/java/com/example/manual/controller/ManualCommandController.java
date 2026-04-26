@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.manual.dto.ApproveRequestDto;
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -55,7 +56,7 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-create";
                 }
@@ -79,7 +80,7 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-create";
                 }
@@ -105,7 +106,7 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-form";
                 }
@@ -135,7 +136,7 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-form";
                 }
@@ -152,7 +153,7 @@ public class ManualCommandController {
         }
 
         // 下書き保存(編集)
-        @PostMapping("/{manualId}/actions/edit-toDraft")
+        @PostMapping({ "/{manualId}/actions/edit-toDraft", "/{manualId}/actions/save-draft-edit" })
         public String editToDraft(
                         @PathVariable Long manualId,
                         @Valid @ModelAttribute ManualEditFormDto formDto,
@@ -165,12 +166,12 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-form";
                 }
                 // 既存処理
-                commandService.editToPending(
+                commandService.editToDraft(
                                 manualId,
                                 formDto,
                                 principal);
@@ -178,11 +179,11 @@ public class ManualCommandController {
                 message.addFlashAttribute(
                                 "message", "マニュアルを保存しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}/actions/edit-to-pending";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // マニュアルを公開(編集)
-        @PostMapping("/{manualId}/actions/edit-to-pending")
+        @PostMapping({ "/{manualId}/actions/edit-to-pending", "/{manualId}/actions/save-pending-edit" })
         public String editToPending(
                         @PathVariable Long manualId,
                         @Valid @ModelAttribute ManualEditFormDto formDto,
@@ -195,7 +196,7 @@ public class ManualCommandController {
                         model.addAttribute("formDto", formDto);
                         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                         model.addAttribute("categoryDto", categoryDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-form";
                 }
@@ -208,7 +209,7 @@ public class ManualCommandController {
                 message.addFlashAttribute(
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}/actions/edit-to-pending";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // ============================================
@@ -216,23 +217,24 @@ public class ManualCommandController {
         // ============================================
 
         // マニュアル公開
-        @GetMapping("/{manualId}/actions/submit")
+        @PostMapping("/{manualId}/actions/submit")
         public String submitManual(
                         @PathVariable Long manualId,
+                        Principal principal,
                         RedirectAttributes message) {
                 log.info("start");
-
+                commandService.submitManual(manualId, principal);
                 message.addFlashAttribute(
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}/actions/submit";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // 承認
         @PostMapping("/{manualId}/actions/approve")
         public String approveManualWithComment(
                         @PathVariable Long manualId,
-                        @Valid @ModelAttribute ManualActionRequestDto actionRequestDto,
+                        @Valid @ModelAttribute ApproveRequestDto approveRequestDto,
                         BindingResult bindingResult,
                         RedirectAttributes message,
                         Principal principal,
@@ -241,19 +243,19 @@ public class ManualCommandController {
                 if (bindingResult.hasErrors()) {
                         ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
                         model.addAttribute("detailDto", detailDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-detail";
                 }
                 // 既存処理
                 commandService.approveManual(
                                 manualId,
-                                actionRequestDto.getChangeNote(),
+                                approveRequestDto.getChangeNote(),
                                 principal);
                 message.addFlashAttribute(
                                 "message", "マニュアルを承認しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // 差し戻し（チェンジノート必須）
@@ -269,7 +271,7 @@ public class ManualCommandController {
                 if (bindingResult.hasErrors()) {
                         ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
                         model.addAttribute("detailDto", detailDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-detail";
                 }
@@ -281,7 +283,7 @@ public class ManualCommandController {
                 message.addFlashAttribute(
                                 "message", "マニュアルを差し戻しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // アーカイブ（チェンジノート必須)
@@ -297,7 +299,7 @@ public class ManualCommandController {
                 if (bindingResult.hasErrors()) {
                         ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
                         model.addAttribute("detailDto", detailDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-detail";
                 }
@@ -308,7 +310,7 @@ public class ManualCommandController {
                 message.addFlashAttribute(
                                 "message", "マニュアルをアーカイブしました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
         // 復帰（チェンジノート必須）
@@ -324,7 +326,7 @@ public class ManualCommandController {
                 if (bindingResult.hasErrors()) {
                         ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
                         model.addAttribute("detailDto", detailDto);
-                        model.addAttribute("message", "入力エラーがあります。");
+                        model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
                         return "manual-detail";
                 }
@@ -336,7 +338,7 @@ public class ManualCommandController {
                 message.addFlashAttribute(
                                 "message", "マニュアルをアーカイブから復帰しました。");
                 message.addFlashAttribute("messageType", "success");
-                return "redirect:/manuals/{manualId}";
+                return "redirect:/manuals/{manualId}/detail";
         }
 
 }

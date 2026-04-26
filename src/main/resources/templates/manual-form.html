@@ -36,37 +36,50 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control text-base" th:field="*{title}" th:errors="*{title}"
-            maxlength="100">
+          <input id="title" type="text" class="form-control text-base" th:field="*{title}"
+            th:classappend="${#fields.hasErrors('title')} ? ' is-invalid'" maxlength="100">
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+          </div>
           <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">本文</label>
-          <textarea id="content" class="form-control text-base " th:field="*{content}" th:errors="*{content}" rows="8"
-            maxlength="10000"></textarea>
+          <textarea id="content" class="form-control text-base " th:field="*{content}"
+            th:classappend="${#fields.hasErrors('content')} ? ' is-invalid'" rows="8" maxlength="10000"></textarea>
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">
+          </div>
           <div class="text-count" data-for="content" data-max="10000">0 / 10000</div>
         </div>
         <div class="mb-3">
           <label for="category" class="form-label">カテゴリ</label>
-          <select id="category" class="form-select" th:field="*{categoryId}">
+          <select id="category" class="form-select" th:field="*{categoryId}"
+            th:classappend="${#fields.hasErrors('categoryId')} ? ' is-invalid'">
+            <option value="">選択してください</option>
             <option class="text-base " th:each="category:${categoryDto}" th:value="${category.id}"
-              th:text="${category.categoryName}" th:errors="${category.categoryName}">営業部
+              th:text="${category.categoryName}">
+              営業部
             </option>
           </select>
+          <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">
+          </div>
         </div>
         <div class="mb-3">
           <label for="changeNote" class="form-label">更新履歴</label>
-          <input id="changeNote" type="text" th:field="*{changeNote}" th:errors="${changeNote}"
-            class="form-control text-base" maxlength="100">
+          <input id="changeNote" type="text" th:field="*{changeNote}"
+            th:classappend="${#fields.hasErrors('changeNote')} ? ' is-invalid'" class="form-control text-base"
+            maxlength="100">
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('changeNote')}" th:errors="*{changeNote}">
+          </div>
           <div class="text-count" data-for="changeNote" data-max="100">0 / 100</div>
         </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-primary" th:disabled="${formDto.guest}">
-          マニュアル公開</button>
         <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.draftSubmit}"
           th:disabled="${formDto.guest}">
           下書きに保存</button>
+        <button type="submit" class="btn btn-outline-primary" th:disabled="${formDto.guest}">
+          マニュアル公開</button>
+
       </div>
     </form>
   </main>

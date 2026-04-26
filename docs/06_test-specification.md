@@ -1,6 +1,6 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.16  
+Version: 01.03.17  
 更新日: 2026-04-26
 
 ---
@@ -8,6 +8,9 @@ Version: 01.03.16
 ## 0. 実施ステータス凡例（06_test-result連動）
 - `✅`: 実施済み（PASS/FAIL/BLOCK いずれかで結果記録あり）
 - 無印: 未実施
+
+### 0-1. 実施ログ参照先
+- 2026-04-26 追記ログ: `docs/06_test-result.md` の「テストログ（2026-04-26 追記・管理者/USER）」
 
 ---
 
@@ -117,18 +120,18 @@ Version: 01.03.16
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
 | MAN-001 | 正常 | title / content / category 入力 | DRAFT で保存される |
-| MAN-002 | 異常 | category 未選択 | エラー表示 |
+| MAN-002 ✅ | 異常 | category 未選択 | エラー表示 |
 | MAN-003 | 異常 | title 100文字超過 | エラー表示 |
 | MAN-004 | 正常 | 公開ボタン押下 | PENDING で保存される |
 | MAN-005 | 異常 | title 未選択 | エラー表示 |
-| MAN-006 | 正常 | 下書き保存ボタン押下 | DRAFT で保存される |
+| MAN-006 ✅ | 正常 | 下書き保存ボタン押下 | DRAFT で保存される |
 | MAN-007 | 正常 | カテゴリ選択 | アクティブカテゴリのみ表示 |
 
 ### 5-2. 更新
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-008 | 正常 | DRAFT 更新 | 更新成功 |
-| MAN-009 | 正常 | changeNote 入力 | 履歴保存 |
+| MAN-008 ✅ | 正常 | DRAFT 更新 | 更新成功 |
+| MAN-009 ✅ | 正常 | changeNote 入力 | 履歴保存 |
 | MAN-010 | 正常 | PENDING の下書きに保存 | DRAFT に戻せる |
 | MAN-011 | 異常 | APPROVED 編集 | 業務ルールに従い制御(編集出来ない) |
 
@@ -152,6 +155,8 @@ Version: 01.03.16
 | MAN-016J | 正常 | statuses 値保持 | 検索後にステータスチェック状態が保持される |
 | MAN-016K | 正常 | アコーディオンID一意 | 複数行で各行が個別に開閉できる |
 | MAN-016L | 異常 | 表示データnull | Model 未設定時に EL エラーを検知できる |
+| MAN-016M | 正常 | Controller分割後の詳細導線 | `GET /manuals/{manualId}/detail` で詳細画面が表示される |
+| MAN-016N | 正常 | Controller分割後の編集/複製導線 | `GET /manuals/{manualId}/actions/edit` / `copy` が表示される |
 
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
@@ -161,13 +166,14 @@ Version: 01.03.16
 | MAN-019 | 正常 | changeNote | 履歴保存される |
 | MAN-020 | 異常 | 使用停止カテゴリ | エラー |
 | MAN-021 | 正常 | 複製マニュアル公開 | PENDINGで新規作成 |
+| MAN-022 | 正常 | Controller分割後の更新系導線 | 各 `POST /manuals/{manualId}/actions/...` が404にならず実行される |
 
 ---
 
 ## 6. ステータス遷移
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| ST-001 | 正常 | DRAFT → PENDING | 遷移成功 |
+| ST-001 ✅ | 正常 | DRAFT → PENDING | 遷移成功 |
 | ST-002 | 正常 | DRAFT → ARCHIVED | 遷移成功 |
 | ST-003 | 正常 | PENDING → APPROVED | 遷移成功 |
 | ST-004 | 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
@@ -201,7 +207,7 @@ Version: 01.03.16
 | AUTH-014 | 異常 | Manual 編集（非作成者） | 実行不可 |
 | AUTH-015 | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
 | AUTH-016 | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
-| AUTH-017 | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
+| AUTH-017 ✅ | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
 | AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
 | AUTH-019 | 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
 | AUTH-020 | 異常 | Manual 承認（作成者本人） | 実行不可 |
@@ -280,6 +286,10 @@ Version: 01.03.16
 | ADM-005 | 異常 | `th:field="${...}"` 記述 | テンプレートエラーとして検知できる |
 | ADM-006 ✅ | 異常 | `target...` が null の状態で更新系ボタン表示 | null ガードにより表示されない |
 | ADM-007 | 異常 | パス不一致（`th:formaction` と `@PostMapping` 不一致） | 400/404/405 として検知できる |
+| ADM-008 ✅ | 異常 | Category新規作成で `displayOrder` 未入力 | nullエラー画面ではなく同画面で入力エラー表示される |
+| ADM-009 ✅ | 異常 | Category更新で必須項目未入力 | 同画面で入力エラー表示される |
+| ADM-010 | 異常 | User新規作成で必須項目未入力 | 同画面で入力エラー表示される |
+| ADM-011 | 異常 | User更新で必須項目未入力 | 同画面で入力エラー表示される |
 
 ### 9-4. パスワード変更（2026-04-23）
 | No | 種別 | テスト観点 | 期待結果 |
@@ -296,6 +306,7 @@ Version: 01.03.16
 | PWD-010 ✅ | 正常 | パスワード変更実行URL（本人） | `POST /users/action/change-password` で更新される |
 | PWD-011 | 正常 | パスワード初期化実行URL（管理者） | `POST /users/{userId}/reset-password` で初期化される |
 | PWD-012 ✅ | 正常 | 初期化後の再変更確認 | 初期化PWでログイン後に新PWへ変更でき、次回ログインは新PWのみ成功する |
+| PWD-013 | 異常 | パスワード変更で入力不備（必須/形式） | 同画面でバリデーションエラー表示され、更新されない |
 
 ---
 

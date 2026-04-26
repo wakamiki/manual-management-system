@@ -68,10 +68,18 @@
       <a th:href="@{/manuals/{manualId}/actions/copy(manualId=${detailDto.manualId})}" target=" _blank"
         rel="noopener noreferrer" class="btn btn-outline-secondary" th:if="${detailDto.canCopy}">
         複製</a>
-      <button type="button" class="btn btn-outline-primary" th:if="${detailDto.canPending}"
-        th:disabled="${detailDto.canGuest}">マニュアル公開</button>
-      <button type="button" class="btn btn-outline-success" th:if="${detailDto.canApprove}"
-        th:disabled="${detailDto.canGuest}">承認</button>
+      <form method="post" th:if="${detailDto.canPending}"
+        th:action="@{/manuals/{manualId}/actions/submit(manualId=${detailDto.manualId})}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button type="submit" class="btn btn-outline-primary" th:disabled="${detailDto.canGuest}">マニュアル公開</button>
+      </form>
+      <button type="button" class="btn btn-outline-success" id="approveButton" th:if="${detailDto.canApprove}"
+        th:disabled="${detailDto.canGuest}" data-action="approve"
+        th:data-url="@{/manuals/{manualId}/actions/approve(manualId=${detailDto.manualId})}">承認</button>
+      <small class="text-muted" th:if="${detailDto.canApprove}">
+        承認時: ダイアログで「更新履歴を入力して承認(OKボタン)」または「そのまま承認(キャンセルボタン)」を選択できます。
+      </small>
+
       <button type="button" class="btn btn-outline-warning js-open-inline-panel" data-action="rollback"
         th:data-url="@{/manuals/{manualId}/actions/rollback(manualId=${detailDto.manualId})}"
         th:if="${detailDto.canRollback}" th:disabled="${detailDto.canGuest}">差し戻し</button>
@@ -105,6 +113,7 @@
           承認ボタン押下時は「履歴コメントを残しますか」の確認ダイアログを表示します。`はい` の場合のみこの入力パネルを開き、`いいえ` の場合はそのまま承認します。
         </div>
         <form id="inlineActionForm" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
           <div class="mb-3">
             <label for="inlineChangeNote" class="form-label">更新履歴</label>
             <textarea id="inlineChangeNote" name="changeNote" class="form-control" rows="3" maxlength="100"></textarea>
@@ -159,6 +168,7 @@
       const submitBtn = document.getElementById('inlineSubmitButton');
       const note = document.getElementById('inlineChangeNote');
       const cancelBtn = document.getElementById('inlineCancelButton');
+      const approveBtn = document.getElementById('approveButton');
 
       const map = {
         rollback: { label: '差し戻しを実行', submit: '差し戻しを確定', ph: '差し戻し内容を入力してください', btn: 'btn-outline-warning' },
@@ -189,7 +199,30 @@
         panel.hidden = true;
         note.value = '';
       });
+      approveBtn?.addEventListener('click', () => {
+        form.action = approveBtn.dataset.url;
+        const withNote = confirm('OK: 更新履歴を入力して承認\nキャンセル: そのまま承認');
+        if (withNote) {
+          label.textContent = '承認を実行';
+          submitBtn.textContent = '承認を確定';
+          note.placeholder = '更新履歴（任意）';
+          submitBtn.classList.remove('btn-outline-warning', 'btn-outline-danger', 'btn-outline-info');
+          submitBtn.classList.add('btn-outline-success');
+          panel.hidden = false;
+          note.focus();
+          return;
+        }
+        form.querySelectorAll('input[name="changeNote"][type="hidden"]').forEach(el => el.remove());
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'changeNote';
+        hidden.value = '';
+        form.appendChild(hidden);
+        form.submit();
+      });
     })();
+
+
   </script>
 </body>
 

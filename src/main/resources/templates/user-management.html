@@ -70,18 +70,26 @@
             </div>
             <div class="mb-3">
               <label for="userId" class="form-label">userId</label>
-              <input id="userId" type="text" class="form-control" th:field="*{loginId}" th:errors="*{loginId}">
+              <input id="userId" type="text" class="form-control" th:field="*{loginId}"
+                th:classappend="${#fields.hasErrors('loginId')} ? ' is-invalid'">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('loginId')}" th:errors="*{loginId}">
+              </div>
             </div>
             <div class="mb-3">
               <label for="displayName" class="form-label">displayName</label>
               <input id="displayName" type="text" class="form-control" th:field="*{displayName}"
-                th:errors="*{displayName}">
+                th:classappend="${#fields.hasErrors('displayName')} ? ' is-invalid'">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}">
+              </div>
             </div>
             <div class="mb-4">
               <label for="role" class="form-label">role</label>
               <select id="role" class="form-select" th:field="*{role}">
-                <option th:each="role:${viewDto.allRole}" th:text="${role}" th:value="${role}" th:errors="*{role}">USER
+                <option th:each="role:${viewDto.allRole}" th:text="${role}" th:value="${role}"
+                  th:classappend="${#fields.hasErrors('role')} ? ' is-invalid'">USER
                 </option>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">
+                </div>
               </select>
             </div>
             <div class="admin-form-actions">
