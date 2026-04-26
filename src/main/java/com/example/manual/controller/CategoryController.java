@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,9 +79,19 @@ public class CategoryController {
       @Valid @ModelAttribute CategoryFormDto formDto,
       Principal principal,
       RedirectAttributes message,
+      BindingResult bindingResult,
       Model model,
       Pageable pageable) {
     log.info("start");
+    if (bindingResult.hasErrors()) {
+      CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "category-management";
+    }
+    // 重複チェック処理
     if (categoryService.createCategory(
         formDto, principal)) {
       boolean duplicate = true;
@@ -92,7 +103,7 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       return "category-management";
     }
-
+    // 既存処理
     message.addFlashAttribute(
         "message", "新しいカテゴリーを作成しました。");
     message.addFlashAttribute("messageType", "success");
@@ -104,10 +115,22 @@ public class CategoryController {
       @Valid @ModelAttribute CategoryFormDto formDto,
       Principal principal,
       RedirectAttributes message,
+      BindingResult bindingResult,
       Model model,
-      Pageable pageable) {
+      @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
-    if (categoryService.updateCategory(formDto, principal)) {
+    if (bindingResult.hasErrors()) {
+      CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "category-management";
+    }
+    // カテゴリー名重複チェック
+    if (formDto.isConfirmed()) {
+      // カテゴリー名重複了承 回避処理
+    } else if (categoryService.isCategoryNameTaken(formDto)) {
       boolean duplicate = true;
       String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
       model.addAttribute("duplicate", duplicate);
@@ -117,6 +140,8 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       return "category-management";
     }
+    // 既存処理
+    categoryService.updateCategory(formDto, principal);
     message.addFlashAttribute(
         "message", "カテゴリーを更新しました。");
     message.addFlashAttribute("messageType", "success");

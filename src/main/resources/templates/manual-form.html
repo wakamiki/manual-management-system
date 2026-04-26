@@ -36,12 +36,13 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control text-base" th:field="*{title}" maxlength="100">
+          <input id="title" type="text" class="form-control text-base" th:field="*{title}" th:errors="*{title}"
+            maxlength="100">
           <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
           <label for="content" class="form-label">本文</label>
-          <textarea id="content" class="form-control text-base " th:field="*{content}" rows="8"
+          <textarea id="content" class="form-control text-base " th:field="*{content}" th:errors="*{content}" rows="8"
             maxlength="10000"></textarea>
           <div class="text-count" data-for="content" data-max="10000">0 / 10000</div>
         </div>
@@ -49,13 +50,14 @@
           <label for="category" class="form-label">カテゴリ</label>
           <select id="category" class="form-select" th:field="*{categoryId}">
             <option class="text-base " th:each="category:${categoryDto}" th:value="${category.id}"
-              th:text="${category.categoryName}">営業部
+              th:text="${category.categoryName}" th:errors="${category.categoryName}">営業部
             </option>
           </select>
         </div>
         <div class="mb-3">
           <label for="changeNote" class="form-label">更新履歴</label>
-          <input id="changeNote" type="text" th:field="*{changeNote}" class="form-control text-base" maxlength="100">
+          <input id="changeNote" type="text" th:field="*{changeNote}" th:errors="${changeNote}"
+            class="form-control text-base" maxlength="100">
           <div class="text-count" data-for="changeNote" data-max="100">0 / 100</div>
         </div>
       </div>

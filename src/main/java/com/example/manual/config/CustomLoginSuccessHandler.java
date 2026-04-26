@@ -39,7 +39,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         User playUser = userService.getUserByLoginId(loginId);
         if (playUser.isPasswordChangeRequired()) {
             // パスワード変更画面
-            response.sendRedirect(request.getContextPath() + "/users/" + playUser.getId() + "/change-password");
+            response.sendRedirect(request.getContextPath() + "/users/change-password");
             return;
         }
         response.sendRedirect(request.getContextPath() + "/manuals/index");

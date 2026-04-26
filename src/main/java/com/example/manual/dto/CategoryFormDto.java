@@ -10,12 +10,14 @@ public class CategoryFormDto {
 
   }
 
-  @NotBlank
+  private Long id;
+  @NotBlank(message = "categoryNameは必須です。")
   @Size(max = 50)
   private String categoryName;
-  @NotNull
+  @NotNull(message = "displayOrderは必須です。")
+  @Size(max = 1000)
   private Integer displayOrder;
-  private Long id;
+  private boolean isActive;
   private boolean confirmed = false;
 
   // getter
@@ -36,6 +38,10 @@ public class CategoryFormDto {
     return confirmed;
   }
 
+  public boolean isActive() {
+    return isActive;
+  }
+
   // setter
   public void setCategoryName(String categoryName) {
     this.categoryName = categoryName;
@@ -51,5 +57,9 @@ public class CategoryFormDto {
 
   public void setConfirmed(boolean confirmed) {
     this.confirmed = confirmed;
+  }
+
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
   }
 }

@@ -11,14 +11,13 @@ public class UserFormDto {
   }
 
   private Long id;
-  @NotBlank
+  @NotBlank(message = "userIDは必須です。")
   private String loginId;
-  @NotBlank
+  @NotBlank(message = "氏名は必須です。")
   @Size(max = 50)
   private String displayName;
-  @NotNull
+  @NotNull(message = "ROLEは必須です。")
   private UserRole role;
-
   private boolean isActive = true;
 
   // getter

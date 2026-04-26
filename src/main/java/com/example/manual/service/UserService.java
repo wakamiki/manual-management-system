@@ -101,12 +101,16 @@ public class UserService {
         return viewDto;
     }
 
-    public void showChangePasswordPage(Principal principal) {
+    public boolean showChangePasswordPage(Principal principal) {
         log.info("start");
         User playUser = getUserByPrincipal(principal);
         if (!userPermission.canShowChangePasswordPage(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
+        if (playUser.getRole() == UserRole.GUEST) {
+            return true;
+        }
+        return false;
     }
 
     // =============================================

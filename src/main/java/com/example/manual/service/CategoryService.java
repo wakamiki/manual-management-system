@@ -106,7 +106,7 @@ public class CategoryService {
     return false;
   }
 
-  public boolean updateCategory(
+  public void updateCategory(
       CategoryFormDto formDto,
       Principal principal) {
     log.info("start");
@@ -114,14 +114,6 @@ public class CategoryService {
     if (!canUpdateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    if (formDto.isConfirmed()) {
-      // カテゴリー名重複了承 チェック回避処理
-    } else if (isCategoryNameTaken(formDto)) {
-      // カテゴリー名重複チェック
-      formDto.setConfirmed(true);
-      return true;
-    }
-
     Category category = findCategoryOrThrow(formDto.getId());
     int currentOrder = category.getDisplayOrder();
     int targetOrder = formDto.getDisplayOrder();
@@ -135,7 +127,6 @@ public class CategoryService {
     category.setDisplayOrder(targetOrder);
     category.markUpdatedNow();
     categoryRepository.save(category);
-    return false;
   }
 
   public void deactivateCategory(Principal principal, Long categoryId) {
@@ -232,7 +223,7 @@ public class CategoryService {
         start, end);
 
     for (Category target : targets) {
-      target.setDisplayOrder(target.getDisplayOrder() + 1);
+      target.setDisplayOrder(target.getDisplayOrder() - 1);
     }
     categoryRepository.saveAll(targets);
   }
@@ -318,6 +309,7 @@ public class CategoryService {
     formDto.setId(category.getId());
     formDto.setDisplayOrder(category.getDisplayOrder());
     formDto.setCategoryName(category.getCategoryName());
+    formDto.setActive(category.isActive());
     return formDto;
   }
 
@@ -336,7 +328,7 @@ public class CategoryService {
   }
 
   // カテゴリー名重複チェック
-  private boolean isCategoryNameTaken(CategoryFormDto formDto) {
+  public boolean isCategoryNameTaken(CategoryFormDto formDto) {
     log.info("start");
     if (formDto.getId() == null) {
       return categoryRepository.existsByCategoryName(formDto.getCategoryName());
@@ -346,7 +338,7 @@ public class CategoryService {
 
   private boolean canShowCategoryManagement(User playUser) {
     log.info("start");
-    if (playUser.getRole() != UserRole.ADMIN) {
+    if (playUser.getRole() != UserRole.ADMIN && playUser.getRole() != UserRole.GUEST) {
       throw new UnauthorizedException("権限が不足しています。");
     }
     if (playUser.isActive() != true) {
@@ -357,7 +349,7 @@ public class CategoryService {
 
   private boolean canShowCategoryUpdateMode(User playUser) {
     log.info("start");
-    if (playUser.getRole() != UserRole.ADMIN) {
+    if (playUser.getRole() != UserRole.ADMIN && playUser.getRole() != UserRole.GUEST) {
       throw new UnauthorizedException("権限が不足しています。");
     }
     if (playUser.isActive() != true) {

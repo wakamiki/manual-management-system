@@ -27,7 +27,10 @@
             class="btn btn-outline-secondary btn-sm" th:disabled="${myPageDto.canGuest}">パスワード変更</a>
         </div>
       </div>
-      <button onclick="window.close()" class="btn btn-outline-secondary mypage-close-btn">閉じる</button>
+      <div class="header-action-group">
+
+        <button onclick="window.close()" class="btn btn-outline-secondary mypage-close-btn">閉じる</button>
+      </div>
     </header>
 
     <div class="alert my-page-alert" id="flashMessage" role="alert" th:if="${message != null}" th:classappend="${
@@ -49,14 +52,16 @@
           <div class="overview-icon">
             <div class="home-icon-preview">
               <a target="_blank" rel="noopener noreferrer" type="button" class="home-icon-button" aria-label="ユーザー"
-                th:if="${myPageDto.userDto.userRole.name()=='ADMIN'}" th:href="@{/users}">
+                th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}"
+                th:href="@{/users}">
                 <i class="bi bi-person-fill-gear home-icon-shape" aria-hidden="true"></i>
               </a>
             </div>
 
             <div class="home-icon-preview">
               <a target="_blank" rel="noopener noreferrer" type="button" class="home-icon-button" aria-label="カテゴリー"
-                th:if="${myPageDto.userDto.userRole.name()=='ADMIN'}" th:href="@{/categories}">
+                th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}"
+                th:href="@{/categories}">
                 <i class="bi bi-diagram-3-fill home-icon-shape" aria-hidden="true"></i>
               </a>
             </div>

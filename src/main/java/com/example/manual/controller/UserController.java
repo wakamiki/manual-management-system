@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,9 +76,10 @@ public class UserController {
 
   // パスワード変更画面
   @GetMapping("/change-password")
-  public String showChangePasswordPage(Principal principal) {
+  public String showChangePasswordPage(Principal principal, Model model) {
     log.info("start");
-    userService.showChangePasswordPage(principal);
+    boolean canGuest = userService.showChangePasswordPage(principal);
+    model.addAttribute("canGuest", canGuest);
     return "password-change";
   }
 
@@ -90,10 +92,18 @@ public class UserController {
       RedirectAttributes message,
       Principal principal,
       @Valid @ModelAttribute UserFormDto formDto,
+      BindingResult bindingResult,
       Model model,
       Pageable pageable) {
     log.info("start");
-
+    if (bindingResult.hasErrors()) {
+      UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "user-management";
+    }
     if (userPermissionService.isUserIdTaken(formDto)) {
       String duplicateMessage = "userIDは既に使われています。別のuserIDを入力してください。";
       model.addAttribute("duplicateMessage", duplicateMessage);
@@ -118,10 +128,18 @@ public class UserController {
       Principal principal,
       @PathVariable Long userId,
       @Valid @ModelAttribute UserFormDto formDto,
+      BindingResult bindingResult,
       Model model,
       Pageable pageable) {
     log.info("start");
-
+    if (bindingResult.hasErrors()) {
+      UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "user-management";
+    }
     if (userService.updateUser(formDto, principal, userId)) {
       String duplicateMessage = "userIDは既に使われています。別のuserIDを入力してください。";
       model.addAttribute("duplicateMessage", duplicateMessage);
@@ -141,8 +159,20 @@ public class UserController {
       RedirectAttributes message,
       Principal principal,
       @PathVariable Long userId,
-      @Valid @ModelAttribute UserFormDto formDto) {
+      @Valid @ModelAttribute UserFormDto formDto,
+      BindingResult bindingResult,
+      Model model,
+      @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
+    if (bindingResult.hasErrors()) {
+      UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "user-management";
+    }
+    // 既存処理
     userService.deactivateUser(principal, formDto, userId);
     message.addFlashAttribute("message", "ユーザーを停止しました。");
     message.addFlashAttribute("messageType", "success");
@@ -154,8 +184,20 @@ public class UserController {
       RedirectAttributes message,
       @PathVariable Long userId,
       Principal principal,
-      @Valid @ModelAttribute UserFormDto formDto) {
+      @Valid @ModelAttribute UserFormDto formDto,
+      BindingResult bindingResult,
+      Model model,
+      @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
+    if (bindingResult.hasErrors()) {
+      UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
+      model.addAttribute("formDto", formDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "user-management";
+    }
+    // 既存処理
     userService.activateUser(principal, userId);
     message.addFlashAttribute("message", "ユーザーを有効にしました。");
     message.addFlashAttribute("messageType", "success");
@@ -184,13 +226,23 @@ public class UserController {
   @PostMapping("/action/change-password")
   public String changePassword(
       @Valid @ModelAttribute PasswordChangeRequestDto passwordDto,
+      BindingResult bindingResult,
       Principal principal,
-      RedirectAttributes message) {
+      RedirectAttributes message,
+      Model model) {
     log.info("start");
+    if (bindingResult.hasErrors()) {
+      boolean canGuest = userService.showChangePasswordPage(principal);
+      model.addAttribute("canGuest", canGuest);
+      model.addAttribute("message", "入力エラーがあります。");
+      model.addAttribute("messageType", "error");
+      return "password-change";
+    }
+    // 既存処理
     userService.changePassword(principal, passwordDto);
     message.addFlashAttribute("message", "パスワードを変更しました。");
     message.addFlashAttribute("messageType", "success");
-    return "redirect:manuals/index";
+    return "redirect:/manuals/index";
   }
 
   @GetMapping("/{userId}/operation-histories")

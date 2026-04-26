@@ -42,7 +42,7 @@ public class UserPermissionService {
     if (!targetUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
-    if (targetUser.getRole() != UserRole.ADMIN) {
+    if (targetUser.getRole() != UserRole.ADMIN && targetUser.getRole() != UserRole.GUEST) {
       throw new UnauthorizedException("権限が不足しています。");
     }
     return true;
@@ -63,9 +63,6 @@ public class UserPermissionService {
     log.info("start");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
-    }
-    if (playUser.getRole() == UserRole.GUEST) {
-      throw new UnauthorizedException("ゲストユーザーにはパスワード変更の権限がありません。");
     }
     return true;
   }

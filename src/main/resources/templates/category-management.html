@@ -34,11 +34,11 @@
         <div class="admin-mode-title d-flex justify-content-center" th:if="${'CREATE'.equals(viewDto.mode.name())}">
           カテゴリー新規作成モード</div>
         <div class="admin-mode-title d-flex justify-content-center" th:if="${'EDIT'.equals(viewDto.mode.name())}">
-          カテゴリー更新モード</div>
+          カテゴリー変更モード</div>
 
         <div class="form-mode-info d-flex justify-content-end"
           th:if="${viewDto.mode != null and 'EDIT'.equals(viewDto.mode.name())}">
-          <span class="admin-mode-select" th:text="|編集中:${viewDto.targetCategory.categoryName}|">
+          <span class="admin-mode-select" th:text="|編集中:${formDto.categoryName}|">
             編集中:
           </span>
           <a class="admin-mode-select" th:href="@{/categories}">
@@ -53,21 +53,23 @@
             <div class="mb-2" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}">
               <label for="categoryId" class="form-label">categoryId</label>
               <input id="categoryId" type="text" class="form-control"
-                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}" th:value="*{id}" readonly>
+                th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}" th:field="*{id}" th:value="*{id}"
+                readonly>
             </div>
             <div class="mb-3">
               <label for="categoryName" class="form-label">categoryName</label>
-              <input id="categoryName" type="text" class="form-control" th:field="*{categoryName}">
+              <input id="categoryName" type="text" class="form-control" th:field="*{categoryName}"
+                th:errors="*{displayOrder}">
             </div>
             <div class="mb-4">
               <label for="displayOrder" class="form-label">displayOrder</label>
-              <input id="displayOrder" type="number" class="form-control" th:field="*{displayOrder}" value="1" min="1"
-                placeholder="指定の番号に割り込み">
+              <input id="displayOrder" type="number" class="form-control" th:field="*{displayOrder}" min="1"
+                placeholder="指定の番号に割り込み" th:errors="*{displayOrder}">
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
-                th:if="${formDto != null or 'CREATE'.equals(viewDto.mode.name())}" th:formaction="@{/categories/create}"
-                th:disabled="${viewDto.canGuest}">新規登録</button>
+                th:if="${formDto != null and 'CREATE'.equals(viewDto.mode.name())}"
+                th:formaction="@{/categories/create}" th:disabled="${viewDto.canGuest}">新規登録</button>
               <button type="submit" class="btn btn-outline-primary"
                 th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}"
                 th:formaction="@{/categories/{categoryId}/update(categoryId=*{id})}"

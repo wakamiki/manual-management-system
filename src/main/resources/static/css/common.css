@@ -204,6 +204,24 @@ small {
   align-self: center;
 }
 
+.header-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-form {
+  margin: 0;
+}
+
+.logout-btn {
+  padding: 0.2rem 0.5rem;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--color-bg-surface);
+  border-color: var(--color-bg-surface);
+}
+
 .btn-primary {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
