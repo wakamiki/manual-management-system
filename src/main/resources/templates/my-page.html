@@ -136,7 +136,8 @@
                   </div>
                   <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</p>
                   <h3 class="notification-title">配送手順の流れが差し戻されました</h3>
-                  <p class="notification-text mb-3">変更理由を見直して、再申請してください。</p>
+                  <p class="notification-text mb-3 manual-content-preserve" th:text="${manual.content}">
+                    変更理由を見直して、再申請してください。</p>
                   <div class="notification-actions">
                     <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
                       class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -157,7 +158,8 @@
                   </div>
                   <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1002</p>
                   <h3 class="notification-title">発注処理フローの承認待ちがあります</h3>
-                  <p class="notification-text mb-3">承認者として内容を確認し、承認または差し戻しを行ってください。</p>
+                  <p class="notification-text mb-3 manual-content-preserve" th:text="${manual.content}">
+                    承認者として内容を確認し、承認または差し戻しを行ってください。</p>
                   <div class="notification-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
                       rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -190,6 +192,7 @@
                         th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-05</small>
                     </div>
                     <h3 class="dashboard-title" th:text="${manual.title}">配送手順の流れ</h3>
+                    <p class="dashboard-text manual-content-preserve mb-0" th:text="${manual.content}">本文</p>
                   </div>
                   <div class="dashboard-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
@@ -226,6 +229,7 @@
                         th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-08</small>
                     </div>
                     <h3 class="dashboard-title" th:text="${manual.title}">見積作成ルール</h3>
+                    <p class="dashboard-text manual-content-preserve mb-0" th:text="${manual.content}">本文</p>
                   </div>
                   <div class="dashboard-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"

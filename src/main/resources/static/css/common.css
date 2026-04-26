@@ -81,6 +81,12 @@ a.list-group-item-action:focus {
   color: var(--color-text-base);
 }
 
+.manual-content-preserve {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
 .page-title-bar {
   flex-wrap: wrap;
   gap: 16px;

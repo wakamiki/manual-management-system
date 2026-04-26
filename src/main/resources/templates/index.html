@@ -189,7 +189,7 @@
             <div class="accordion-collapse collapse" th:id="|collapse-${stat.index}|"
               data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                <p th:text="${manual.content}">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
+                <p class="manual-content-preserve" th:text="${manual.content}">見積作成から承認依頼までの業務手順をまとめたマニュアルです。</p>
                 <div class="d-flex flex-wrap gap-2 mb-3">
                   <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
                     rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
