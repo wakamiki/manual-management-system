@@ -3,10 +3,6 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.Manual;
@@ -15,22 +11,31 @@ import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 @Service
 public class MyPageService {
 
-  private final UserPermissionService userPermissionService;
+
 
   private static final Logger log = LoggerFactory.getLogger(MyPageService.class);
 
   private final UserService userService;
   private final ManualQueryService query;
+  private final UserPermissionService userPermissionService;
+  private final NotificationService notificationService;
 
   public MyPageService(UserService userService,
-      ManualQueryService manualQueryService, UserPermissionService userPermissionService) {
+      ManualQueryService manualQueryService,
+          UserPermissionService userPermissionService,
+            NotificationService notificationService) {
 
     this.userService = userService;
     this.query = manualQueryService;
     this.userPermissionService = userPermissionService;
+    this.notificationService = notificationService;
   }
 
   // ================================================
@@ -58,10 +63,10 @@ public class MyPageService {
       List<Manual> pendingManuals = query.findPendingManuals(playUser);
       List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals, playUser);
       myPageDto.setPendingManualList(pendingDtos);
-      myPageDto.setPendingUnCreatedCount(query.countNotUserCreatedPendingManualList(principal));
+      myPageDto.setPendingUnCreatedCount(notificationService.pendingUnCreatedCount(principal));
     }
 
-    myPageDto.setRollbackCount(query.countMyRollbackManual(principal));
+    myPageDto.setRollbackCount(notificationService.unreadRollbackCount(principal));
     myPageDto.setUserDto(userService.toCreatedUserDto(playUser));
     myPageDto.setCanGuest(userPermissionService.isGuest(playUser));
 

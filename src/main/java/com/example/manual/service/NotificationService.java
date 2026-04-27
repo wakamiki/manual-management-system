@@ -3,19 +3,20 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.Notification;
 import com.example.manual.entity.User;
+import com.example.manual.enums.ManualStatus;
 import com.example.manual.enums.NotificationType;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.NotificationRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificationService {
@@ -79,7 +80,7 @@ public class NotificationService {
     // 通知削除
     // ========================================================
 
-    // マニュアル承認時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
+    // マニュアル承認時またはPending→Draftステータス変更時にそのマニュアルに紐づく通知を送ったユーザーの通知を削除する。
     @Transactional
     public void deletePendingApprovalNotificationsByManualId(
             Long manualId) {
@@ -97,15 +98,22 @@ public class NotificationService {
                 manualId, NotificationType.ROLLBACK);
     }
 
+    //該当マニュアルに紐づく通知を全削除
+    @Transactional
+    public void deleteByManualIdNotification(Long manualId) {
+        log.info("start");
+        notificationRepository.deleteByManualId(manualId);
+    }
+
     public void deleteAsRead(Long notificationId, User user) {
         log.info("start");
-        // 指定通知を既読にする。既読ボタンに対応。
+        // 指定通知を削除する。既読ボタンに対応。
         // 有効ユーザー 画面更新要
     }
 
     public void deleteAllAsRead(User user) {
         log.info("start");
-        // まとめて既読にする。全既読ボタン用。
+        // まとめて削除にする。全既読ボタン用。
         // 有効ユーザー
     }
 
@@ -125,17 +133,21 @@ public class NotificationService {
     // ユーザー未読の差し戻し通知数を取得
     public int unreadRollbackCount(Principal principal) {
         log.info("start");
-        User targetUser = userService.getUserByPrincipal(principal);
-        Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.ROLLBACK);
+        User playUser = userService.getUserByPrincipal(principal);
+        Long count = notificationRepository.countByTargetUserAndType(playUser,NotificationType.ROLLBACK);
         int notificationCount = Math.toIntExact(count);
         return notificationCount;
     }
 
-    // ユーザー未読の承認待ち通知数を取得
-    public int unreadPendingCount(Principal principal) {
+    // ユーザー未読の承認待ち通知数（自分作成マニュアルを除く）を取得
+    public int pendingUnCreatedCount(Principal principal) {
         log.info("start");
-        User targetUser = userService.getUserByPrincipal(principal);
-        Long count = notificationRepository.countByTargetUserAndType(targetUser, NotificationType.PENDING_APPROVAL);
+        User playUser = userService.getUserByPrincipal(principal);
+        Long count =
+                notificationRepository.countByTypeAndManual_StatusAndManual_CreatedByUserNot(
+                    NotificationType.PENDING_APPROVAL,
+                        ManualStatus.PENDING,
+                            playUser);
         int notificationCount = Math.toIntExact(count);
         return notificationCount;
     }

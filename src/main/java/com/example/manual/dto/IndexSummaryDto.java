@@ -10,7 +10,7 @@ public class IndexSummaryDto {
   private int countCreatedPendingManual=0;
   private int countRecentWeeklyManual=0;
   private int unreadRollbackCount=0;
-  private int unreadPendingCount=0;
+  private int pendingUnCreatedCount=0;
 
 
   //getter
@@ -31,8 +31,8 @@ public class IndexSummaryDto {
     return this.unreadRollbackCount;
   }
 
-  public int getUnreadPendingCount() {
-    return this.unreadPendingCount;
+  public int getPendingUnCreatedCount() {
+    return this.pendingUnCreatedCount;
   }
   //setter
 
@@ -52,7 +52,7 @@ public class IndexSummaryDto {
     this.unreadRollbackCount = unreadRollbackCount;
   }
 
-  public void setUnreadPendingCount(int unreadPendingCount) {
-    this.unreadPendingCount = unreadPendingCount;
+  public void setPendingUnCreatedCount(int pendingUnCreatedCount) {
+    this.pendingUnCreatedCount = pendingUnCreatedCount;
   }
 }

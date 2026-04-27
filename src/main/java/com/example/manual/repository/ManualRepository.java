@@ -59,6 +59,13 @@ public interface ManualRepository extends JpaRepository<Manual, Long>, JpaSpecif
             LocalDateTime updatedAt, Pageable pageable);
     // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
 
+    // 指定ステータス以外(Draft想定) 引数の日付より更新日時が後のマニュアルを取得（更新昇順）
+    Page<Manual> findByUpdatedAtAfterAndStatusNotOrderByUpdatedAtDesc(
+                    LocalDateTime updatedAt,
+                    ManualStatus draft,
+                    Pageable pageable);
+    // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
+
     // 数取得 作成者が自分の差し戻しマニュアル取得
     Long countByIsRolledbackTrueAndCreatedByUser(
             User createdByUser);
@@ -75,6 +82,12 @@ public interface ManualRepository extends JpaRepository<Manual, Long>, JpaSpecif
 
     // 数取得 引数の日付より更新日時が後のマニュアル
     Long countByUpdatedAtAfter(LocalDateTime updatedAt);
+    // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
+
+    // 数取得 指定ステータス以外(Draft想定) 引数の日付より更新日時が後のマニュアルを取得（更新昇順）
+    Long countByUpdatedAtAfterAndStatusNot(
+                    LocalDateTime updatedAt,
+                    ManualStatus draft);
     // 引数LocalDateTime.now().minusDays(7)で一週間以内取得
 
     // 数取得 自分作成分のマニュアル全件

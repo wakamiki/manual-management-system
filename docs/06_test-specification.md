@@ -1,6 +1,6 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.18  
+Version: 01.03.18
 更新日: 2026-04-26
 
 ---
@@ -157,7 +157,7 @@ Version: 01.03.18
 | MAN-016L | 異常 | 表示データnull | Model 未設定時に EL エラーを検知できる |
 | MAN-016M ✅ | 正常 | Controller分割後の詳細導線 | `GET /manuals/{manualId}/detail` で詳細画面が表示される |
 | MAN-016N | 正常 | Controller分割後の編集/複製導線 | `GET /manuals/{manualId}/actions/edit` / `copy` が表示される |
-| MAN-016O | 正常 | 本文の改行表示 | index / manual-detail / my-page で改行が保持される |
+| MAN-016O ✅| 正常 | 本文の改行表示 | index / manual-detail / my-page で改行が保持される |
 
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
@@ -176,11 +176,11 @@ Version: 01.03.18
 | --- | --- | --- | --- |
 | ST-001 ✅ | 正常 | DRAFT → PENDING | 遷移成功 |
 | ST-002 | 正常 | DRAFT → ARCHIVED | 遷移成功 |
-| ST-003 | 正常 | PENDING → APPROVED | 遷移成功 |
+| ST-003 ✅ | 正常 | PENDING → APPROVED | 遷移成功 |
 | ST-004  ✅| 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
 | ST-005 | 正常 | PENDING → ARCHIVED | 遷移成功 |
-| ST-006 | 正常 | APPROVED → ARCHIVED | 遷移成功 |
-| ST-007 | 正常 | ARCHIVED → APPROVED | 復帰成功 |
+| ST-006 ✅ | 正常 | APPROVED → ARCHIVED | 遷移成功 |
+| ST-007 ✅ | 正常 | ARCHIVED → APPROVED | 復帰成功 |
 | ST-008 | 異常 | 不正な遷移 | エラー |
 
 ---
@@ -213,9 +213,9 @@ Version: 01.03.18
 | AUTH-019 ✅| 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
 | AUTH-020 | 異常 | Manual 承認（作成者本人） | 実行不可 |
 | AUTH-021 | 異常 | Manual 承認（PENDING以外） | 実行不可 |
-| AUTH-022 | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
-| AUTH-023 | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
-| AUTH-024 | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
+| AUTH-022 ✅ | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
+| AUTH-023 ✅ | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
+| AUTH-024 ✅ | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
 | AUTH-025 | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
 | AUTH-026 | 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
 | AUTH-027 ✅ | 正常 | Category 管理画面表示（GUEST） | 実行可能（閲覧のみ） |
@@ -224,23 +224,23 @@ Version: 01.03.18
 | AUTH-030 ✅ | 正常 | USER/APPROVER の権限外操作UI | マイページのユーザー管理/カテゴリー管理ボタンが非表示 |
 | AUTH-031 ✅ | 正常 | GUEST のユーザー管理画面表示制御 | `userId` / `lastLoginAt` / `操作` 列が非表示、更新系ボタンは非活性 |
 | AUTH-032 | 正常 | ゲストログイン（環境変数設定あり） | `POST /login/guest` でログインし `/manuals/index` へ遷移する |
-| AUTH-033 | 異常 | ゲストログイン（環境変数未設定/不正） | `/login` に戻りエラーメッセージが表示される |
+| AUTH-033 ✅ | 異常 | ゲストログイン（環境変数未設定/不正） | `/login` に戻りエラーメッセージが表示される |
 
 ---
 
 ## 8. 通知 / マイページ
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| NT-001 | 正常 | submit 時 | APPROVER 全員に通知作成 |
+| NT-001 ✅ | 正常 | submit 時 | APPROVER 全員に通知作成 |
 | NT-002 | 正常 | approve 時 | 作成者へ通知作成 |
-| NT-003 | 正常 | rollback 時 | 作成者へ通知作成 |
+| NT-003 ✅ | 正常 | rollback 時 | 作成者へ通知作成 |
 | NT-004 | 正常 | ホームバッヂ | 上段=差し戻し、下段=未承認 |
 | NT-005 ✅ | 正常 | マイページ初期表示 | 通知タブが開く |
 | NT-006 ✅ | 正常 | APPROVER のマイページ | 未承認タブ表示 |
 | NT-007 | 正常 | マイページの初回取得 | 必要データが一括取得される |
 | NT-008 | 正常 | 通知件数 | 未読のみがカウントされる |
-| NT-009 | 正常 | 差し戻し一覧 | `isRolledBack = true` の全件が表示される |
-| NT-010 | 正常 | 承認待ち一覧 | `PENDING` かつ自分以外の全件が表示される |
+| NT-009 ✅ | 正常 | 差し戻し一覧 | `isRolledBack = true` の全件が表示される |
+| NT-010 ✅ | 正常 | 承認待ち一覧 | `PENDING` かつ自分以外の全件が表示される |
 | NT-011 | 正常 | 通知の既読化 | 既読ボタン操作で既読になる |
 | NT-012 ✅ | 正常 | 承認時の通知削除 | 対象マニュアルの `PENDING_APPROVAL` 通知が全削除される |
 
@@ -249,14 +249,14 @@ Version: 01.03.18
 ## 8-2. 詳細画面インライン入力の確定操作
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| FORM-001 | 正常 | rollback を詳細画面のインライン入力で確定 | changeNote 入力後に DRAFT へ更新される |
-| FORM-002 | 正常 | archive を詳細画面のインライン入力で確定 | changeNote 入力後に ARCHIVED へ更新される |
-| FORM-003 | 正常 | restore を詳細画面のインライン入力で確定 | approvedAt を保持した ARCHIVED が APPROVED へ戻る |
-| FORM-004 | 正常 | approve で確認ダイアログ `はい` | インライン入力が開き、履歴コメント付きで承認できる |
-| FORM-005 | 正常 | approve で確認ダイアログ `いいえ` | コメントなしで承認できる |
-| FORM-006 | 異常 | rollback で changeNote 未入力 | エラー表示 |
-| FORM-007 | 異常 | archive で changeNote 未入力 | エラー表示 |
-| FORM-008 | 異常 | restore で changeNote 未入力 | エラー表示 |
+| FORM-001 ✅ | 正常 | rollback を詳細画面のインライン入力で確定 | changeNote 入力後に DRAFT へ更新される |
+| FORM-002 ✅ | 正常 | archive を詳細画面のインライン入力で確定 | changeNote 入力後に ARCHIVED へ更新される |
+| FORM-003 ✅ | 正常 | restore を詳細画面のインライン入力で確定 | approvedAt を保持した ARCHIVED が APPROVED へ戻る |
+| FORM-004 ✅ | 正常 | approve で確認ダイアログ `はい` | インライン入力が開き、履歴コメント付きで承認できる |
+| FORM-005 ✅ | 正常 | approve で確認ダイアログ `いいえ` | コメントなしで承認できる |
+| FORM-006 ✅ | 異常 | rollback で changeNote 未入力 | エラー表示 |
+| FORM-007 ✅ | 異常 | archive で changeNote 未入力 | エラー表示 |
+| FORM-008 ✅ | 異常 | restore で changeNote 未入力 | エラー表示 |
 
 ---
 

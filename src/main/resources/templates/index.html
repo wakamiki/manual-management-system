@@ -139,12 +139,12 @@
                    listDto.userDto != null and
                    listDto.userDto.userRole != null and
                    listDto.summaryDto != null and
-                   listDto.summaryDto.unreadPendingCount > 0 and
+                   listDto.summaryDto.pendingUnCreatedCount > 0 and
                    (
                    listDto.userDto.userRole.name() == 'ADMIN' or
                   listDto.userDto.userRole.name() == 'APPROVER'
                    )
-                  }" th:text="${listDto.summaryDto.unreadPendingCount}">4</span>
+                  }" th:text="${listDto.summaryDto.pendingUnCreatedCount}">4</span>
                 </span>
                 <span class="sidebar-home-user">
                   <span class="sidebar-home-user-label" th:if="${listDto.userDto != null and listDto.userDto.userRole != null and

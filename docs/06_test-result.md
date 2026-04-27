@@ -106,7 +106,7 @@
 - 実施者: miki
 - 対象機能: 認証 / パスワード変更 / マイページ表示制御
 - 実行環境: local / H2
-- 対象コミット: 778a1bf　052e18d　703df79
+- 対象コミット:
 
 ### 2. テスト結果一覧
 | No | テストID | テスト観点 | 期待結果 | 実際結果 | 判定（PASS/FAIL/BLOCK） | 備考 |
@@ -170,8 +170,67 @@
 
 ---
 
+## 実施ログ（2026-04-27）
+
+### 1. テスト実施情報
+- 実施者: miki
+- 対象機能: ゲストログイン / 承認フロー / 通知 / マニュアル複製 / 状態遷移
+- 実行環境: local / H2
+- 対象コミット: 7eb0483 以降（当日修正含む）
+
+### 2. テスト結果一覧
+| No | テストID | テスト観点 | 期待結果 | 実際結果 | 判定（PASS/FAIL/BLOCK） | 備考 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | AUTH-033 | GUESTログイン（環境変数なし） | `/login` に戻りエラーメッセージ表示 | 「guestログインに失敗しました」表示 | PASS | |
+| 2 | AUTH-017 | ADMINで新規作成→公開 | DRAFT→PENDING遷移 | 正常動作 | PASS | |
+| 3 | AUTH-012/013 | ADMIN自分作成マニュアル編集 | 編集可能 | 正常動作 | PASS | |
+| 4 | AUTH-020 | 作成者本人の承認制御（画面） | 承認ボタン非表示 | 非表示を確認 | PASS | 直POSTは別途確認 |
+| 5 | NT-010 | index未承認件数（自分作成除外） | 自分作成分を除外した件数 | 当初不一致→Repository修正後に正常 | PASS | NotificationRepositoryにJPA追加 |
+| 6 | MAN-016D/F | 一覧検索（カテゴリ全選択 + ARCHIVEDのみ） | 条件一致のみ表示 | 正常動作 | PASS | |
+| 7 | FORM-003 | restore（インライン入力） | APPROVEDへ復帰 | 当初エラー→Entity内if修正後に正常 | PASS | |
+| 8 | FORM-008 | restoreでchangeNote未入力 | 入力エラー表示 | 必須項目エラー表示 | PASS | |
+| 9 | AUTH-003 | 作成者本人承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POSTは405確認 | BLOCK | Postmanで再確認予定 |
+| 10 | AUTH-021 | PENDING以外承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
+| 11 | MAN-019 | マニュアル複製：changeNote未入力で下書き保存 | 入力エラー表示 | エラーメッセージ表示 | PASS | |
+| 12 | MAN-019 | マニュアル複製：changeNote未入力で公開 | 入力エラー表示 | エラーメッセージ表示 | PASS | |
+| 13 | MAN-017/022 | マニュアル複製：必須項目入力で下書き保存 | 正常保存 | エラーページ表示 | FAIL | POSTがGET化の疑い |
+| 14 | FORM-004 | 承認（更新履歴入力あり） | 承認成功 + 履歴反映 | 当初履歴未反映→if条件修正後に正常 | PASS | |
+| 15 | FORM-005 | 承認（更新履歴入力なし） | 承認成功 | 正常動作 | PASS | |
+| 16 | MAN-016O | 本文改行表示（detail/index/my-page） | 改行保持表示 | 正常表示 | PASS | |
+| 17 | NT-012 | 未承認通知削除整合 | 承認/状態変更時に不要通知削除 | draft戻し/承認済残存あり→追加修正後に改善 | PASS | 再発時は再調査 |
+| 18 | FORM-002 | archive（インライン入力） | ARCHIVED遷移 + 履歴 + 通知削除 | canArchive判定修正後に正常 | PASS | |
+| 19 | MAN-012 | 最新更新ショートカット表示制御 | 下書きを除外表示 | 修正後に正常 | PASS | |
+| 20 | FORM-001 | rollback（インライン入力） | DRAFT遷移 + 通知作成 | 判定逆転修正後に正常 | PASS | |
+| 21 | FORM-006 | rollbackでchangeNote未入力 | 入力エラー表示 | 必須項目エラー表示 | PASS | |
+| 22 | FORM-007 | archiveでchangeNote未入力 | 入力エラー表示 | 必須項目エラー表示 | PASS | |
+| 23 | NT-001 | USER公開時の未承認通知作成 | APPROVER/ADMINに通知作成 | コンソール確認OK | PASS | |
+| 24 | NT-003/NT-009 | 差し戻し通知表示 | index/my-pageに表示 | 両画面で表示OK | PASS | |
+| 25 | AUTH-004 | USER承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
+| 26 | AUTH-020 | 作成者本人承認不可（USER、画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
+
+### 3. 失敗ケース一覧（FAILのみ）
+| No | テストID | 事象 | 原因仮説 | 対応方針 |
+| --- | --- | --- | --- | --- |
+| 1 | MAN-017/022 | マニュアル複製で必須項目入力済み下書き保存時にエラーページ | フォーム送信メソッド不整合（POST/GET）または`th:formaction`不一致 | Controllerの`@PostMapping`とテンプレート送信先/メソッドを突合し修正 |
+
+### 4. 明日実施するテスト（優先順）
+- 優先A:
+  - MAN-017/022: 複製下書き保存エラー（POST/GET不整合）修正確認
+  - AUTH-003 / AUTH-004 / AUTH-020 / AUTH-021: 直POST拒否をPostmanで検証
+  - AUTH-032: GUESTログイン（環境変数あり）成功導線を確認
+- 優先B:
+  - NT-012: 未承認通知削除の再発有無確認（承認・差し戻し・アーカイブ）
+  - GlobalExceptionHandlerの遷移先適正化（manual操作失敗時の戻り先）
+
+### 5. 改修メモ（任意）
+- index未承認件数の不整合は、NotificationRepositoryで「自分作成以外のPENDING件数」取得JPAを追加して修正。
+- restore失敗はEntity内メソッドのif条件ミス、承認履歴未反映はService内if分岐逆転、category存在エラーはmanualId/categoryId取り違えが原因だった。
+- 通知残存に対し、PENDING→DRAFT時の未承認通知削除と、ARCHIVED遷移時の該当manual通知削除を追加。
+
+---
+
 ## 未解消FAIL一覧（最新）
 
 | テストID | 事象 | 対応状況 |
 | --- | --- | --- |
-| なし | - | - |
+| MAN-017/022 | マニュアル複製で必須項目入力済み下書き保存時にエラーページ | 未解消（POST/GET不整合調査中） |

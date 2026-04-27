@@ -43,6 +43,7 @@ public class GlobalExceptionHandler {
     if (uri.startsWith("/login")) {
       return "redirect:/login";
     }
+
     return "redirect:/manuals/index";
   }
 

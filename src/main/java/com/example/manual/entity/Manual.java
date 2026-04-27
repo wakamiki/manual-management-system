@@ -159,9 +159,11 @@ public class Manual {
     public void restoreToApproved() {
         if (this.status == ManualStatus.ARCHIVED) {
             this.status = ManualStatus.APPROVED;
-              // 復帰後は承認日時を保持するため、approvedAt は更新しない
-            throw new IllegalStateException("同カテゴリでアーカイブされたマニュアルのみ復帰できます");
-    }}
+            // 復帰後は承認日時を保持するため、approvedAt は更新しない
+        } else {
+            throw new IllegalStateException("復帰できるのはステータスARCHIVEDのマニュアルだけです。");
+        }
+}
 
     public void markCreatedNow() {
         this.createdAt = LocalDateTime.now();

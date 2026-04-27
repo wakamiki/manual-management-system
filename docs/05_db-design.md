@@ -1,7 +1,7 @@
 # 05_db-design.md
 
-Version: 01.03.04  
-更新日: 2026-04-24
+Version: 01.03.05
+更新日: 2026-04-27
 
 ---
 
@@ -18,6 +18,13 @@ Version: 01.03.04
 ### 1-3. 注意事項
 - `users` テーブル名を使用する（`user` は予約語衝突回避）
 - 設計書と実装差分がある場合、現時点ではコードを正とする
+
+### 1-4. PostgreSQL移行時の注意
+
+- H2とPostgreSQLでは予約語、boolean、timestamp、enum保存の挙動差に注意する
+- Entityの `@Table` 名は小文字スネークケースへ寄せる
+- 本番では `ddl-auto=update` を避け、初期化手順を管理する
+- users / notifications / user_operation_histories などのテーブル名を設計書と一致させる
 
 ---
 
@@ -137,4 +144,3 @@ manuals                  1 --- N Notifications
 ### 9-1. 実装準拠メモ
 - 現在のEntityには `is_read` は未実装
 - テーブル名は `Notifications`（先頭大文字）を使用
-

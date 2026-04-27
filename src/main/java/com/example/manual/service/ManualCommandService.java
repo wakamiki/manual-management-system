@@ -2,10 +2,6 @@ package com.example.manual.service;
 
 import java.security.Principal;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDraftDto;
 import com.example.manual.dto.ManualEditFormDto;
@@ -14,6 +10,10 @@ import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ManualCommandService {
@@ -163,7 +163,7 @@ public class ManualCommandService {
     notificationService.createSubmitNotifications(principal, savedManual);
   }
 
-  // 編集マニュアル公開(Draft)
+  // 編集マニュアル下書き保存(Draft)
   public void editToDraft(
       Long manualId,
       ManualDraftDto formDto,
@@ -182,6 +182,7 @@ public class ManualCommandService {
     manual.markStatusDRAFT();
     manual.setCategory(category);
     Manual savedManual = manualRepository.save(manual);
+    notificationService.deletePendingApprovalNotificationsByManualId(manualId);
     if (!formDto.getChangeNote().isBlank() && formDto.getChangeNote() != null) {
       historyService.createHistory(
           savedManual,
@@ -243,7 +244,7 @@ public class ManualCommandService {
     log.info("start");
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
-    Category category = categoryService.getCategoryById(manual.getId());
+    Category category = manual.getCategory();
     if (!permission.canApproveManual(manual, category, playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
@@ -252,13 +253,12 @@ public class ManualCommandService {
     manual.markApprovedNow();
     Manual savedManual = manualRepository.save(manual);
     if (changeNote != null && !changeNote.isBlank()) {
-    } else {
       historyService.createHistory(
           savedManual,
           changeNote,
           principal);
     }
-    // 承認通知削除
+    // 未承認通知削除
     notificationService.deletePendingApprovalNotificationsByManualId(manualId);
   }
 
@@ -302,6 +302,7 @@ public class ManualCommandService {
     Manual savedManual = manualRepository.save(manual);
     historyService.createHistory(
         savedManual, actionRequestDto.getChangeNote(), principal);
+    notificationService.deleteByManualIdNotification(manualId);
   }
 
   // 復帰

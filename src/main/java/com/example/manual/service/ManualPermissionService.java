@@ -2,10 +2,6 @@ package com.example.manual.service;
 
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.ManualEditFormDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
@@ -13,8 +9,11 @@ import com.example.manual.entity.User;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
-import com.example.manual.exception.NotFoundException;
 import com.example.manual.exception.UnauthorizedException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ManualPermissionService {
@@ -33,10 +32,10 @@ public class ManualPermissionService {
     // ============================
 
     public boolean canRestore(User playUser, Manual manual) {
-        if (isApproverOrAdmin(playUser)) {
+        if (!isApproverOrAdmin(playUser)) {
             return false;
         }
-        if (isStatusArchived(manual)) {
+        if (!isStatusArchived(manual)) {
             return false;
         }
         return true;
@@ -106,8 +105,7 @@ public class ManualPermissionService {
         if (!isApproverOrAdmin(playUser)) {
             return false;
         }
-        if (!isStatusArchived(manual) &&
-                !isStatusDraft(manual)) {
+        if (!isStatusApproved(manual)&&!isStatusPending(manual)&&!isStatusDraft(manual)) {
             return false;
         }
         if (!isTitleAndContent(manual.getTitle(), manual.getContent())) {
@@ -209,15 +207,8 @@ public class ManualPermissionService {
                 !isStatusApproved(manual)) {
             throw new InvalidStateException("マニュアルのステータスが条件を満たしていません。");
         }
-        if (!isCategoryActivate(category)) {
-            throw new UnauthorizedException(
-                    "指定カテゴリはアクティブではありません。");
-        }
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新期歴は必須です。");
-        }
-        if (!isTitleAndContent(manual.getTitle(), manual.getContent())) {
-            throw new NotFoundException("タイトル・コンテンツがありません。");
         }
         return true;
     }
@@ -264,7 +255,7 @@ public class ManualPermissionService {
             throw new InvalidStateException(
                     "差し戻しができるのはステータス:PENDINGのマニュアルのみです。");
         }
-        if (!isOwner(manual.getCreatedByUser(), playUser)) {
+        if (isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアルを差し戻しすることは出来ません。");
         }

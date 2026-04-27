@@ -31,7 +31,7 @@
       編集内容を更新できます。更新履歴は任意です。
     </div>
 
-    <form class="card" method="post" th:object="${formDto}" th:action="${formDto.pendingSubmit}">
+    <form class="card" method="post" th:object="${formDto}">
       <input type="hidden" name="mode" th:value="${formDto.mode}">
       <div class="card-body">
         <div class="mb-3">
@@ -74,10 +74,14 @@
         </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.draftSubmit}"
+        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode == 'edit'}
+  ? @{/manuals/{manualId}/actions/save-draft(manualId=${formDto.manualId})}
+  : @{/manuals/{manualId}/actions/save-draft-copy(manualId=${formDto.manualId})}"
           th:disabled="${formDto.guest}">
           下書きに保存</button>
-        <button type="submit" class="btn btn-outline-primary" th:disabled="${formDto.guest}">
+        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode == 'edit'}
+  ? @{/manuals/{manualId}/actions/save-pending(manualId=${formDto.manualId})}
+  : @{/manuals/{manualId}/actions/save-pending-copy(manualId=${formDto.manualId})}" th:disabled="${formDto.guest}">
           マニュアル公開</button>
 
       </div>

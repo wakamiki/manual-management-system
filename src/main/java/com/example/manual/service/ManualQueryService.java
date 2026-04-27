@@ -7,15 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.IndexSummaryDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -36,6 +27,15 @@ import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
 import com.example.manual.repository.ManualSpecification;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ManualQueryService {
@@ -238,11 +238,13 @@ public class ManualQueryService {
     return manualList;
   }
 
-  // index 最近７日間の更新のデータ一覧を返す。
+  // index 最近７日間の更新のデータ一覧(Draft以外)を返す。
   public Page<Manual> findRecentlyUpdatedManuals(Pageable pageable) {
     log.info("start");
-    Page<Manual> manualList = manualRepository.findByUpdatedAtAfterOrderByUpdatedAtDesc(
-        LocalDateTime.now().minusDays(7), pageable);
+    Page<Manual> manualList = manualRepository.findByUpdatedAtAfterAndStatusNotOrderByUpdatedAtDesc(
+                    LocalDateTime.now().minusDays(7),
+                    ManualStatus.DRAFT,
+                    pageable);
     return manualList;
   }
 
@@ -256,11 +258,12 @@ public class ManualQueryService {
     return targetCount;
   }
 
-  // index count最近7日間の更新の数を返す。
+  // index count最近7日間の更新の数(Draft以外)を返す。
   public int countRecentWeeklyManuals() {
     log.info("start");
-    Long count = manualRepository.countByUpdatedAtAfter(
-        LocalDateTime.now().minusDays(7));
+    Long count = manualRepository.countByUpdatedAtAfterAndStatusNot(
+        LocalDateTime.now().minusDays(7),
+        ManualStatus.DRAFT);
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -300,7 +303,7 @@ public class ManualQueryService {
     log.info("start");
     // 通知欄２つの数字を取得
     int unreadRollbackCount = notificationService.unreadRollbackCount(principal);
-    int unreadPendingCount = notificationService.unreadPendingCount(principal);
+    int pendingUnCreatedCount = notificationService.pendingUnCreatedCount(principal);
     // count 自分の作成マニュアル
     int countUserCreatedManual = countUserCreatedManual(principal);
     // count 申請中
@@ -313,7 +316,7 @@ public class ManualQueryService {
     summaryDto.setCountCreatedPendingManual(countCreatedPendingManual);
     summaryDto.setCountRecentWeeklyManual(countRecentWeeklyManual);
     summaryDto.setUnreadRollbackCount(unreadRollbackCount);
-    summaryDto.setUnreadPendingCount(unreadPendingCount);
+    summaryDto.setPendingUnCreatedCount(pendingUnCreatedCount);
 
     return summaryDto;
   }
