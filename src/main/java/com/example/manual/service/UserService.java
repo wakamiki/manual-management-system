@@ -207,7 +207,7 @@ public class UserService {
         log.info("start");
         User targetUser = getUserById(id);
         User playUser = getUserByPrincipal(principal);
-        if (!userPermission.canResetPassword(playUser)) {
+        if (!userPermission.canResetPassword(playUser, targetUser)) {
             throw new InvalidStateException("判定エラー");
         }
 

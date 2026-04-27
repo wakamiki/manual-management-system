@@ -106,7 +106,7 @@
 - 実施者: miki
 - 対象機能: 認証 / パスワード変更 / マイページ表示制御
 - 実行環境: local / H2
-- 対象コミット:
+- 対象コミット: 778a1bf　052e18d　703df79
 
 ### 2. テスト結果一覧
 | No | テストID | テスト観点 | 期待結果 | 実際結果 | 判定（PASS/FAIL/BLOCK） | 備考 |
@@ -176,7 +176,7 @@
 - 実施者: miki
 - 対象機能: ゲストログイン / 承認フロー / 通知 / マニュアル複製 / 状態遷移
 - 実行環境: local / H2
-- 対象コミット: 7eb0483 以降（当日修正含む）
+- 対象コミット: 4f5c902
 
 ### 2. テスト結果一覧
 | No | テストID | テスト観点 | 期待結果 | 実際結果 | 判定（PASS/FAIL/BLOCK） | 備考 |
@@ -189,8 +189,8 @@
 | 6 | MAN-016D/F | 一覧検索（カテゴリ全選択 + ARCHIVEDのみ） | 条件一致のみ表示 | 正常動作 | PASS | |
 | 7 | FORM-003 | restore（インライン入力） | APPROVEDへ復帰 | 当初エラー→Entity内if修正後に正常 | PASS | |
 | 8 | FORM-008 | restoreでchangeNote未入力 | 入力エラー表示 | 必須項目エラー表示 | PASS | |
-| 9 | AUTH-003 | 作成者本人承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POSTは405確認 | BLOCK | Postmanで再確認予定 |
-| 10 | AUTH-021 | PENDING以外承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
+| 9 | AUTH-003 | 作成者本人承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面非表示OK、直POSTは405で拒否を確認 | PASS | 拒否動作として確認完了 |
+| 10 | AUTH-021 | PENDING以外承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 直POSTは200だが `InvalidStateException` で拒否（index遷移） | PASS | GlobalExceptionHandler経由で拒否確認 |
 | 11 | MAN-019 | マニュアル複製：changeNote未入力で下書き保存 | 入力エラー表示 | エラーメッセージ表示 | PASS | |
 | 12 | MAN-019 | マニュアル複製：changeNote未入力で公開 | 入力エラー表示 | エラーメッセージ表示 | PASS | |
 | 13 | MAN-017/022 | マニュアル複製：必須項目入力で下書き保存 | 正常保存 | エラーページ表示 | FAIL | POSTがGET化の疑い |
@@ -205,8 +205,16 @@
 | 22 | FORM-007 | archiveでchangeNote未入力 | 入力エラー表示 | 必須項目エラー表示 | PASS | |
 | 23 | NT-001 | USER公開時の未承認通知作成 | APPROVER/ADMINに通知作成 | コンソール確認OK | PASS | |
 | 24 | NT-003/NT-009 | 差し戻し通知表示 | index/my-pageに表示 | 両画面で表示OK | PASS | |
-| 25 | AUTH-004 | USER承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
-| 26 | AUTH-020 | 作成者本人承認不可（USER、画面/直POST） | 画面非表示 + 直POST拒否 | 画面はOK、直POST未確認 | BLOCK | Postmanで再確認予定 |
+| 25 | AUTH-004 | USER承認不可（画面/直POST） | 画面非表示 + 直POST拒否 | 直POSTは200だが `UnauthorizedException` で拒否（index遷移） | PASS | 業務拒否を確認 |
+| 26 | AUTH-020 | 作成者本人承認不可（USER、画面/直POST） | 画面非表示 + 直POST拒否 | 直POSTは200だが `InvalidStateException` で拒否（index遷移） | PASS | 業務拒否を確認 |
+| 27 | AUTH-032 | GUESTログイン（環境変数あり） | `/manuals/index` へ遷移 | 正常ログインを確認 | PASS | |
+| 28 | AUTH-008 | 本人パスワード変更可 | 変更成功し新PWで再ログイン可能 | 初回エラー（`th:object`不足）修正後に成功、旧PWログイン不可も確認 | PASS | `password-change.html` 修正反映 |
+| 29 | AUTH-009 | 本人以外パスワード変更不可 | 他人指定変更不可 | Principal固定設計のため入力経路自体なし（N/A） | PASS | 設計上の到達不可として記録 |
+| 30 | AUTH-010 | ADMINが他ユーザーPW初期化可 | 初期化成功 | 別adminユーザーを対象に初期化成功を確認 | PASS | |
+| 31 | PWD-006 | パスワード文字種要件 | 要件未達はエラー | 小文字+数字のみで赤枠エラー表示を確認 | PASS | |
+| 32 | PWD-003 | パスワード変更成功時フラグ更新相当 | 変更後ログイン可能 | 大文字/小文字/数字で変更成功、再ログイン成功 | PASS | 実運用観点で確認 |
+| 33 | 追加運用観点 | 本人パスワードリセット禁止 | エラー表示で拒否 | 本人のリセットボタン押下でエラーメッセージ表示 | PASS | 仕様補足観点 |
+| 34 | AUTH-025（前段） | ADMINによるユーザー停止処理 | 指定ユーザーを停止できる | 停止処理成功を確認 | PASS | 無効ユーザー操作拒否テストの事前準備として実施 |
 
 ### 3. 失敗ケース一覧（FAILのみ）
 | No | テストID | 事象 | 原因仮説 | 対応方針 |
@@ -216,9 +224,8 @@
 ### 4. 明日実施するテスト（優先順）
 - 優先A:
   - MAN-017/022: 複製下書き保存エラー（POST/GET不整合）修正確認
-  - AUTH-003 / AUTH-004 / AUTH-020 / AUTH-021: 直POST拒否をPostmanで検証
-  - AUTH-032: GUESTログイン（環境変数あり）成功導線を確認
 - 優先B:
+  - AUTH-011: ADMIN以外のパスワード初期化不可を確認
   - NT-012: 未承認通知削除の再発有無確認（承認・差し戻し・アーカイブ）
   - GlobalExceptionHandlerの遷移先適正化（manual操作失敗時の戻り先）
 
@@ -226,6 +233,7 @@
 - index未承認件数の不整合は、NotificationRepositoryで「自分作成以外のPENDING件数」取得JPAを追加して修正。
 - restore失敗はEntity内メソッドのif条件ミス、承認履歴未反映はService内if分岐逆転、category存在エラーはmanualId/categoryId取り違えが原因だった。
 - 通知残存に対し、PENDING→DRAFT時の未承認通知削除と、ARCHIVED遷移時の該当manual通知削除を追加。
+- パスワード変更画面の `#fields.hasErrors(...)` エラーは、`<form th:object="${passwordChangeRequestDto}">` 不足が原因。`th:object` 追加で解消。
 
 ---
 

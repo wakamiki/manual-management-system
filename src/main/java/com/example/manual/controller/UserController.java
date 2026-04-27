@@ -79,6 +79,9 @@ public class UserController {
   public String showChangePasswordPage(Principal principal, Model model) {
     log.info("start");
     boolean canGuest = userService.showChangePasswordPage(principal);
+    if (!model.containsAttribute("passwordChangeRequestDto")) {
+      model.addAttribute("passwordChangeRequestDto", new PasswordChangeRequestDto());
+    }
     model.addAttribute("canGuest", canGuest);
     return "password-change";
   }

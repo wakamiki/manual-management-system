@@ -190,8 +190,8 @@ Version: 01.03.18
 | --- | --- | --- | --- |
 | AUTH-001 ✅| 正常 | USER が作成 | 実行可能 |
 | AUTH-002 ✅| 正常 | APPROVER が承認 | 実行可能 |
-| AUTH-003 | 異常 | 作成者本人が承認 | 実行不可 |
-| AUTH-004 | 異常 | USER が承認 | 実行不可 |
+| AUTH-003 ✅ | 異常 | 作成者本人が承認 | 実行不可 |
+| AUTH-004 ✅ | 異常 | USER が承認 | 実行不可 |
 | AUTH-005 ✅ | 正常 | ADMIN/GUEST がユーザー管理画面表示 | 実行可能（GUESTは閲覧のみ） |
 | AUTH-006 ✅ | 正常 | GUEST の一覧/詳細/検索 | 閲覧操作のみ実行可能 |
 | AUTH-007 ✅ | 異常 | GUEST の更新系操作 | 非活性または拒否される |
@@ -211,8 +211,8 @@ Version: 01.03.18
 | AUTH-017 ✅ | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
 | AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
 | AUTH-019 ✅| 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
-| AUTH-020 | 異常 | Manual 承認（作成者本人） | 実行不可 |
-| AUTH-021 | 異常 | Manual 承認（PENDING以外） | 実行不可 |
+| AUTH-020 ✅ | 異常 | Manual 承認（作成者本人） | 実行不可 |
+| AUTH-021 ✅ | 異常 | Manual 承認（PENDING以外） | 実行不可 |
 | AUTH-022 ✅ | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
 | AUTH-023 ✅ | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
 | AUTH-024 ✅ | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |

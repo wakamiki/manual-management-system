@@ -131,13 +131,16 @@ public class UserPermissionService {
     return true;
   }
 
-  public boolean canResetPassword(User playUser) {
+  public boolean canResetPassword(User playUser, User targetUser) {
     log.info("start");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
+    }
+    if (Objects.equals(playUser.getId(), targetUser.getId())) {
+      throw new UnauthorizedException("操作者本人のパスワードを初期化することは出来ません。");
     }
     return true;
   }
