@@ -6,11 +6,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.stereotype.Service;
+
 import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.enums.ManualStatus;
 import com.example.manual.repository.ManualRepository;
 
+@Service
 public class ManualArchiveService {
     private static final Logger log = LoggerFactory.getLogger(ManualCommandService.class);
     private final ManualRepository manualRepository;
@@ -30,7 +33,7 @@ public class ManualArchiveService {
 
     public void archiveManualsByInactiveDuplicateCategory(Category category, Principal principal) {
         log.info("start");
-        List<Manual> manuals = manualRepository.findByCategoryInAndStatusNot(
+        List<Manual> manuals = manualRepository.findByCategoryAndStatusNot(
                 category,
                 ManualStatus.ARCHIVED);
         for (Manual manual : manuals) {
