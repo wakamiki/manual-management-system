@@ -3,6 +3,7 @@ package com.example.manual.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.manual.entity.Category;
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
 import com.example.manual.enums.ManualStatus;
@@ -22,7 +23,11 @@ public interface ManualRepository extends JpaRepository<Manual, Long>, JpaSpecif
 
     // status絞り込み検索機能（更新昇順）
     Page<Manual> findByStatusOrderByUpdatedAtDesc(
-            ManualStatus status, Pageable pageable);
+                    ManualStatus status, Pageable pageable);
+
+    //=================================================
+    //クイックビュー・通知関係
+    //=================================================
 
     // 作成者が自分の差し戻しマニュアル取得（更新昇順）
     Page<Manual> findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
@@ -92,4 +97,13 @@ public interface ManualRepository extends JpaRepository<Manual, Long>, JpaSpecif
 
     // 数取得 自分作成分のマニュアル全件
     Long countByCreatedByUser(User createdByUser);
+
+    //=====================================
+    //同名カテゴリーアーカイブ化
+    //=====================================
+
+    //停止中同名カテゴリー配下のマニュアルget
+    List<Manual> findByCategoryInAndStatusNot(
+                    Category categories,
+                    ManualStatus status);
 }

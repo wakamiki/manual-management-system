@@ -2,6 +2,10 @@ package com.example.manual.service;
 
 import java.security.Principal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.ManualActionRequestDto;
 import com.example.manual.dto.ManualDraftDto;
 import com.example.manual.dto.ManualEditFormDto;
@@ -10,10 +14,6 @@ import com.example.manual.entity.Manual;
 import com.example.manual.entity.User;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ManualCommandService {
@@ -220,6 +220,10 @@ public class ManualCommandService {
     notificationService.createSubmitNotifications(principal, savedManual);
   }
 
+  // ================================================
+  // ワンボタンアクション
+  // ================================================
+
   // 公開
   public void submitManual(
       Long manualId,
@@ -322,4 +326,5 @@ public class ManualCommandService {
     historyService.createHistory(
         savedManual, requestDto.getChangeNote(), principal);
   }
+
 }

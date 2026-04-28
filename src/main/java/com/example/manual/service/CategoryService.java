@@ -19,6 +19,7 @@ import com.example.manual.dto.PagingDto;
 import com.example.manual.dto.UserResponseDto;
 import com.example.manual.entity.Category;
 import com.example.manual.entity.User;
+import com.example.manual.enums.DuplicateStatus;
 import com.example.manual.enums.UserRole;
 import com.example.manual.enums.ViewMode;
 import com.example.manual.exception.InvalidStateException;
@@ -34,15 +35,18 @@ public class CategoryService {
   public final CategoryRepository categoryRepository;
   public final UserService userService;
   public final UserPermissionService userPermissionService;
+  public final ManualArchiveService manualArchiveService;
 
   public CategoryService(
       CategoryRepository categoryRepository,
       UserService userService,
-      UserPermissionService userPermissionService) {
+      UserPermissionService userPermissionService,
+      ManualArchiveService manualArchiveService) {
 
     this.categoryRepository = categoryRepository;
     this.userService = userService;
     this.userPermissionService = userPermissionService;
+    this.manualArchiveService = manualArchiveService;
   }
 
   // =============================================
@@ -79,7 +83,7 @@ public class CategoryService {
   // 登録・更新
   // ============================================
 
-  public boolean createCategory(
+  public CategoryFormDto createCategory(
       CategoryFormDto formDto,
       Principal principal) {
     log.info("start");
@@ -87,13 +91,13 @@ public class CategoryService {
     if (!canCreateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    if (formDto.isConfirmed()) {
-      // カテゴリー名重複了承 チェック回避処理
-    } else if (isCategoryNameTaken(formDto)) {
-      // カテゴリー名重複チェック
-      return true;
+    formDto = handleDuplicateOnCreate(formDto, principal);
+    if (formDto.getDuplicateStatus() == DuplicateStatus.ACTIVE_DUPLICATE) {
+      return formDto;
+    } else if (formDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
+      return formDto;
     }
-
+    // 通常処理
     int targetOrder = formDto.getDisplayOrder();
     shiftUpOrderNumbers(targetOrder, null);
     Category category = new Category();
@@ -103,10 +107,10 @@ public class CategoryService {
     category.markUpdatedNow();
     category.markActive();
     categoryRepository.save(category);
-    return false;
+    return formDto;
   }
 
-  public void updateCategory(
+  public CategoryFormDto updateCategory(
       CategoryFormDto formDto,
       Principal principal) {
     log.info("start");
@@ -114,6 +118,14 @@ public class CategoryService {
     if (!canUpdateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
+    formDto = handleDuplicateOnCreate(formDto, principal);
+    if (formDto.getDuplicateStatus() == DuplicateStatus.ACTIVE_DUPLICATE) {
+      return formDto;
+    } else if (formDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
+      return formDto;
+    }
+
+    // 通常処理
     Category category = findCategoryOrThrow(formDto.getId());
     int currentOrder = category.getDisplayOrder();
     int targetOrder = formDto.getDisplayOrder();
@@ -127,6 +139,7 @@ public class CategoryService {
     category.setDisplayOrder(targetOrder);
     category.markUpdatedNow();
     categoryRepository.save(category);
+    return formDto;
   }
 
   public void deactivateCategory(Principal principal, Long categoryId) {
@@ -254,6 +267,25 @@ public class CategoryService {
     categoryRepository.saveAll(targets);
   }
 
+  public Category findInactiveCategoryByName(CategoryFormDto formDto) {
+    if (formDto.getId() == null) {
+      // 新規作成時
+      Optional<Category> categoryOpt = categoryRepository
+          .findByCategoryNameAndIsActiveFalse(formDto.getCategoryName());
+      if (categoryOpt.isEmpty()) {
+        throw new InvalidStateException("取得カテゴリがありません。");
+      }
+      return categoryOpt.get();
+    }
+    // 変更時
+    Optional<Category> categoryOpt = categoryRepository
+        .findByCategoryNameAndIsActiveFalseAndIdNot(formDto.getCategoryName(), formDto.getId());
+    if (categoryOpt.isEmpty()) {
+      throw new InvalidStateException("取得カテゴリがありません。");
+    }
+    return categoryOpt.get();
+  }
+
   // ===============================================
   // Dto詰め替え
   // ===============================================
@@ -328,12 +360,24 @@ public class CategoryService {
   }
 
   // カテゴリー名重複チェック
-  public boolean isCategoryNameTaken(CategoryFormDto formDto) {
+  public boolean existsActiveCategoryByName(CategoryFormDto formDto) {
     log.info("start");
     if (formDto.getId() == null) {
-      return categoryRepository.existsByCategoryName(formDto.getCategoryName());
+      // 新規作成時
+      return categoryRepository.existsByCategoryNameAndIsActiveTrue(formDto.getCategoryName());
     }
-    return categoryRepository.existsByCategoryNameAndIdNot(formDto.getCategoryName(), formDto.getId());
+    // 変更時
+    return categoryRepository.existsByCategoryNameAndIsActiveTrueAndIdNot(formDto.getCategoryName(), formDto.getId());
+  }
+
+  public boolean existsInactiveCategoryByName(CategoryFormDto formDto) {
+    log.info("start");
+    if (formDto.getId() == null) {
+      // 新規作成時
+      return categoryRepository.existsByCategoryNameAndIsActiveFalse(formDto.getCategoryName());
+    }
+    // 変更時
+    return categoryRepository.existsByCategoryNameAndIsActiveFalseAndIdNot(formDto.getCategoryName(), formDto.getId());
   }
 
   private boolean canShowCategoryManagement(User playUser) {
@@ -412,4 +456,21 @@ public class CategoryService {
     return "停止中";
   }
 
+  private CategoryFormDto handleDuplicateOnCreate(CategoryFormDto formDto, Principal principal) {
+    if (formDto.isConfirmed()) {
+      // カテゴリー名重複了承 チェック回避処理
+      Category category = findInactiveCategoryByName(formDto);
+      manualArchiveService.archiveManualsByInactiveDuplicateCategory(category, principal);
+      formDto.setDuplicateStatus(DuplicateStatus.NONE);
+    } else if (existsActiveCategoryByName(formDto)) {
+      // カテゴリー名重複チェックactive
+      formDto.setDuplicateStatus(DuplicateStatus.ACTIVE_DUPLICATE);
+      return formDto;
+    } else if (existsInactiveCategoryByName(formDto)) {
+      // カテゴリー名重複チェックinactive
+      formDto.setDuplicateStatus(DuplicateStatus.INACTIVE_DUPLICATE);
+      return formDto;
+    }
+    return formDto;
+  }
 }

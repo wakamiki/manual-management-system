@@ -47,8 +47,7 @@
         </div>
 
         <div class="card-body">
-          <form th:object="${formDto}" th:action="@{/categories/create}" method="post"
-            th:onsubmit="${duplicate} ? 'return confirm(&quot;同名のカテゴリがあります。このまま更新しますか？&quot;);' : 'return true;'">
+          <form id="categoryForm" th:object="${formDto}" th:action="@{/categories/create}" method="post">
 
             <div class="mb-2" th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}">
               <label for="categoryId" class="form-label">categoryId</label>
@@ -70,6 +69,10 @@
               <div class="invalid-feedback" th:if="${#fields.hasErrors('displayOrder')}" th:errors="*{displayOrder}">
               </div>
             </div>
+            <input type="hidden" th:field="*{confirmed}" id="confirmed">
+            <input type="hidden" th:field="*{duplicateStatus}">
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" id="modeValue" th:value="${viewDto.mode != null ? viewDto.mode.name() : 'CREATE'}">
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
                 th:if="${formDto != null and 'CREATE'.equals(viewDto.mode.name())}"
@@ -111,7 +114,12 @@
                   <td th:text="${category.id}">01</td>
                   <td th:text="${category.categoryName}">営業部</td>
                   <td th:text="${category.displayOrder}">1</td>
-                  <td><span class="admin-status is-active" th:text="${category.activeLabel}">使用中</span></td>
+                  <td><span class="admin-status is-active" th:if="${category.isActive}"
+                      th:text="${category.activeLabel}">使用中</span>
+                    <span class="admin-status is-inactive" th:if="${!category.isActive}"
+                      th:text="${category.activeLabel}">停止中
+                    </span>
+                  </td>
                   <td>
                     <div class="admin-inline-actions">
                       <a class="btn btn-outline-primary btn-sm"
@@ -156,6 +164,49 @@
       }, 3000);
     });
   </script>
+  <script th:inline="javascript">
+    const status = /*[[${formDto.duplicateStatus != null ? formDto.duplicateStatus.name() : ''}]]*/ '';
+    if (status === 'INACTIVE_DUPLICATE') {
+      const modal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+      modal.show();
+    }
+
+    function confirmDuplicateSubmit() {
+      const form = document.getElementById('categoryForm');
+      const mode = document.getElementById('modeValue').value;
+      const idEl = document.getElementById('categoryId'); // th:field="*{id}" の input
+
+      document.getElementById('confirmed').value = 'true';
+
+      if (mode === 'EDIT' && idEl && idEl.value) {
+        form.action = `/categories/${idEl.value}/update`;
+      } else {
+        form.action = '/categories/create';
+      }
+      form.submit();
+    }
+
+  </script>
+
+  <!-- Modal -->
+  <div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="duplicateModalLabel">同名カテゴリが見つかりました</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">この名前で処理を続行しますか？（既存カテゴリに関連するマニュアルはアーカイブ対象になります）
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+          <button type="button" class="btn btn-primary" onclick="confirmDuplicateSubmit()">続行する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

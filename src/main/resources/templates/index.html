@@ -71,6 +71,10 @@
       マニュアルを更新しました。
     </div>
 
+    <div id="manualListRefreshMessage" class="alert alert-info index-alert mb-0 d-none" role="alert">
+      別タブで更新が行われました。最新状態に更新します。
+    </div>
+
     <div class="row g-4 align-items-start">
       <aside class="col-lg-2 col-md-3 sidebar">
         <div class="card">
@@ -289,6 +293,22 @@
         setTimeout(() => alertEl.remove(), 400);
       }, 3000);
     });
+
+    window.addEventListener("storage", (event) => {
+        if (event.key !== "manualListNeedsRefresh") {
+          return;
+        }
+
+        const refreshMessage = document.getElementById("manualListRefreshMessage");
+        if (refreshMessage) {
+          refreshMessage.classList.remove("d-none");
+        }
+
+        setTimeout(() => {
+          localStorage.removeItem("manualListNeedsRefresh");
+          location.reload();
+        }, 3000);
+      });
   </script>
 </body>
 

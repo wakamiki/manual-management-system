@@ -135,9 +135,7 @@
                       th:text="${#temporals.format(manual.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-04-08 09:30</small>
                   </div>
                   <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</p>
-                  <h3 class="notification-title">配送手順の流れが差し戻されました</h3>
-                  <p class="notification-text mb-3 manual-content-preserve" th:text="${manual.content}">
-                    変更理由を見直して、再申請してください。</p>
+                  <h3 class="notification-title" th:text="|${manual.title}が差し戻されました|">配送手順の流れが差し戻されました</h3>
                   <div class="notification-actions">
                     <a href="./manual-detail.html" target="_blank" rel="noopener noreferrer"
                       class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -157,9 +155,7 @@
                       th:text="${#temporals.format(manual.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-04-08 08:45</small>
                   </div>
                   <p class="text-muted mb-2" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1002</p>
-                  <h3 class="notification-title">発注処理フローの承認待ちがあります</h3>
-                  <p class="notification-text mb-3 manual-content-preserve" th:text="${manual.content}">
-                    承認者として内容を確認し、承認または差し戻しを行ってください。</p>
+                  <h3 class="notification-title" th:text="|${manual.title}の承認待ちがあります|">発注処理フローの承認待ちがあります</h3>
                   <div class="notification-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
                       rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">詳細を見る</a>
@@ -186,13 +182,13 @@
                 <div class="dashboard-card-main">
                   <div>
                     <div class="dashboard-meta">
-                      <span class="badge bg-success" th:text="${manual.statusLabel}">承認済</span>
+                      <span class="badge-status" th:classappend="' ' + ${manual.status.name().toLowerCase()}"
+                      th:text="${manual.statusLabel}">承認済</span>
                       <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</small>
                       <small class="text-muted"
                         th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-05</small>
                     </div>
                     <h3 class="dashboard-title" th:text="${manual.title}">配送手順の流れ</h3>
-                    <p class="dashboard-text manual-content-preserve mb-0" th:text="${manual.content}">本文</p>
                   </div>
                   <div class="dashboard-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"
@@ -223,14 +219,14 @@
                 <div class="dashboard-card-main">
                   <div>
                     <div class="dashboard-meta">
-                      <span class="badge bg-primary" th:text="${manual.statusLabel}">申請中</span>
+                      <span class="badge-status" th:classappend="' ' + ${manual.status.name().toLowerCase()}"
+                      th:text="${manual.statusLabel}">申請中</span>
                       <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1003</small>
                       <small class="text-muted" th:text="|申請者: ${manual.createdUserDto.displayName}|">申請者: 佐藤 次郎</small>
                       <small class="text-muted"
                         th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-08</small>
                     </div>
                     <h3 class="dashboard-title" th:text="${manual.title}">見積作成ルール</h3>
-                    <p class="dashboard-text manual-content-preserve mb-0" th:text="${manual.content}">本文</p>
                   </div>
                   <div class="dashboard-actions">
                     <a th:href="@{/manuals/{manualId}/detail(manualId=${manual.manualId})}" target="_blank"

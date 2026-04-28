@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.manual.dto.CategoryFormDto;
 import com.example.manual.dto.CategoryViewDto;
+import com.example.manual.enums.DuplicateStatus;
 import com.example.manual.service.CategoryService;
 
 import jakarta.validation.Valid;
@@ -83,6 +84,7 @@ public class CategoryController {
       Model model,
       Pageable pageable) {
     log.info("start");
+    // @validエラー処理
     if (bindingResult.hasErrors()) {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
       model.addAttribute("formDto", formDto);
@@ -91,21 +93,15 @@ public class CategoryController {
       model.addAttribute("messageType", "error");
       return "category-management";
     }
-    // 重複チェック処理
-    if (categoryService.createCategory(
-        formDto, principal)) {
-      boolean duplicate = true;
-      String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
-      model.addAttribute("duplicate", duplicate);
-      model.addAttribute("duplicateMessage", duplicateMessage);
-      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(formDto, principal, pageable);
-      model.addAttribute("formDto", formDto);
-      model.addAttribute("viewDto", viewDto);
-      return "category-management";
+
+    CategoryFormDto resultDto = categoryService.createCategory(formDto, principal);
+    // カテゴリー名重複チェック
+    String url = handleDuplicateStatus(resultDto, principal, pageable, model);
+    if (resultDto.getDuplicateStatus() != DuplicateStatus.NONE) {
+      return url;
     }
-    // 既存処理
-    message.addFlashAttribute(
-        "message", "新しいカテゴリーを作成しました。");
+    // 通常処理
+    message.addFlashAttribute("message", "新しいカテゴリーを作成しました。");
     message.addFlashAttribute("messageType", "success");
     return "redirect:/categories";
   }
@@ -119,6 +115,7 @@ public class CategoryController {
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
     log.info("start");
+    // @validエラー処理
     if (bindingResult.hasErrors()) {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
       model.addAttribute("formDto", formDto);
@@ -127,21 +124,13 @@ public class CategoryController {
       model.addAttribute("messageType", "error");
       return "category-management";
     }
+    CategoryFormDto resultDto = categoryService.updateCategory(formDto, principal);
     // カテゴリー名重複チェック
-    if (formDto.isConfirmed()) {
-      // カテゴリー名重複了承 回避処理
-    } else if (categoryService.isCategoryNameTaken(formDto)) {
-      boolean duplicate = true;
-      String duplicateMessage = "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？";
-      model.addAttribute("duplicate", duplicate);
-      model.addAttribute("duplicateMessage", duplicateMessage);
-      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(formDto, principal, pageable);
-      model.addAttribute("formDto", formDto);
-      model.addAttribute("viewDto", viewDto);
-      return "category-management";
+    String url = handleDuplicateStatus(resultDto, principal, pageable, model);
+    if (resultDto.getDuplicateStatus() != DuplicateStatus.NONE) {
+      return url;
     }
-    // 既存処理
-    categoryService.updateCategory(formDto, principal);
+    // 通常処理
     message.addFlashAttribute(
         "message", "カテゴリーを更新しました。");
     message.addFlashAttribute("messageType", "success");
@@ -182,6 +171,34 @@ public class CategoryController {
   public void getAllActiveCategories() {
     // adminのみ実行可
     log.info("start");
+  }
+
+  // ===================================================
+  // 共通処理
+  // ===================================================
+
+  private String handleDuplicateStatus(
+      CategoryFormDto resultDto,
+      Principal principal,
+      Pageable pageable,
+      Model model) {
+    if (resultDto.getDuplicateStatus() == DuplicateStatus.ACTIVE_DUPLICATE) {
+      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(resultDto, principal, pageable);
+      model.addAttribute("formDto", resultDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("message", "同名カテゴリの使用中カテゴリがあります。別の名前を使用してください。");
+      model.addAttribute("messageType", "error");
+      return "category-management";
+    }
+    if (resultDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
+      CategoryViewDto viewDto = categoryService.convertToCategoryViewDto(resultDto, principal, pageable);
+      model.addAttribute("formDto", resultDto);
+      model.addAttribute("viewDto", viewDto);
+      model.addAttribute("duplicate", true);
+      model.addAttribute("duplicateMessage", "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？");
+      return "category-management";
+    }
+    return "category-management";
   }
 
 }

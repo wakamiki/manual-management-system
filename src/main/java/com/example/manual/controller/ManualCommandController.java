@@ -3,6 +3,18 @@ package com.example.manual.controller;
 import java.security.Principal;
 import java.util.List;
 
+import com.example.manual.dto.ApproveRequestDto;
+import com.example.manual.dto.CategoryResponseDto;
+import com.example.manual.dto.ManualActionRequestDto;
+import com.example.manual.dto.ManualDetailDto;
+import com.example.manual.dto.ManualDraftDto;
+import com.example.manual.dto.ManualEditFormDto;
+import com.example.manual.exception.InvalidStateException;
+import com.example.manual.exception.NotFoundException;
+import com.example.manual.exception.UnauthorizedException;
+import com.example.manual.service.ManualCommandService;
+import com.example.manual.service.ManualQueryService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -13,15 +25,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.example.manual.dto.ApproveRequestDto;
-import com.example.manual.dto.CategoryResponseDto;
-import com.example.manual.dto.ManualActionRequestDto;
-import com.example.manual.dto.ManualDetailDto;
-import com.example.manual.dto.ManualDraftDto;
-import com.example.manual.dto.ManualEditFormDto;
-import com.example.manual.service.ManualCommandService;
-import com.example.manual.service.ManualQueryService;
 
 import jakarta.validation.Valid;
 
@@ -52,18 +55,26 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnDraftManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-create";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.saveDraftForCreate(formDto, principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnDraftManualCreateWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                // 成功処理
                 message.addFlashAttribute("message", "下書きを保存しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/create";
         }
 
@@ -76,18 +87,26 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnPendingManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-create";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.createPendingManual(formDto, principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnPendingManualCreateWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute("message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/create";
         }
 
@@ -101,23 +120,30 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-form";
+                        return url;
                 }
                 // 既存処理
-                commandService.saveDraftForCopy(
+                try{commandService.saveDraftForCopy(
                                 manualId,
                                 formDto,
                                 principal);
-
+        }catch(UnauthorizedException|InvalidStateException|NotFoundException e)
+        {
+                String url = returnDraftManualFormWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "複製マニュアルを下書きに保存しました");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/actions/save-draft-copy";
         }
 
@@ -131,23 +157,30 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-form";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.savePendingForCopy(
                                 manualId,
                                 formDto,
                                 principal);
-
+        }catch(UnauthorizedException|InvalidStateException|NotFoundException e)
+        {
+                String url = returnPendingManualFormWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
                 message.addFlashAttribute(
                                 "message", "複製マニュアルを下書きに保存しました");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/actions/save-draft-copy";
         }
 
@@ -161,23 +194,31 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-form";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.editToDraft(
                                 manualId,
                                 formDto,
                                 principal);
-
+        }catch(UnauthorizedException|InvalidStateException|NotFoundException e)
+        {
+                String url = returnDraftManualFormWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルを保存しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -191,23 +232,30 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        model.addAttribute("formDto", formDto);
-                        List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
-                        model.addAttribute("categoryDto", categoryDto);
+                        String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-form";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.editToPending(
                                 manualId,
                                 formDto,
                                 principal);
-
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnPendingManualFormWithError(model, formDto, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -220,12 +268,22 @@ public class ManualCommandController {
         public String submitManual(
                         @PathVariable Long manualId,
                         Principal principal,
-                        RedirectAttributes message) {
+                        RedirectAttributes message,
+                        Model model) {
                 log.info("start");
+                try{
                 commandService.submitManual(manualId, principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnManualDetailWithError(model, manualId, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -239,21 +297,30 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
-                        model.addAttribute("detailDto", detailDto);
+                        String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-detail";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.approveManual(
                                 manualId,
                                 approveRequestDto.getChangeNote(),
                                 principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnManualDetailWithError(model, manualId, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルを承認しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -267,21 +334,30 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
-                        model.addAttribute("detailDto", detailDto);
+                        String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-detail";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.rollbackEditManual(
                                 manualId,
                                 actionRequestDto,
                                 principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnManualDetailWithError(model, manualId, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルを差し戻しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -295,20 +371,29 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
-                        model.addAttribute("detailDto", detailDto);
+                        String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-detail";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.archiveManual(manualId,
                                 actionRequestDto,
                                 principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnManualDetailWithError(model, manualId, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルをアーカイブしました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -322,22 +407,87 @@ public class ManualCommandController {
                         Principal principal,
                         Model model) {
                 log.info("start");
+                // @validエラー処理
                 if (bindingResult.hasErrors()) {
-                        ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
-                        model.addAttribute("detailDto", detailDto);
+                        String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        return "manual-detail";
+                        return url;
                 }
                 // 既存処理
+                try{
                 commandService.restoreManual(
                                 manualId,
                                 actionRequestDto,
                                 principal);
+        } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
+                String url = returnManualDetailWithError(model, manualId, principal);
+                model.addAttribute("message", e.getMessage());
+                model.addAttribute("messageType", "error");
+                return url;
+        }
+                //成功処理
                 message.addFlashAttribute(
                                 "message", "マニュアルをアーカイブから復帰しました。");
                 message.addFlashAttribute("messageType", "success");
+                message.addFlashAttribute("manualListNeedsRefresh", true);
                 return "redirect:/manuals/{manualId}/detail";
+        }
+
+        //================================================
+        //共通処理
+        //================================================
+
+        private String returnDraftManualCreateWithError(
+                Model model,
+                ManualDraftDto formDto,
+                        Principal principal) {
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-create";
+        }
+
+        private String returnPendingManualCreateWithError(
+                        Model model,
+                        ManualEditFormDto formDto,
+                        Principal principal) {
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-create";
+        }
+
+        private String returnDraftManualFormWithError(
+                Model model,
+                ManualDraftDto formDto,
+                Principal principal) {
+
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-form";
+        }
+
+        private String returnPendingManualFormWithError(
+                Model model,
+                ManualEditFormDto formDto,
+                Principal principal) {
+
+                model.addAttribute("formDto", formDto);
+                List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
+                model.addAttribute("categoryDto", categoryDto);
+                return "manual-form";
+        }
+
+        private String returnManualDetailWithError(
+                Model model,
+                        Long manualId,
+                                Principal principal) {
+                ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
+                model.addAttribute("detailDto", detailDto);
+
+                return "manual-detail";
         }
 
 }

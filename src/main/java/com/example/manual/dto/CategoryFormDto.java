@@ -1,8 +1,10 @@
 package com.example.manual.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Min;
+import com.example.manual.enums.DuplicateStatus;
+
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -22,9 +24,9 @@ public class CategoryFormDto {
   private Integer displayOrder;
   private boolean isActive;
   private boolean confirmed = false;
+  private DuplicateStatus duplicateStatus = DuplicateStatus.NONE;
 
   // getter
-
   public Long getId() {
     return this.id;
   }
@@ -43,6 +45,10 @@ public class CategoryFormDto {
 
   public boolean isActive() {
     return isActive;
+  }
+
+  public DuplicateStatus getDuplicateStatus() {
+    return duplicateStatus;
   }
 
   // setter
@@ -65,4 +71,9 @@ public class CategoryFormDto {
   public void setActive(boolean isActive) {
     this.isActive = isActive;
   }
+
+  public void setDuplicateStatus(DuplicateStatus duplicateStatus) {
+    this.duplicateStatus = duplicateStatus;
+  }
+
 }

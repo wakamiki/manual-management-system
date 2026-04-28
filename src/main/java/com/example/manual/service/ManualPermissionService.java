@@ -233,7 +233,7 @@ public class ManualPermissionService {
             throw new InvalidStateException(
                     "自分が作成したマニュアルの承認をすることは出来ません。");
         }
-        if (!isActive(playUser)) {
+        if (!category.isActive()) {
             throw new InvalidStateException(
                     "有効でないカテゴリーでは承認することが出来ません。");
         }

@@ -126,6 +126,9 @@
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:if="${manualListNeedsRefresh}">
+    localStorage.setItem("manualListNeedsRefresh", Date.now());
+  </script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const alertEl = document.getElementById("flashMessage");
@@ -196,19 +199,29 @@
         panel.hidden = true;
         note.value = '';
       });
+
+      const historyModalEl = document.getElementById('historyAddModal');
+      const historyModal = historyModalEl ? new bootstrap.Modal(historyModalEl) : null;
+
       approveBtn?.addEventListener('click', () => {
+        if (!historyModal) return;
         form.action = approveBtn.dataset.url;
-        const withNote = confirm('OK: 更新履歴を入力して承認\nキャンセル: そのまま承認');
-        if (withNote) {
-          label.textContent = '承認を実行';
-          submitBtn.textContent = '承認を確定';
-          note.placeholder = '更新履歴（任意）';
-          submitBtn.classList.remove('btn-outline-warning', 'btn-outline-danger', 'btn-outline-info');
-          submitBtn.classList.add('btn-outline-success');
-          panel.hidden = false;
-          note.focus();
-          return;
-        }
+        historyModal.show();
+      });
+
+      window.approveWithHistory = function () {
+        historyModal?.hide();
+        label.textContent = '承認を実行';
+        submitBtn.textContent = '承認を確定';
+        note.placeholder = '更新履歴（任意）';
+        submitBtn.classList.remove('btn-outline-warning', 'btn-outline-danger', 'btn-outline-info');
+        submitBtn.classList.add('btn-outline-success');
+        panel.hidden = false;
+        note.focus();
+      };
+
+      window.approveWithoutHistory = function () {
+        historyModal?.hide();
         form.querySelectorAll('input[name="changeNote"][type="hidden"]').forEach(el => el.remove());
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
@@ -216,11 +229,29 @@
         hidden.value = '';
         form.appendChild(hidden);
         form.submit();
-      });
+      };
     })();
 
-
   </script>
+
+  <!-- Modal -->
+  <div class="modal fade" id="historyAddModal" tabindex="-1" aria-labelledby="historyAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="historyAddModalLabel">承認時に更新履歴を追加しますか？</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">追加する場合は次画面で更新履歴を入力します。
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" onclick="approveWithoutHistory()">そのまま承認</button>
+          <button type="button" class="btn btn-primary" onclick="approveWithHistory()">追加する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>
