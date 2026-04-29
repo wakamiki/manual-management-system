@@ -1,10 +1,10 @@
 package com.example.manual.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
 
 import com.example.manual.entity.User;
 
@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String loginId) {
-    log.info("start");
+
     User targetUser = userService.getUserByLoginId(loginId);
 
     UserDetails userDetails = org.springframework.security.core.userdetails.User

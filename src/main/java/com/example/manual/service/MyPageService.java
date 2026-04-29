@@ -3,6 +3,10 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.ManualResponseDto;
 import com.example.manual.dto.MyPageDto;
 import com.example.manual.entity.Manual;
@@ -11,14 +15,8 @@ import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 @Service
 public class MyPageService {
-
-
 
   private static final Logger log = LoggerFactory.getLogger(MyPageService.class);
 
@@ -29,8 +27,8 @@ public class MyPageService {
 
   public MyPageService(UserService userService,
       ManualQueryService manualQueryService,
-          UserPermissionService userPermissionService,
-            NotificationService notificationService) {
+      UserPermissionService userPermissionService,
+      NotificationService notificationService) {
 
     this.userService = userService;
     this.query = manualQueryService;
@@ -44,11 +42,13 @@ public class MyPageService {
 
   // myPage表示
   public MyPageDto showMyPage(Principal principal) {
-    log.info("start");
+
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!canShowMyPage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     MyPageDto myPageDto = new MyPageDto();
 
     List<Manual> myCreatedManuals = query.findMyCreatedManuals(principal);
@@ -59,6 +59,7 @@ public class MyPageService {
     List<ManualResponseDto> rollbackDtos = query.buildIndexWithManualsPage(createdRollbackManuals, playUser);
     myPageDto.setRollbackManualList(rollbackDtos);
 
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.APPROVER || playUser.getRole() == UserRole.ADMIN) {
       List<Manual> pendingManuals = query.findPendingManuals(playUser);
       List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals, playUser);
@@ -78,8 +79,9 @@ public class MyPageService {
   // ================================================
 
   public boolean canShowMyPage(User user) {
-    log.info("start");
+
     // 有効アカウント
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!user.isActive()) {
       throw new UnauthorizedException("このアカウントは有効ではありません。");
     }

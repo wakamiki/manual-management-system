@@ -48,11 +48,12 @@ public class UserController {
   public String showUserManagementPage(
       Principal principal, Model model,
       @PageableDefault(size = 10) Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
     UserFormDto formDto = new UserFormDto();
     model.addAttribute("viewDto", viewDto);
     model.addAttribute("formDto", formDto);
+    log.info("[{}][END] result={}");
     return "user-management";
   }
 
@@ -64,25 +65,27 @@ public class UserController {
       RedirectAttributes message,
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     UserViewDto viewDto = userService.showUserUpdateMode(principal, userId, pageable);
     UserFormDto formDto = userService.toFormData(userId);
     model.addAttribute("viewDto", viewDto);
     model.addAttribute("formDto", formDto);
     message.addFlashAttribute("message", "ユーザーを取得しました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "user-management";
   }
 
   // パスワード変更画面
   @GetMapping("/change-password")
   public String showChangePasswordPage(Principal principal, Model model) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     boolean canGuest = userService.showChangePasswordPage(principal);
     if (!model.containsAttribute("passwordChangeRequestDto")) {
       model.addAttribute("passwordChangeRequestDto", new PasswordChangeRequestDto());
     }
     model.addAttribute("canGuest", canGuest);
+    log.info("[{}][END] result={}");
     return "password-change";
   }
 
@@ -98,13 +101,14 @@ public class UserController {
       BindingResult bindingResult,
       Model model,
       Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (bindingResult.hasErrors()) {
       UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     if (userPermissionService.isUserIdTaken(formDto)) {
@@ -113,6 +117,7 @@ public class UserController {
       UserViewDto viewDto = userService.concertToUserViewDto(formDto, principal, pageable);
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("formDto", formDto);
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     String password = userService.createUser(
@@ -122,6 +127,7 @@ public class UserController {
     message.addFlashAttribute("messageType", "success");
     message.addFlashAttribute("isCredentialNotice", true);
     message.addFlashAttribute("issuedPassword", password);
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 
@@ -134,13 +140,14 @@ public class UserController {
       BindingResult bindingResult,
       Model model,
       Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (bindingResult.hasErrors()) {
       UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     if (userService.updateUser(formDto, principal, userId)) {
@@ -150,10 +157,12 @@ public class UserController {
       model.addAttribute("viewDto", viewDto);
       formDto = userService.toFormData(userId);
       model.addAttribute("formDto", formDto);
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     message.addFlashAttribute("message", "更新処理が成功しました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 
@@ -166,19 +175,21 @@ public class UserController {
       BindingResult bindingResult,
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (bindingResult.hasErrors()) {
       UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     // 既存処理
     userService.deactivateUser(principal, formDto, userId);
     message.addFlashAttribute("message", "ユーザーを停止しました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 
@@ -191,19 +202,21 @@ public class UserController {
       BindingResult bindingResult,
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (bindingResult.hasErrors()) {
       UserViewDto viewDto = userService.showUserManagementPage(principal, pageable);
       model.addAttribute("formDto", formDto);
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "user-management";
     }
     // 既存処理
     userService.activateUser(principal, userId);
     message.addFlashAttribute("message", "ユーザーを有効にしました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 
@@ -212,7 +225,7 @@ public class UserController {
       RedirectAttributes message,
       Principal principal,
       @PathVariable Long userId) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     // 自分自身のリセット禁止 一時パスを通知で渡す
     // 初回ログインで強制パスワード変更要請
     // 連続実行抑止: 連続リセットを制限
@@ -223,6 +236,7 @@ public class UserController {
     message.addFlashAttribute("messageType", "warning");
     message.addFlashAttribute("isCredentialNotice", true);
     message.addFlashAttribute("issuedPassword", password);
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 
@@ -233,26 +247,29 @@ public class UserController {
       Principal principal,
       RedirectAttributes message,
       Model model) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (bindingResult.hasErrors()) {
       boolean canGuest = userService.showChangePasswordPage(principal);
       model.addAttribute("canGuest", canGuest);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "password-change";
     }
     // 既存処理
     userService.changePassword(principal, passwordDto);
     message.addFlashAttribute("message", "パスワードを変更しました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "redirect:/manuals/index";
   }
 
   @GetMapping("/{userId}/operation-histories")
   public String getOperationHistories(RedirectAttributes message) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     message.addFlashAttribute("message", "処理に成功しました。");
     message.addFlashAttribute("messageType", "success");
+    log.info("[{}][END] result={}");
     return "redirect:/users";
   }
 

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Service;
 
 import com.example.manual.entity.Category;
@@ -32,14 +31,16 @@ public class ManualArchiveService {
     // ==============================================
 
     public void archiveManualsByInactiveDuplicateCategory(Category category, Principal principal) {
-        log.info("start");
+
         List<Manual> manuals = manualRepository.findByCategoryAndStatusNot(
                 category,
                 ManualStatus.ARCHIVED);
         for (Manual manual : manuals) {
             manual.archive();
             manual.markUpdatedNow();
+            log.info("[{}][{}][PERSIST][START] action={} id={}");
             manualRepository.save(manual);
+            log.info("[{}][{}][PERSIST][DONE] action={} id={}");
             String changeNote = "同名カテゴリー追加のためARCHIVE化:更新履歴自動生成";
             historyService.createHistory(manual, changeNote, principal);
         }

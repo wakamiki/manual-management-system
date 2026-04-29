@@ -31,6 +31,7 @@ public class UserPermissionService {
   // =========================================
 
   public boolean canUpdateLastLoginAt(User playUser) {
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
@@ -38,10 +39,12 @@ public class UserPermissionService {
   }
 
   boolean canShowUserManagementPage(User targetUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!targetUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (targetUser.getRole() != UserRole.ADMIN && targetUser.getRole() != UserRole.GUEST) {
       throw new UnauthorizedException("権限が不足しています。");
     }
@@ -49,10 +52,12 @@ public class UserPermissionService {
   }
 
   public boolean canShowUpdateMode(User targetUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!targetUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (targetUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
@@ -60,7 +65,8 @@ public class UserPermissionService {
   }
 
   public boolean canShowChangePasswordPage(User playUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
@@ -70,20 +76,24 @@ public class UserPermissionService {
   public boolean canCreateUser(
       UserFormDto formDto,
       User playUser) {
-    log.info("start");
 
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getLoginId() == null || formDto.getLoginId().isBlank()) {
       throw new NotFoundException("userIdは必須入力項目です。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getDisplayName() == null || formDto.getDisplayName().isBlank()) {
       throw new NotFoundException("user名は必須入力項目です。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getRole() == null) {
       throw new NotFoundException("Roleは必須入力項目です。");
     }
@@ -93,10 +103,12 @@ public class UserPermissionService {
   public boolean canUpdateUser(
       UserFormDto formDto,
       User playUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
@@ -104,13 +116,16 @@ public class UserPermissionService {
   }
 
   public boolean canDeactivateUser(User targetUser, User playUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!targetUser.isActive()) {
       throw new InvalidStateException("対象のユーザーは既に停止中です。");
     }
@@ -118,13 +133,16 @@ public class UserPermissionService {
   }
 
   public boolean canActivateUser(User targetUser, User playUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (targetUser.isActive()) {
       throw new InvalidStateException("対象のユーザーは既に有効になっています。");
     }
@@ -132,13 +150,16 @@ public class UserPermissionService {
   }
 
   public boolean canResetPassword(User playUser, User targetUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() != UserRole.ADMIN) {
       throw new UnauthorizedException("権限が不足しています。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (Objects.equals(playUser.getId(), targetUser.getId())) {
       throw new UnauthorizedException("操作者本人のパスワードを初期化することは出来ません。");
     }
@@ -146,7 +167,8 @@ public class UserPermissionService {
   }
 
   public boolean isUserIdTaken(UserFormDto formDto) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getId() == null) {
       return userRepository.existsByLoginId(formDto.getLoginId());
     }
@@ -156,13 +178,16 @@ public class UserPermissionService {
   public boolean canChangePassword(
       User playUser,
       PasswordChangeRequestDto passwordDto) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!playUser.isActive()) {
       throw new UnauthorizedException("有効なユーザーではありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.GUEST) {
       throw new UnauthorizedException("ゲストユーザーにはパスワード変更の権限がありません。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (passwordDto.getConfirmPassword() == null ||
         passwordDto.getCurrentPassword() == null ||
         passwordDto.getNewPassword() == null ||
@@ -171,6 +196,7 @@ public class UserPermissionService {
         passwordDto.getNewPassword().isBlank()) {
       throw new NotFoundException("入力されていない項目があります。");
     }
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!Objects.equals(passwordDto.getConfirmPassword(), passwordDto.getNewPassword())) {
       throw new InvalidStateException("新しいパスワードと確認用パスワードが違っています。");
     }
@@ -179,7 +205,8 @@ public class UserPermissionService {
   }
 
   public boolean isGuest(User playUser) {
-    log.info("start");
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.GUEST) {
       return true;
     }

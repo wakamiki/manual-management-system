@@ -57,12 +57,14 @@ public class UserService {
     // user-management表示
     public UserViewDto showUserManagementPage(
             Principal principal, Pageable pageable) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canShowUserManagementPage(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         Page<User> userList = userRepository.findAllByOrderByUpdatedAtDesc(pageable);
+        log.info("[{}][FETCH]");
         List<UserDetailDto> userResponseDto = new ArrayList<>();
         PagingDto pagingDto = PagingDto.from(userList);
         for (User user : userList) {
@@ -90,8 +92,9 @@ public class UserService {
 
     public UserViewDto showUserUpdateMode(
             Principal principal, Long userId, Pageable pageable) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canShowUpdateMode(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -102,11 +105,13 @@ public class UserService {
     }
 
     public boolean showChangePasswordPage(Principal principal) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canShowChangePasswordPage(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
+        log.info("[{}][PERMISSION][START] rule={}");
         if (playUser.getRole() == UserRole.GUEST) {
             return true;
         }
@@ -119,18 +124,22 @@ public class UserService {
 
     public void updateLastLoginAt(String loginId) {
         User playUser = getUserByLoginId(loginId);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canUpdateLastLoginAt(playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         playUser.markLastLoginNow();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         userRepository.save(playUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     }
 
     public String createUser(
             UserFormDto formDto,
             Principal principal) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canCreateUser(formDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -142,7 +151,9 @@ public class UserService {
         // パスワードエンコード
         String newPassword = generateInitialPassword();
         targetUser = newCreatePassword(targetUser, newPassword);
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(targetUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordCreateUser(savedUser, playUser);
         return newPassword;
     }
@@ -151,12 +162,14 @@ public class UserService {
             UserFormDto formDto,
             Principal principal,
             Long id) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canUpdateUser(formDto, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         // ログインID重複チェック
+        log.info("[{}][PERMISSION][START] rule={}");
         if (userPermission.isUserIdTaken(formDto)) {
             return true;
         } // TODO:変更事項があるかチェック
@@ -165,7 +178,9 @@ public class UserService {
         targetUser.changeRole(formDto.getRole());
         targetUser.setDisplayName(formDto.getDisplayName());
         targetUser.markUpdatedNow();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(targetUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordUpdateUser(savedUser, playUser);
         return false;
     }
@@ -174,39 +189,46 @@ public class UserService {
             Principal principal,
             UserFormDto formDto,
             Long id) {
-        log.info("start");
+
         User targetUser = getUserById(id);
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canDeactivateUser(targetUser, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         targetUser.deactivate();
         targetUser.markUpdatedNow();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(targetUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordDeactiveteUser(savedUser, playUser);
     }
 
     public void activateUser(
             Principal principal,
             Long id) {
-        log.info("start");
+
         User targetUser = getUserById(id);
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canActivateUser(targetUser, playUser)) {
             throw new InvalidStateException("判定エラー");
         }
         targetUser.activate();
         targetUser.markUpdatedNow();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(targetUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordActivateUser(savedUser, playUser);
     }
 
     public String resetPassword(
             Principal principal,
             Long id) {
-        log.info("start");
+
         User targetUser = getUserById(id);
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canResetPassword(playUser, targetUser)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -214,7 +236,9 @@ public class UserService {
         targetUser.markUpdatedNow();
         String newPassword = generateInitialPassword();
         targetUser = newCreatePassword(targetUser, newPassword);
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(targetUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordResetPassword(savedUser, playUser);
         return newPassword;
     }
@@ -222,8 +246,9 @@ public class UserService {
     public void changePassword(
             Principal principal,
             PasswordChangeRequestDto passwordDto) {
-        log.info("start");
+
         User playUser = getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!userPermission.canChangePassword(playUser, passwordDto)) {
             throw new InvalidStateException("判定エラー");
         }
@@ -231,13 +256,15 @@ public class UserService {
         playUser = encodePassword(passwordDto.getNewPassword(), playUser);
         // 要変更フラグ削除
         playUser.clearPasswordChangeRequired();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         User savedUser = userRepository.save(playUser);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         operation.recordChangePassword(savedUser, playUser);
 
     }
 
     private User newCreatePassword(User targetUser, String newPassword) {
-        log.info("start");
+
         String encodePassword = passwordEncoder.encode(newPassword);
         targetUser.setPassword(encodePassword);
         targetUser.markPasswordChangeRequired();
@@ -256,8 +283,10 @@ public class UserService {
     // =============================================
 
     public User getUserByPrincipal(Principal principal) {
-        log.info("start");
+
         Optional<User> userOpt = userRepository.findByLoginId(principal.getName());
+        log.info("[{}][FETCH]");
+        log.info("[{}][PERMISSION][START] rule={}");
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
@@ -267,8 +296,10 @@ public class UserService {
     }
 
     public String getDisplayNameByLoginId(String loginId) {
-        log.info("start");
+
         Optional<User> userOpt = userRepository.findByLoginId(loginId);
+        log.info("[{}][FETCH]");
+        log.info("[{}][PERMISSION][START] rule={}");
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
@@ -278,14 +309,17 @@ public class UserService {
     }
 
     public Page<User> findAllUser(Pageable pageable) {
-        log.info("start");
+
         Page<User> userList = userRepository.findAll(pageable);
+        log.info("[{}][FETCH]");
         return userList;
     }
 
     public User getUserByLoginId(String loginId) {
-        log.info("start");
+
         Optional<User> userOpt = userRepository.findByLoginId(loginId);
+        log.info("[{}][FETCH]");
+        log.info("[{}][PERMISSION][START] rule={}");
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
@@ -295,8 +329,10 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        log.info("start");
+
         Optional<User> userOpt = userRepository.findById(id);
+        log.info("[{}][FETCH]");
+        log.info("[{}][PERMISSION][START] rule={}");
         if (userOpt.isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "指定したユーザーが存在しません");
@@ -307,20 +343,23 @@ public class UserService {
 
     // Status:admin/approver全取得(特定ユーザーを除く)
     public List<User> findApproverAndAdminUsersExcept(Long excludedUserId) {
-        log.info("start");
+
         UserRole[] roles = { UserRole.ADMIN, UserRole.APPROVER };
         List<User> users = userRepository.findByRoleInAndIsActiveTrueAndIdNot(roles, excludedUserId);
+        log.info("[{}][FETCH]");
         return users;
     }
 
     private Long getAllUserCount() {
-        log.info("start");
+
         Long count = userRepository.count();
+        log.info("[{}][FETCH]");
         return count;
     }
 
     private String getActivateLabel(boolean isActive) {
-        log.info("start");
+
+        log.info("[{}][PERMISSION][START] rule={}");
         if (isActive) {
             String label = "使用中";
             return label;
@@ -331,7 +370,7 @@ public class UserService {
     }
 
     private String generateInitialPassword() {
-        log.info("start");
+
         String upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
         String lower = "abcdefghijkmnopqrstuvwxyz";
         String digit = "23456789";
@@ -406,6 +445,7 @@ public class UserService {
             UserFormDto formDto,
             Principal principal, Pageable pageable) {
         UserViewDto viewDto = showUserManagementPage(principal, pageable);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (formDto.getId() == null) {
             viewDto.setMode(ViewMode.CREATE);
         } else {

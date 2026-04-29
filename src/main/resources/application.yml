@@ -31,7 +31,7 @@ server:
 
 logging:
   pattern:
-    console: "%d{HH:mm:ss} %-5level %class.%M - %msg%n"
+    console: "%d{HH:mm:ss} %-5level [%thread] %class.%M [rid=%X{rid}] - %msg%n"
 
 app:
   guest-login:

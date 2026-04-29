@@ -7,6 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
 import com.example.manual.dto.CategoryResponseDto;
 import com.example.manual.dto.IndexSummaryDto;
 import com.example.manual.dto.ManualDetailDto;
@@ -27,15 +36,6 @@ import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.ManualRepository;
 import com.example.manual.repository.ManualSpecification;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ManualQueryService {
@@ -73,7 +73,7 @@ public class ManualQueryService {
       Principal principal,
       Page<Manual> manuals,
       ManualSearchConditionDto condition) {
-    log.info("start");
+
     // 標準表示項目取得
     ManualIndexDto listDto = buildIndexCommonData(principal);
     // 一覧リスト ページ毎に分ける必要有
@@ -93,11 +93,13 @@ public class ManualQueryService {
 
   // 新規作成(新規タブ)
   public List<CategoryResponseDto> goToNewCreatePage(Principal principal) {
-    log.info("start");
+
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToNewCreatePage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     List<CategoryResponseDto> categoryDto = categoryService.getActiveCategoryDtos();
     return categoryDto;
   }
@@ -106,14 +108,16 @@ public class ManualQueryService {
   public ManualEditFormDto goToEditPage(
       Long manualId,
       Principal principal) {
-    log.info("start");
+
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
 
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToEditPage(
         playUser, manual)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     FormMode mode = FormMode.edit;
     return toManualFormInputDto(manual, playUser, mode);
   }
@@ -122,12 +126,14 @@ public class ManualQueryService {
   public ManualEditFormDto goToCopyPage(
       Long manualId,
       Principal principal) {
-    log.info("start");
+
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToCopyPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     FormMode mode = FormMode.copy;
     return toManualFormInputDto(manual, playUser, mode);
   }
@@ -136,12 +142,14 @@ public class ManualQueryService {
   public ManualDetailDto goToDetailPage(
       Long manualId,
       Principal principal) {
-    log.info("start");
+
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToDetailPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     ManualDetailDto baseDetailDto = toManualDetailDto(manual);
     ManualDetailDto detailDto = buildDetailPermissions(manual, playUser, baseDetailDto);
 
@@ -157,25 +165,30 @@ public class ManualQueryService {
       ManualSearchConditionDto condition,
       Principal principal,
       Pageable pageable) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canFindManualsBySearch(targetUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
 
     Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
 
     Specification<Manual> keywordSpec = ManualSpecification.containsKeyword(condition.getKeyword());
+    log.info("[{}][PERMISSION][START] rule={}");
     if (keywordSpec != null) {
       specification = specification.and(keywordSpec);
     }
 
     Specification<Manual> categorySpec = ManualSpecification.hasCategoryIds(condition.getCategoryIds());
+    log.info("[{}][PERMISSION][START] rule={}");
     if (categorySpec != null) {
       specification = specification.and(categorySpec);
     }
 
     Specification<Manual> statusSpec = ManualSpecification.hasStatuses(condition.getStatuses());
+    log.info("[{}][PERMISSION][START] rule={}");
     if (statusSpec != null) {
       specification = specification.and(statusSpec);
     }
@@ -189,7 +202,7 @@ public class ManualQueryService {
 
   // status一覧を返す
   public List<ManualStatus> getManualStatuses() {
-    log.info("start");
+
     List<ManualStatus> responseStatus = Arrays.asList(ManualStatus.values());
 
     return responseStatus;
@@ -197,110 +210,121 @@ public class ManualQueryService {
 
   // MyPege 差し戻し（自分作成）のデータを渡す。
   public List<Manual> findCreatedRollbackManuals(User user) {
-    log.info("start");
+
     List<Manual> rollbackList = manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
         user);
+    log.info("[{}][FETCH]");
 
     return rollbackList;
   }
 
   // MyPege PENDINGの全マニュアル（自分作成以外）のデータを渡す。
   public List<Manual> findPendingManuals(User user) {
-    log.info("start");
+
     List<Manual> pendingManualList = manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
         user, ManualStatus.PENDING);
+    log.info("[{}][FETCH]");
     return pendingManualList;
   }
 
   // index 自分作成分のマニュアルデータ一覧を返す。
   public Page<Manual> findMyCreatedManualsPage(Principal principal, Pageable pageable) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Page<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
         targetUser, pageable);
+    log.info("[{}][FETCH]");
     return manualList;
   }
 
   public List<Manual> findMyCreatedManuals(Principal principal) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     List<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
         targetUser);
+    log.info("[{}][FETCH]");
     return manualList;
   }
 
   // index 自分作成PENDINGのデータ一覧を返す。
   public Page<Manual> findMyPendingManuals(Principal principal, Pageable pageable) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Page<Manual> manualList = manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
         targetUser, ManualStatus.PENDING, pageable);
+    log.info("[{}][FETCH]");
     return manualList;
   }
 
   // index 最近７日間の更新のデータ一覧(Draft以外)を返す。
   public Page<Manual> findRecentlyUpdatedManuals(Pageable pageable) {
-    log.info("start");
+
     Page<Manual> manualList = manualRepository.findByUpdatedAtAfterAndStatusNotOrderByUpdatedAtDesc(
-                    LocalDateTime.now().minusDays(7),
-                    ManualStatus.DRAFT,
-                    pageable);
+        LocalDateTime.now().minusDays(7),
+        ManualStatus.DRAFT,
+        pageable);
+    log.info("[{}][FETCH]");
     return manualList;
   }
 
   // index count自分作成PENDINGの数を返す。
   public int countCreatedPendingManual(Principal principal) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserAndStatus(
         targetUser, ManualStatus.PENDING);
+    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
 
   // index count最近7日間の更新の数(Draft以外)を返す。
   public int countRecentWeeklyManuals() {
-    log.info("start");
+
     Long count = manualRepository.countByUpdatedAtAfterAndStatusNot(
         LocalDateTime.now().minusDays(7),
         ManualStatus.DRAFT);
+    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
 
   // MyPage index通知 count自分以外作成PENDINGの数を返す。
   public int countNotUserCreatedPendingManualList(Principal principal) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserNotAndStatus(
         targetUser,
         ManualStatus.PENDING);
+    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
 
   // MyPage index通知 count作成者自分の差し戻しマニュアル数を返す。
   public int countMyRollbackManual(Principal principal) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByIsRolledbackTrueAndCreatedByUser(
         targetUser);
+    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
 
   // index count自分作成分の数を返す。
   public int countUserCreatedManual(Principal principal) {
-    log.info("start");
+
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUser(targetUser);
+    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
 
   // index quickView表示取得
   public IndexSummaryDto getIndexSummary(Principal principal) {
-    log.info("start");
+
     // 通知欄２つの数字を取得
     int unreadRollbackCount = notificationService.unreadRollbackCount(principal);
     int pendingUnCreatedCount = notificationService.pendingUnCreatedCount(principal);
@@ -310,6 +334,7 @@ public class ManualQueryService {
     int countCreatedPendingManual = countCreatedPendingManual(principal);
     // count 最近更新（７日間）
     int countRecentWeeklyManual = countRecentWeeklyManuals();
+    log.info("[{}][FETCH]");
 
     IndexSummaryDto summaryDto = new IndexSummaryDto();
     summaryDto.setCountUserCreatedManual(countUserCreatedManual);
@@ -326,8 +351,10 @@ public class ManualQueryService {
   // ============================
 
   public Manual findManualOrThrow(Long id) {
-    log.info("start");
+
     Optional<Manual> manualOpt = manualRepository.findById(id);
+    log.info("[{}][FETCH]");
+    log.info("[{}][PERMISSION][START] rule={}");
     if (manualOpt.isEmpty()) {
       throw new RuntimeException("");
     }
@@ -340,8 +367,9 @@ public class ManualQueryService {
 
   public ManualEditFormDto toManualFormInputDto(Manual manual, User playUser,
       FormMode mode) {
-    log.info("start");
+
     ManualEditFormDto formDto = new ManualEditFormDto();
+    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.GUEST) {
       formDto.setGuest(true);
     }
@@ -352,9 +380,12 @@ public class ManualQueryService {
     formDto.setContent(manual.getContent());
     formDto.setTitle(manual.getTitle());
     formDto.setMode(mode);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (mode == FormMode.copy) {
       formDto.setModeLabel("複製");
-    } else if (mode == FormMode.edit) {
+    } else
+      log.info("[{}][PERMISSION][START] rule={}");
+    if (mode == FormMode.edit) {
       formDto.setModeLabel("編集");
     }
     return formDto;
@@ -364,6 +395,7 @@ public class ManualQueryService {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
+      log.info("[{}][PERMISSION][START] rule={}");
       if (permission.canEditManual(manual, playUser)) {
         responseDto.setCanEdit(true);
       }
@@ -389,6 +421,7 @@ public class ManualQueryService {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
+      log.info("[{}][PERMISSION][START] rule={}");
       if (permission.canEditManual(manual, playUser)) {
         responseDto.setCanEdit(true);
       }
@@ -445,7 +478,6 @@ public class ManualQueryService {
 
   // index表示に必要なコモンデータ（一覧表示以外）を集める。
   public ManualIndexDto buildIndexCommonData(Principal principal) {
-    log.info("start");
 
     // カテゴリーリスト 検索欄用 active inactive
     List<CategoryResponseDto> activeCategoriesDto = categoryService.getActiveCategoryDtos();
@@ -485,11 +517,12 @@ public class ManualQueryService {
 
   // status一覧(Draft以外)を返す
   public List<ManualResponseDto> getDefaultStatuses() {
-    log.info("start");
+
     List<ManualResponseDto> responseStatus = new ArrayList<>();
     ManualStatus status[] = ManualStatus.values();
     for (ManualStatus manualStatus : status) {
       ManualResponseDto defaultStatus = new ManualResponseDto();
+      log.info("[{}][PERMISSION][START] rule={}");
       if (manualStatus == ManualStatus.DRAFT) {
       } else {
         defaultStatus.setStatus(manualStatus);

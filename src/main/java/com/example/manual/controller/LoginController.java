@@ -40,16 +40,19 @@ public class LoginController {
 
   @GetMapping("/")
   public String showLoginView(Principal principal, RedirectAttributes message) {
-    log.info("start");
+    log.info("[{}][START] args={}");
+    log.info("[{}][END] result={}");
     return "redirect:/login";
   }
 
   @GetMapping("/login")
   public String showLoginPage(Principal principal, RedirectAttributes message) {
-    log.info("start");
+    log.info("[{}][START] args={}");
     if (principal != null) {
+      log.info("[{}][END] result={}");
       return "redirect:/manuals/index";
     }
+    log.info("[{}][END] result={}");
     return "login";
   }
 
@@ -71,11 +74,13 @@ public class LoginController {
           HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
           context);
 
+      log.info("[{}][END] result={}");
       return "redirect:/manuals/index";
     } catch (AuthenticationException e) {
       log.warn("guest login failed. loginId={}, reason={}", guestLoginId, e.getClass().getSimpleName(), e);
       message.addFlashAttribute("message", "ゲストログインに失敗しました。");
       message.addFlashAttribute("messageType", "error");
+      log.info("[{}][END] result={}");
       return "redirect:/login";
     }
   }

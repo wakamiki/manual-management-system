@@ -53,14 +53,16 @@ public class ManualCommandService {
   public void saveDraftForCreate(
       ManualDraftDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = new Manual();
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
     User createUser = userService.getUserByPrincipal(principal);
 
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canSaveDraftForCreate(createUser, manual, category)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markUpdatedNow();
@@ -70,20 +72,24 @@ public class ManualCommandService {
     manual.setCreatedByUser(createUser);
     // Rollbackフラグ初期化
     manual.markUnreadRolledback();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
   }
 
   // 新規作成マニュアル公開(PENDING)
   public void createPendingManual(
       ManualEditFormDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = new Manual();
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
     User createUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canCreatePendingManual(createUser, category, formDto)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markCreatedNow();
@@ -93,7 +99,9 @@ public class ManualCommandService {
     manual.setCreatedByUser(createUser);
     // Rollbackフラグ初期化
     manual.markUnreadRolledback();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     // 承認通知作成
     notificationService.createSubmitNotifications(principal, savedManual);
   }
@@ -103,16 +111,18 @@ public class ManualCommandService {
       Long manualId,
       ManualDraftDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canSaveDraftForCopy(playUser,
         category,
         formDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markUpdatedNow();
@@ -122,7 +132,9 @@ public class ManualCommandService {
     manual.setCreatedByUser(playUser);
     // Rollbackフラグ初期化
     manual.markUnreadRolledback();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     historyService.createHistory(savedManual,
         formDto.getChangeNote(),
         principal);
@@ -133,11 +145,12 @@ public class ManualCommandService {
       Long manualId,
       ManualEditFormDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canSavePendingForCopy(
         playUser,
         category,
@@ -146,6 +159,7 @@ public class ManualCommandService {
         formDto.getContent())) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markUpdatedNow();
@@ -155,7 +169,9 @@ public class ManualCommandService {
     manual.setCreatedByUser(playUser);
     // Rollbackフラグ初期化
     manual.markUnreadRolledback();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     historyService.createHistory(
         savedManual,
         formDto.getChangeNote(),
@@ -168,21 +184,26 @@ public class ManualCommandService {
       Long manualId,
       ManualDraftDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canEditToDraft(playUser, manual)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markUpdatedNow();
     manual.markStatusDRAFT();
     manual.setCategory(category);
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     notificationService.deletePendingApprovalNotificationsByManualId(manualId);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!formDto.getChangeNote().isBlank() && formDto.getChangeNote() != null) {
       historyService.createHistory(
           savedManual,
@@ -196,25 +217,30 @@ public class ManualCommandService {
       Long manualId,
       ManualEditFormDto formDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canEditToPending(playUser, manual, formDto)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.setTitle(formDto.getTitle());
     manual.setContent(formDto.getContent());
     manual.markUpdatedNow();
     manual.submitPENDING();
     manual.setCategory(category);
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!formDto.getChangeNote().isBlank() && formDto.getChangeNote() != null) {
       historyService.createHistory(savedManual,
           formDto.getChangeNote(),
           principal);
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     // 承認通知作成
     notificationService.deleteRollbackNotification(manualId, playUser);
     notificationService.createSubmitNotifications(principal, savedManual);
@@ -228,15 +254,19 @@ public class ManualCommandService {
   public void submitManual(
       Long manualId,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canPending(manual, playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.submitPENDING();
     manual.markUpdatedNow();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     notificationService.createSubmitNotifications(principal, savedManual);
   }
 
@@ -245,17 +275,22 @@ public class ManualCommandService {
       Long manualId,
       String changeNote,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
     Category category = manual.getCategory();
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canApproveManual(manual, category, playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.approve();
     manual.markUpdatedNow();
     manual.markApprovedNow();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
+    log.info("[{}][PERMISSION][START] rule={}");
     if (changeNote != null && !changeNote.isBlank()) {
       historyService.createHistory(
           savedManual,
@@ -271,16 +306,20 @@ public class ManualCommandService {
       Long manualId,
       ManualActionRequestDto requestDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canRollbackManual(manual, playUser, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.markReadRolledback();
     manual.markUpdatedNow();
     manual.rollbackToDraft();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     historyService.createHistory(
         savedManual, requestDto.getChangeNote(), principal);
     // 差し戻し通知作成
@@ -292,18 +331,22 @@ public class ManualCommandService {
       Long manualId,
       ManualActionRequestDto actionRequestDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
     Category category = categoryService.getCategoryById(manual.getCategory().getId());
 
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canArchiveManual(
         playUser, manual, category, actionRequestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.archive();
     manual.markUpdatedNow();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     historyService.createHistory(
         savedManual, actionRequestDto.getChangeNote(), principal);
     notificationService.deleteByManualIdNotification(manualId);
@@ -314,15 +357,19 @@ public class ManualCommandService {
       Long manualId,
       ManualActionRequestDto requestDto,
       Principal principal) {
-    log.info("start");
+
     Manual manual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
+    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canRestoreManual(manual, playUser, requestDto.getChangeNote())) {
       throw new UnauthorizedException("判定エラー");
     }
+    log.info("[{}][PERMISSION][PASS] rule={}");
     manual.restoreToApproved();
     manual.markUpdatedNow();
+    log.info("[{}][{}][PERSIST][START] action={} id={}");
     Manual savedManual = manualRepository.save(manual);
+    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     historyService.createHistory(
         savedManual, requestDto.getChangeNote(), principal);
   }

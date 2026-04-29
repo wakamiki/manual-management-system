@@ -3,6 +3,11 @@ package com.example.manual.service;
 import java.security.Principal;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.manual.entity.Manual;
 import com.example.manual.entity.Notification;
 import com.example.manual.entity.User;
@@ -12,11 +17,6 @@ import com.example.manual.enums.UserRole;
 import com.example.manual.exception.InvalidStateException;
 import com.example.manual.exception.UnauthorizedException;
 import com.example.manual.repository.NotificationRepository;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificationService {
@@ -41,8 +41,9 @@ public class NotificationService {
     // 有効ユーザーのadmin/approverに通知を送る（作成者を除く）
 
     public void createSubmitNotifications(Principal principal, Manual manual) {
-        log.info("start");
+
         User user = userService.getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!canCreateSubmitNotifications(principal)) {
             throw new UnauthorizedException("判定エラー");
         }
@@ -55,12 +56,14 @@ public class NotificationService {
             notification.setManual(manual);
             notification.setType(NotificationType.PENDING_APPROVAL);
             notification.markCreatedNow();
+            log.info("[{}][{}][PERSIST][START] action={} id={}");
             notificationRepository.save(notification);
+            log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
     }
 
     public void createRollbackNotification(Manual manual) {
-        log.info("start");
+
         // 差し戻し時に作成者へ通知を作成する。
         User targetUser = userService.getUserByLoginId(
                 manual.getCreatedByUser().getLoginId());
@@ -70,7 +73,9 @@ public class NotificationService {
         notification.setManual(manual);
         notification.setType(NotificationType.ROLLBACK);
         notification.markCreatedNow();
+        log.info("[{}][{}][PERSIST][START] action={} id={}");
         notificationRepository.save(notification);
+        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     }
 
     // public void createApproveNotification(Manual manual){}
@@ -84,7 +89,7 @@ public class NotificationService {
     @Transactional
     public void deletePendingApprovalNotificationsByManualId(
             Long manualId) {
-        log.info("start");
+
         notificationRepository.deleteByManualIdAndType(
                 manualId, NotificationType.PENDING_APPROVAL);
     }
@@ -92,62 +97,62 @@ public class NotificationService {
     // 差し戻しマニュアルがPENDINGに変わった時に通知を削除する。
     @Transactional
     public void deleteRollbackNotification(Long manualId, User user) {
-        log.info("start");
+
         // 通知のあるユーザーがPENDINGしたときに実行
         notificationRepository.deleteByManualIdAndType(
                 manualId, NotificationType.ROLLBACK);
     }
 
-    //該当マニュアルに紐づく通知を全削除
+    // 該当マニュアルに紐づく通知を全削除
     @Transactional
     public void deleteByManualIdNotification(Long manualId) {
-        log.info("start");
+
         notificationRepository.deleteByManualId(manualId);
     }
 
     public void deleteAsRead(Long notificationId, User user) {
-        log.info("start");
+
         // 指定通知を削除する。既読ボタンに対応。
         // 有効ユーザー 画面更新要
     }
 
     public void deleteAllAsRead(User user) {
-        log.info("start");
+
         // まとめて削除にする。全既読ボタン用。
         // 有効ユーザー
     }
 
     public void clearPendingNotifications(Long manualId) {
-        log.info("start");
+
     }
 
     // ========================================================
     // 通知数取得
     // ========================================================
     public void getUnreadCount(User user) {
-        log.info("start");
+
         // 未読件数を返す。バッヂ表示に使う。
         // 有効ユーザー 件数を取得。取得方法検討
     }
 
     // ユーザー未読の差し戻し通知数を取得
     public int unreadRollbackCount(Principal principal) {
-        log.info("start");
+
         User playUser = userService.getUserByPrincipal(principal);
-        Long count = notificationRepository.countByTargetUserAndType(playUser,NotificationType.ROLLBACK);
+        Long count = notificationRepository.countByTargetUserAndType(playUser, NotificationType.ROLLBACK);
         int notificationCount = Math.toIntExact(count);
         return notificationCount;
     }
 
     // ユーザー未読の承認待ち通知数（自分作成マニュアルを除く）を取得
     public int pendingUnCreatedCount(Principal principal) {
-        log.info("start");
+
         User playUser = userService.getUserByPrincipal(principal);
-        Long count =
-                notificationRepository.countByTypeAndManual_StatusAndManual_CreatedByUserNot(
-                    NotificationType.PENDING_APPROVAL,
-                        ManualStatus.PENDING,
-                            playUser);
+        Long count = notificationRepository.countByTypeAndManual_StatusAndManual_CreatedByUserNot(
+                NotificationType.PENDING_APPROVAL,
+                ManualStatus.PENDING,
+                playUser);
+        log.info("[{}][FETCH]");
         int notificationCount = Math.toIntExact(count);
         return notificationCount;
     }
@@ -156,8 +161,9 @@ public class NotificationService {
     // 権限判定
     // ========================================================
     private boolean isActiveUser(Principal principal) {
-        log.info("start");
+
         User user = userService.getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!user.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -165,11 +171,13 @@ public class NotificationService {
     }
 
     private boolean canCreateSubmitNotifications(Principal principal) {
-        log.info("start");
+
         User user = userService.getUserByPrincipal(principal);
+        log.info("[{}][PERMISSION][START] rule={}");
         if (user.getRole() == UserRole.GUEST) {
             throw new InvalidStateException("権限が不足しています。");
         }
+        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActiveUser(principal)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
