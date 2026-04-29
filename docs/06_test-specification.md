@@ -166,7 +166,7 @@ Version: 01.03.21
 | MAN-017 ✅| 正常 | 複製実行 | DRAFT で新規作成 |
 | MAN-018 ✅| 正常 | approvedAt | null になる |
 | MAN-019 ✅| 正常 | changeNote | 履歴保存される |
-| MAN-020 | 異常 | 使用停止カテゴリ | エラー |
+| MAN-020 ✅ | 異常 | 使用停止カテゴリ | エラー |
 | MAN-021 ✅| 正常 | 複製マニュアル公開 | PENDINGで新規作成 |
 | MAN-022 ✅| 正常 | Controller分割後の更新系導線 | 各 `POST /manuals/{manualId}/actions/...` が404にならず実行される |
 
@@ -182,7 +182,7 @@ Version: 01.03.21
 | ST-005 ✅| 正常 | PENDING → ARCHIVED | 遷移成功 |
 | ST-006 ✅ | 正常 | APPROVED → ARCHIVED | 遷移成功 |
 | ST-007 ✅ | 正常 | ARCHIVED → APPROVED | 復帰成功 |
-| ST-008 | 異常 | 不正な遷移 | エラー |
+| ST-008 ✅ | 異常 | 不正な遷移 | エラー |
 
 ---
 
@@ -199,29 +199,29 @@ Version: 01.03.21
 | AUTH-008 ✅| 正常 | 本人がパスワード変更 | 実行可能 |
 | AUTH-009 | 異常 | 本人以外のパスワード変更 | 実行不可 |
 | AUTH-010 ✅| 正常 | ADMIN が他ユーザーのパスワード初期化 | 実行可能 |
-| AUTH-011 | 異常 | ADMIN 以外のパスワード初期化 | 実行不可 |
+| AUTH-011 ✅ | 異常 | ADMIN 以外のパスワード初期化 | 実行不可 |
 
 ### 7-2. 認可ルール対応（docs/04 2-2B 同期）
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
 | AUTH-012 ✅| 正常 | Manual 編集（作成者 + DRAFT） | 実行可能 |
 | AUTH-013 ✅| 正常 | Manual 編集（作成者 + PENDING） | 実行可能 |
-| AUTH-014 | 異常 | Manual 編集（非作成者） | 実行不可 |
+| AUTH-014 ✅ | 異常 | Manual 編集（非作成者） | 実行不可 |
 | AUTH-015✅ | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
-| AUTH-016 | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
+| AUTH-016 ✅ | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
 | AUTH-017 ✅ | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
-| AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
+| AUTH-018 ✅ | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
 | AUTH-019 ✅| 正常 | Manual 承認（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能 |
 | AUTH-020 ✅ | 異常 | Manual 承認（作成者本人） | 実行不可 |
 | AUTH-021 ✅ | 異常 | Manual 承認（PENDING以外） | 実行不可 |
 | AUTH-022 ✅ | 正常 | Manual 差し戻し（ADMIN/APPROVER + 非作成者 + PENDING） | 実行可能（更新履歴必須） |
 | AUTH-023 ✅ | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
 | AUTH-024 ✅ | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
-| AUTH-025 | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
+| AUTH-025 ✅ | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
 | AUTH-026 ✅| 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
 | AUTH-027 ✅ | 正常 | Category 管理画面表示（GUEST） | 実行可能（閲覧のみ） |
 | AUTH-028 ✅| 正常 | Category 作成/更新/停止/復帰（ADMIN） | 実行可能 |
-| AUTH-029 | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
+| AUTH-029 ✅ | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
 | AUTH-030 ✅ | 正常 | USER/APPROVER の権限外操作UI | マイページのユーザー管理/カテゴリー管理ボタンが非表示 |
 | AUTH-031 ✅ | 正常 | GUEST のユーザー管理画面表示制御 | `userId` / `lastLoginAt` / `操作` 列が非表示、更新系ボタンは非活性 |
 | AUTH-032✅ | 正常 | ゲストログイン（環境変数設定あり） | `POST /login/guest` でログインし `/manuals/index` へ遷移する |
@@ -297,11 +297,11 @@ Version: 01.03.21
 | --- | --- | --- | --- |
 | ADM-001 ✅| 正常 | User 一覧の設定ボタン（GET） | `EDIT` モードで user-management が表示される |
 | ADM-002 ✅ | 正常 | Category 一覧の更新ボタン（GET） | `EDIT` モードで category-management が表示される |
-| ADM-003 | 異常 | 更新系URLへ GET 送信 | 405 を検知し、リンク/ボタン定義の不一致を発見できる |
+| ADM-003 ✅ | 異常 | 更新系URLへ GET 送信 | 405 を検知し、リンク/ボタン定義の不一致を発見できる |
 | ADM-004 ✅ | 正常 | `th:object` + `th:field="*{...}"` のバインド | 入力値が DTO に正常バインドされる |
 | ADM-005 | 異常 | `th:field="${...}"` 記述 | テンプレートエラーとして検知できる |
 | ADM-006 ✅ | 異常 | `target...` が null の状態で更新系ボタン表示 | null ガードにより表示されない |
-| ADM-007 | 異常 | パス不一致（`th:formaction` と `@PostMapping` 不一致） | 400/404/405 として検知できる |
+| ADM-007 ✅ | 異常 | パス不一致（`th:formaction` と `@PostMapping` 不一致） | 400/404/405 として検知できる |
 | ADM-008 ✅ | 異常 | Category新規作成で `displayOrder` 未入力 | nullエラー画面ではなく同画面で入力エラー表示される |
 | ADM-009 ✅ | 異常 | Category更新で必須項目未入力 | 同画面で入力エラー表示される |
 | ADM-010 | 異常 | User新規作成で必須項目未入力 | 同画面で入力エラー表示される |

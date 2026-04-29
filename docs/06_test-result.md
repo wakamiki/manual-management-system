@@ -2,6 +2,36 @@
 
 ---
 
+## 実施ログ（2026-04-29 追記）
+### 1. テスト実施情報
+- 実施者: miki
+- 実施概要: 承認者画面ページング確認、異常系（遷移/権限/URL不一致）確認
+- 実施環境: local / H2
+
+### 2. テスト結果一覧
+| No | テストID | テスト観点 | 期待結果 | 実施結果 | 判定 | 備考 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | PAGING-001 | 承認待ちを約10件追加後の一覧ページング | 複数ページで遷移できる | 一覧ページング正常動作 | PASS | 承認者ログインで確認 |
+| 2 | ST-008 | approve（APPROVEDに対して） | 不正遷移は拒否される | 「承認ができるのはステータス:PENDINGのマニュアルのみです。」表示 | PASS | |
+| 3 | ST-008 | archive（ARCHIVEDに対して） | 不正遷移は拒否される | 「マニュアルのステータスが条件を満たしていません。」表示 | PASS | |
+| 4 | ST-008 | restore（DRAFTに対して） | 不正遷移は拒否される | 「復帰ができるのはステータス:ARCHIVEDのマニュアルのみです。」表示 | PASS | |
+| 5 | MAN-020 | 使用停止カテゴリで複製（下書き） | 作成不可 | 「停止中カテゴリにマニュアルは作成できません。」表示 | PASS | |
+| 6 | MAN-020 | 使用停止カテゴリで複製（公開） | 作成不可 | 「停止中カテゴリにマニュアルは作成できません。」表示 | PASS | |
+| 7 | AUTH-025 | 無効ユーザー拒否 | 全操作拒否 | ログイン時 403 Forbidden、ログイン不可 | PASS | `path=/login` |
+| 8 | AUTH-029 | Category create（ADMIN以外） | 実行不可 | UnauthorizedException で拒否、DB更新なし | PASS | |
+| 9 | AUTH-029 | Category update（ADMIN以外） | 実行不可 | UnauthorizedException で拒否、DB更新なし | PASS | |
+| 10 | AUTH-029 | Category deactivate（ADMIN以外） | 実行不可 | UnauthorizedException で拒否、DB更新なし | PASS | |
+| 11 | AUTH-029 | Category activate（ADMIN以外） | 実行不可 | UnauthorizedException で拒否、DB更新なし | PASS | |
+| 12 | ADM-003 | 更新系URLへGET送信 | 405検知 | 405 Method Not Allowed | PASS | |
+| 13 | ADM-007 | パス不一致検知 | 404/405検知 | 404 Not Found | PASS | |
+| 14 | AUTH-011 | ADMIN以外のPW初期化拒否 | 実行不可 | UnauthorizedException で拒否、DB更新なし | PASS | |
+| 15 | AUTH-014 | 非作成者編集拒否 | 実行不可 | 「自分が作成したマニュアル以外を編集することはできません。」表示 | PASS | |
+| 16 | AUTH-016 | DRAFT複製拒否 | 実行不可 | 「ステータスがDRAFTのマニュアルは複製できません。」表示 | PASS | |
+| 17 | AUTH-018 | 非作成者 or DRAFT以外公開拒否 | 実行不可 | エラーメッセージ表示 | PASS | |
+
+### 3. 補足
+- 異常系は「エラーメッセージ表示」および「DB更新なし」をもってPASS判定とした。
+
 ## 運用ルール（追記方法）
 
 - 本ファイルは「日次ブロック」で追記する
@@ -295,7 +325,8 @@
 - 実施者: miki
 - 対象機能: マニュアル複製 / 状態遷移 / 認証・認可 / 通知・管理 / パスワード
 - 実施環境: local / H2
-- 対象コミット: 
+- 対象コミット: 3bc27cc
+
 
 ### 2. テスト結果一覧
 | No | テストID | テスト観点 | 期待結果 | 実測結果 | 判定（PASS/FAIL/BLOCK） | 備考 |
