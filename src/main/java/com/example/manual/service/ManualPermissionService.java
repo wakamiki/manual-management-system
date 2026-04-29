@@ -351,6 +351,9 @@ public class ManualPermissionService {
             throw new InvalidStateException(
                     "選択できるのは使用中カテゴリのみです。");
         }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
+        }
         return true;
     }
 
@@ -371,6 +374,9 @@ public class ManualPermissionService {
         log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(formDto.getTitle(), formDto.getContent())) {
             throw new InvalidStateException("必須項目が入力されていません。");
+        }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
         }
         return true;
     }
@@ -393,6 +399,9 @@ public class ManualPermissionService {
         log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新履歴は必須です。");
+        }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
         }
         return true;
     }
@@ -420,6 +429,9 @@ public class ManualPermissionService {
         log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(title, content)) {
             throw new InvalidStateException("タイトル・本文は必須です。");
+        }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
         }
         return true;
     }
@@ -454,6 +466,9 @@ public class ManualPermissionService {
             throw new InvalidStateException(
                     "タイトルと本文は必須項目です。");
         }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
+        }
         return true;
     }
 
@@ -481,6 +496,9 @@ public class ManualPermissionService {
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアル以外を編集することはできません。");
+        }
+        if (isGuest(playUser)) {
+            throw new UnauthorizedException("ゲストユーザーには許されていない操作です。");
         }
         return true;
     }

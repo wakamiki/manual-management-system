@@ -1,7 +1,7 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.20
-更新日: 2026-04-28
+Version: 01.03.21
+更新日: 2026-04-29
 
 ---
 
@@ -11,6 +11,7 @@ Version: 01.03.20
 
 ### 0-1. 実施ログ参照先
 - 2026-04-26 実施ログ: `docs/06_test-result.md` の「実施ログ（2026-04-26）」
+- 2026-04-29 実施ログ: `docs/06_test-result.md` の「実施ログ（2026-04-29）」
 
 ---
 
@@ -162,12 +163,12 @@ Version: 01.03.20
 ### 5-4. 複製
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| MAN-017 | 正常 | 複製実行 | DRAFT で新規作成 |
-| MAN-018 | 正常 | approvedAt | null になる |
-| MAN-019 | 正常 | changeNote | 履歴保存される |
+| MAN-017 ✅| 正常 | 複製実行 | DRAFT で新規作成 |
+| MAN-018 ✅| 正常 | approvedAt | null になる |
+| MAN-019 ✅| 正常 | changeNote | 履歴保存される |
 | MAN-020 | 異常 | 使用停止カテゴリ | エラー |
-| MAN-021 | 正常 | 複製マニュアル公開 | PENDINGで新規作成 |
-| MAN-022 | 正常 | Controller分割後の更新系導線 | 各 `POST /manuals/{manualId}/actions/...` が404にならず実行される |
+| MAN-021 ✅| 正常 | 複製マニュアル公開 | PENDINGで新規作成 |
+| MAN-022 ✅| 正常 | Controller分割後の更新系導線 | 各 `POST /manuals/{manualId}/actions/...` が404にならず実行される |
 
 ---
 
@@ -175,10 +176,10 @@ Version: 01.03.20
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
 | ST-001 ✅ | 正常 | DRAFT → PENDING | 遷移成功 |
-| ST-002 | 正常 | DRAFT → ARCHIVED | 遷移成功 |
+| ST-002✅ | 正常 | DRAFT → ARCHIVED | 遷移成功 |
 | ST-003 ✅ | 正常 | PENDING → APPROVED | 遷移成功 |
 | ST-004  ✅| 正常 | PENDING → DRAFT | 差し戻しまたは下書き保存で成功 |
-| ST-005 | 正常 | PENDING → ARCHIVED | 遷移成功 |
+| ST-005 ✅| 正常 | PENDING → ARCHIVED | 遷移成功 |
 | ST-006 ✅ | 正常 | APPROVED → ARCHIVED | 遷移成功 |
 | ST-007 ✅ | 正常 | ARCHIVED → APPROVED | 復帰成功 |
 | ST-008 | 異常 | 不正な遷移 | エラー |
@@ -195,9 +196,9 @@ Version: 01.03.20
 | AUTH-005 ✅ | 正常 | ADMIN/GUEST がユーザー管理画面表示 | 実行可能（GUESTは閲覧のみ） |
 | AUTH-006 ✅ | 正常 | GUEST の一覧/詳細/検索 | 閲覧操作のみ実行可能 |
 | AUTH-007 ✅ | 異常 | GUEST の更新系操作 | 非活性または拒否される |
-| AUTH-008 | 正常 | 本人がパスワード変更 | 実行可能 |
+| AUTH-008 ✅| 正常 | 本人がパスワード変更 | 実行可能 |
 | AUTH-009 | 異常 | 本人以外のパスワード変更 | 実行不可 |
-| AUTH-010 | 正常 | ADMIN が他ユーザーのパスワード初期化 | 実行可能 |
+| AUTH-010 ✅| 正常 | ADMIN が他ユーザーのパスワード初期化 | 実行可能 |
 | AUTH-011 | 異常 | ADMIN 以外のパスワード初期化 | 実行不可 |
 
 ### 7-2. 認可ルール対応（docs/04 2-2B 同期）
@@ -206,7 +207,7 @@ Version: 01.03.20
 | AUTH-012 ✅| 正常 | Manual 編集（作成者 + DRAFT） | 実行可能 |
 | AUTH-013 ✅| 正常 | Manual 編集（作成者 + PENDING） | 実行可能 |
 | AUTH-014 | 異常 | Manual 編集（非作成者） | 実行不可 |
-| AUTH-015 | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
+| AUTH-015✅ | 正常 | Manual 複製（PENDING / APPROVED / ARCHIVED） | 実行可能 |
 | AUTH-016 | 異常 | Manual 複製（DRAFT） | 実行不可（編集で対応） |
 | AUTH-017 ✅ | 正常 | Manual 公開（作成者 + DRAFT） | 実行可能 |
 | AUTH-018 | 異常 | Manual 公開（非作成者 または DRAFT以外） | 実行不可 |
@@ -217,13 +218,13 @@ Version: 01.03.20
 | AUTH-023 ✅ | 正常 | Manual アーカイブ（ADMIN/APPROVER） | 対象statusで実行可能（更新履歴必須） |
 | AUTH-024 ✅ | 正常 | Manual 復帰（ADMIN/APPROVER + ARCHIVED） | カテゴリ有効時に実行可能（更新履歴必須） |
 | AUTH-025 | 異常 | 無効ユーザー（isActive=false）の操作 | 全操作拒否 |
-| AUTH-026 | 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
+| AUTH-026 ✅| 正常 | Category 管理画面表示（ADMIN） | 実行可能 |
 | AUTH-027 ✅ | 正常 | Category 管理画面表示（GUEST） | 実行可能（閲覧のみ） |
-| AUTH-028 | 正常 | Category 作成/更新/停止/復帰（ADMIN） | 実行可能 |
+| AUTH-028 ✅| 正常 | Category 作成/更新/停止/復帰（ADMIN） | 実行可能 |
 | AUTH-029 | 異常 | Category 作成/更新/停止/復帰（ADMIN以外） | 実行不可 |
 | AUTH-030 ✅ | 正常 | USER/APPROVER の権限外操作UI | マイページのユーザー管理/カテゴリー管理ボタンが非表示 |
 | AUTH-031 ✅ | 正常 | GUEST のユーザー管理画面表示制御 | `userId` / `lastLoginAt` / `操作` 列が非表示、更新系ボタンは非活性 |
-| AUTH-032 | 正常 | ゲストログイン（環境変数設定あり） | `POST /login/guest` でログインし `/manuals/index` へ遷移する |
+| AUTH-032✅ | 正常 | ゲストログイン（環境変数設定あり） | `POST /login/guest` でログインし `/manuals/index` へ遷移する |
 | AUTH-033 ✅ | 異常 | ゲストログイン（環境変数未設定/不正） | `/login` に戻りエラーメッセージが表示される |
 
 ---
@@ -234,10 +235,10 @@ Version: 01.03.20
 | NT-001 ✅ | 正常 | submit 時 | APPROVER 全員に通知作成 |
 | NT-002 | 正常 | approve 時 | 作成者へ通知作成 |
 | NT-003 ✅ | 正常 | rollback 時 | 作成者へ通知作成 |
-| NT-004 | 正常 | ホームバッヂ | 上段=差し戻し、下段=未承認 |
+| NT-004✅  | 正常 | ホームバッヂ | 上段=差し戻し、下段=未承認 |
 | NT-005 ✅ | 正常 | マイページ初期表示 | 通知タブが開く |
 | NT-006 ✅ | 正常 | APPROVER のマイページ | 未承認タブ表示 |
-| NT-007 | 正常 | マイページの初回取得 | 必要データが一括取得される |
+| NT-007 ✅| 正常 | マイページの初回取得 | 必要データが一括取得される |
 | NT-008 | 正常 | 通知件数 | 未読のみがカウントされる |
 | NT-009 ✅ | 正常 | 差し戻し一覧 | `isRolledBack = true` の全件が表示される |
 | NT-010 ✅ | 正常 | 承認待ち一覧 | `PENDING` かつ自分以外の全件が表示される |
@@ -294,7 +295,7 @@ Version: 01.03.20
 ### 9-3. 管理画面フォーム連携（2026-04-22）
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| ADM-001 | 正常 | User 一覧の設定ボタン（GET） | `EDIT` モードで user-management が表示される |
+| ADM-001 ✅| 正常 | User 一覧の設定ボタン（GET） | `EDIT` モードで user-management が表示される |
 | ADM-002 ✅ | 正常 | Category 一覧の更新ボタン（GET） | `EDIT` モードで category-management が表示される |
 | ADM-003 | 異常 | 更新系URLへ GET 送信 | 405 を検知し、リンク/ボタン定義の不一致を発見できる |
 | ADM-004 ✅ | 正常 | `th:object` + `th:field="*{...}"` のバインド | 入力値が DTO に正常バインドされる |
@@ -310,13 +311,13 @@ Version: 01.03.20
 ### 9-4. パスワード変更（2026-04-23）
 | No | 種別 | テスト観点 | 期待結果 |
 | --- | --- | --- | --- |
-| PWD-001 | 正常 | 初期パスワード発行時 | ハッシュ値で保存され、平文は保存されない |
+| PWD-001 ✅| 正常 | 初期パスワード発行時 | ハッシュ値で保存され、平文は保存されない |
 | PWD-002 ✅ | 正常 | `passwordChangeRequired=true` でログイン | 変更画面へ遷移する |
-| PWD-003 | 正常 | パスワード変更成功 | `passwordChangeRequired=false` へ更新される |
+| PWD-003 ✅| 正常 | パスワード変更成功 | `passwordChangeRequired=false` へ更新される |
 | PWD-004 | 異常 | 新規/確認パスワード不一致 | エラー表示され、更新されない |
 | PWD-005 | 異常 | 許可文字外の入力 | バリデーションエラー表示 |
 | PWD-006 | 異常 | 文字種要件未達（大文字/小文字/数字不足） | バリデーションエラー表示 |
-| PWD-007 | 正常 | 初期パスワード通知表示 | 自動消去されず手動で閉じるまで表示される |
+| PWD-007 ✅| 正常 | 初期パスワード通知表示 | 自動消去されず手動で閉じるまで表示される |
 | PWD-008 ✅ | 正常 | 初期パスワードコピー操作 | クリップボードへコピーされる |
 | PWD-009 ✅ | 正常 | パスワード変更画面URL遷移（本人） | `GET /users/change-password` で画面表示される |
 | PWD-010 ✅ | 正常 | パスワード変更実行URL（本人） | `POST /users/action/change-password` で更新される |

@@ -13,8 +13,10 @@
   <main class="container mock-page">
     <div class="page-title-bar tight-gap">
       <div>
-        <span class="badge mb-1 mode-badge" th:text="${formDto.modeLabel}">編集</span>
-        <span class="text-muted mb-0" th:text="|${formDto.modeLabel}元マニュアルID: ${formDto.manualId}|">
+        <span class="badge mb-1 mode-badge"
+          th:text="${formDto.modeLabel != null ? formDto.modeLabel : (formDto.mode != null and formDto.mode.name() == 'copy' ? '複製' : '編集')}">編集</span>
+        <span class="text-muted mb-0"
+          th:text="|${formDto.modeLabel != null ? formDto.modeLabel : (formDto.mode != null and formDto.mode.name() == 'copy' ? '複製' : '編集')}元マニュアルID: ${formDto.manualId}|">
           (複製元)(編集元)マニュアルID: 1001</span>
         <h1 class="h4 mb-1">マニュアルエディター</h1>
 
@@ -32,6 +34,7 @@
     </div>
 
     <form class="card" method="post" th:object="${formDto}">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
       <input type="hidden" name="mode" th:value="${formDto.mode}">
       <div class="card-body">
         <div class="mb-3">
@@ -54,7 +57,6 @@
           <label for="category" class="form-label">カテゴリ</label>
           <select id="category" class="form-select" th:field="*{categoryId}"
             th:classappend="${#fields.hasErrors('categoryId')} ? ' is-invalid'">
-            <option>選択してください</option>
             <option class="text-base " th:each="category:${categoryDto}" th:value="${category.id}"
               th:text="${category.categoryName}">
               営業部
@@ -74,12 +76,11 @@
         </div>
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
-        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode == 'edit'}
+        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode != null and formDto.mode.name() == 'edit'}
   ? @{/manuals/{manualId}/actions/save-draft(manualId=${formDto.manualId})}
-  : @{/manuals/{manualId}/actions/save-draft-copy(manualId=${formDto.manualId})}"
-          th:disabled="${formDto.guest}">
+  : @{/manuals/{manualId}/actions/save-draft-copy(manualId=${formDto.manualId})}" th:disabled="${formDto.guest}">
           下書きに保存</button>
-        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode == 'edit'}
+        <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode != null and formDto.mode.name() == 'edit'}
   ? @{/manuals/{manualId}/actions/save-pending(manualId=${formDto.manualId})}
   : @{/manuals/{manualId}/actions/save-pending-copy(manualId=${formDto.manualId})}" th:disabled="${formDto.guest}">
           マニュアル公開</button>
@@ -91,7 +92,7 @@
   <script th:if="${manualListNeedsRefresh}">
     localStorage.setItem("manualListNeedsRefresh", Date.now());
   </script>
-<script>
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
       const alertEl = document.getElementById("flashMessage");
       if (!alertEl) return;

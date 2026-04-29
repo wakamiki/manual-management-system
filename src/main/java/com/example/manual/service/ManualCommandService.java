@@ -112,7 +112,7 @@ public class ManualCommandService {
       ManualDraftDto formDto,
       Principal principal) {
 
-    Manual manual = query.findManualOrThrow(manualId);
+    Manual manual = new Manual();
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
@@ -146,7 +146,7 @@ public class ManualCommandService {
       ManualEditFormDto formDto,
       Principal principal) {
 
-    Manual manual = query.findManualOrThrow(manualId);
+    Manual manual = new Manual();
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);

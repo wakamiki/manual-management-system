@@ -15,13 +15,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-
 @Entity
 @Table(name = "manuals")
 public class Manual {
 
-      public Manual() {
-}
+    public Manual() {
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +42,9 @@ public class Manual {
     private LocalDateTime updatedAt;
     private LocalDateTime approvedAt;
     @Column(name = "is_rolled_back", nullable = false)
-    private boolean isRolledback=false;
+    private boolean isRolledback = false;
 
-  //getter
+    // getter
     public Long getId() {
         return this.id;
     }
@@ -87,7 +86,7 @@ public class Manual {
         return this.isRolledback;
     }
 
-  // setter
+    // setter
     public void setCategory(Category category) {
         this.category = category;
     }
@@ -148,11 +147,12 @@ public class Manual {
 
     public void archive() {
         if (this.status == ManualStatus.APPROVED
-                || this.status == ManualStatus.PENDING) {
+                || this.status == ManualStatus.PENDING
+                || this.status == ManualStatus.DRAFT) {
             this.status = ManualStatus.ARCHIVED;
             markUpdatedNow();
         } else {
-            throw new IllegalStateException("公開されているマニュアルのみアーカイブできます");
+            throw new IllegalStateException("すでにアーカイブされているマニュアルは再度アーカイブできません。");
         }
     }
 
@@ -163,14 +163,16 @@ public class Manual {
         } else {
             throw new IllegalStateException("復帰できるのはステータスARCHIVEDのマニュアルだけです。");
         }
-}
+    }
 
     public void markCreatedNow() {
         this.createdAt = LocalDateTime.now();
     }
+
     public void markUpdatedNow() {
         this.updatedAt = LocalDateTime.now();
     }
+
     public void markApprovedNow() {
         this.approvedAt = LocalDateTime.now();
     }

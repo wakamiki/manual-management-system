@@ -153,7 +153,7 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 log.info("[{}][END] result={}");
-                return "redirect:/manuals/{manualId}/actions/save-draft-copy";
+                return "redirect:/manuals/{manualId}/actions/copy";
         }
 
         // マニュアルを公開(複製)
@@ -188,11 +188,11 @@ public class ManualCommandController {
                         return url;
                 }
                 message.addFlashAttribute(
-                                "message", "複製マニュアルを下書きに保存しました");
+                                "message", "複製マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 log.info("[{}][END] result={}");
-                return "redirect:/manuals/{manualId}/actions/save-draft-copy";
+                return "redirect:/manuals/{manualId}/actions/copy";
         }
 
         // 下書き保存(編集)
