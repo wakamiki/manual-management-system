@@ -5,22 +5,26 @@ import java.util.List;
 
 import com.example.manual.enums.ManualStatus;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class ManualSearchConditionDto {
 
   public ManualSearchConditionDto() {
 
   }
 
+  @Size(max = 500)
   private String keyword;
   private List<Long> categoryIds = new ArrayList<>();
   private List<ManualStatus> statuses = new ArrayList<>();
 
-  //getter
+  // getter
   public String getKeyword() {
     return this.keyword;
   }
 
-  public List<Long> getCategoryIds() {
+  public List<@Positive Long> getCategoryIds() {
     return this.categoryIds;
   }
 
@@ -28,7 +32,7 @@ public class ManualSearchConditionDto {
     return this.statuses;
   }
 
-  //setter
+  // setter
   public void setKeyword(String keyword) {
     this.keyword = keyword;
   }
@@ -39,5 +43,5 @@ public class ManualSearchConditionDto {
 
   public void setStatuses(List<ManualStatus> statuses) {
     this.statuses = statuses;
-  } 
+  }
 }

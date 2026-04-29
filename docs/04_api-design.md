@@ -1,7 +1,7 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.21
-更新日: 2026-04-27
+Version: 01.03.22
+更新日: 2026-04-29
 
 ---
 
@@ -60,11 +60,11 @@ Version: 01.03.21
 ### 1-5. My Page API
 - GET `/my-page`
 
-## ■ ヘルスチェックAPI
+## ■ ヘルスチェックAPI（将来対応）
 
-### GET /health
+### GET /health（未実装）
 
-#### 概要
+#### 概要（将来対応）
 アプリケーションの起動確認用エンドポイント。
 外部サービス（Renderなど）からの稼働監視に使用する。
 
@@ -103,6 +103,10 @@ Version: 01.03.21
 - DTO の形式チェックは `@Valid` で行う
 - 業務ルール依存の判定は Service で行う
 - パスワード変更入力は専用DTO（`PasswordChangeRequestDto`）で受ける
+- 主要DTOの扱い
+  - `ManualActionRequestDto.changeNote` は必須（`@NotBlank`）
+  - `ApproveRequestDto.changeNote` は任意（`@Size(max=100)`）
+  - `ManualSearchConditionDto` は現時点で制約なし（将来必要に応じて追加）
 
 ### 2-2A. パスワード操作の権限制御
 - パスワード変更画面表示（`GET /users/change-password`）は本人のみ実行可能とする
@@ -154,6 +158,12 @@ Version: 01.03.21
 - `@ControllerAdvice`（`GlobalExceptionHandler`）で画面系例外を集約処理する
 - 画面系はフラッシュメッセージ（`message` / `messageType`）を付与してリダイレクトする
 - Controller 側での個別 `try-catch` は最小化し、Service で throw した例外を共通処理へ委譲する
+- URIプレフィックス別の戻り先
+  - `/users` -> `redirect:/users`
+  - `/categories` -> `redirect:/categories`
+  - `/my-page` -> `redirect:/my-page`
+  - `/login` -> `redirect:/login`
+  - その他 -> `redirect:/manuals/index`
 - 主な例外候補
   - `NotFoundException`
   - `UnauthorizedException`
@@ -236,6 +246,9 @@ Version: 01.03.21
   - `POST /manuals/{manualId}/actions/rollback`
   - `POST /manuals/{manualId}/actions/archive`
   - `POST /manuals/{manualId}/actions/restore`
+- 互換URL（旧）を当面受け付ける
+  - `POST /manuals/{manualId}/actions/edit-toDraft`（旧）
+  - `POST /manuals/{manualId}/actions/edit-to-pending`（旧）
 - UI 上は rollback / archive / restore を詳細画面のインライン入力で `changeNote` 入力後に確定してよい
 - approve は確認ダイアログを出し、必要に応じてインライン入力で履歴コメントを受け取ってよい
 - restore 対象は `approvedAt` を保持した `ARCHIVED` マニュアルとする
@@ -249,9 +262,10 @@ Version: 01.03.21
 ## 4. DTO 方針
 
 ### 4-1. Request DTO
-- `ManualRequestDto`
-- `ManualDraftRequestDto`
-- `ManualCopyRequestDto`
+- `ManualDraftDto`
+- `ManualEditFormDto`
+- `ManualActionRequestDto`
+- `ApproveRequestDto`
 - `ManualSearchConditionDto`
 - `CategoryFormDto`
 - `UserFormDto`
@@ -259,12 +273,13 @@ Version: 01.03.21
 
 ### 4-2. Response DTO
 - `ManualResponseDto`
-- `ManualListDto`
 - `ManualDetailDto`
 - `CategoryResponseDto`
 - `UserResponseDto`
 - `CategoryViewDto`
 - `UserViewDto`
+- `ManualIndexDto`
+- `MyPageDto`
 
 ### 4-2A. 管理画面フォーム mode
 - `ViewMode` を `CREATE / EDIT` で扱う
@@ -277,7 +292,7 @@ Version: 01.03.21
   - keyword
   - categoryIds
   - statuses
-- `ManualListDto`
+- `ManualResponseDto`
   - manualId
   - title
   - status

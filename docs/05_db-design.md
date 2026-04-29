@@ -92,7 +92,7 @@ manuals                  1 --- N Notifications
 | operated_by_user_id | BIGINT | FK | 作成/更新ユーザー |
 | title | VARCHAR(100) | NOT NULL | タイトル |
 | content | VARCHAR(10000) | NOT NULL | 本文 |
-| status | VARCHAR(20) | NOT NULL | DRAFT / PENDING / APPROVED / ARCHIVED |
+| status | VARCHAR(20) | NULL（実装準拠） | DRAFT / PENDING / APPROVED / ARCHIVED |
 | created_at | TIMESTAMP | NULL | 作成日時 |
 | updated_at | TIMESTAMP | NULL | 更新日時 |
 | approved_at | TIMESTAMP | NULL | 承認日時 |
@@ -137,7 +137,7 @@ manuals                  1 --- N Notifications
 | id | BIGINT | PK / NOT NULL | 通知ID |
 | target_user_id | BIGINT | FK | 通知対象ユーザー |
 | manual_id | BIGINT | FK | 対象マニュアル |
-| type | VARCHAR(30) | NOT NULL | 通知種別 |
+| type | VARCHAR(30) | NULL（実装準拠） | 通知種別 |
 | message | VARCHAR | NULL | 通知文面 |
 | created_at | TIMESTAMP | NULL | 通知作成日時 |
 
