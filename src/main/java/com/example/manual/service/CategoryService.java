@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.manual.dto.CategoryDetailDto;
 import com.example.manual.dto.CategoryFormDto;
@@ -87,6 +88,7 @@ public class CategoryService {
   // 登録・更新
   // ============================================
 
+  @Transactional
   public CategoryFormDto createCategory(
       CategoryFormDto formDto,
       Principal principal) {
@@ -121,6 +123,7 @@ public class CategoryService {
     return formDto;
   }
 
+  @Transactional
   public CategoryFormDto updateCategory(
       CategoryFormDto formDto,
       Principal principal) {
@@ -524,14 +527,17 @@ public class CategoryService {
       Category category = findInactiveCategoryByName(formDto);
       manualArchiveService.archiveManualsByInactiveDuplicateCategory(category, principal);
       formDto.setDuplicateStatus(DuplicateStatus.NONE);
-    } else
-      log.info("[{}][PERMISSION][START] rule={}");
+      return formDto;
+    }
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (existsActiveCategoryByName(formDto)) {
       // カテゴリー名重複チェックactive
       formDto.setDuplicateStatus(DuplicateStatus.ACTIVE_DUPLICATE);
       return formDto;
-    } else
-      log.info("[{}][PERMISSION][START] rule={}");
+    }
+
+    log.info("[{}][PERMISSION][START] rule={}");
     if (existsInactiveCategoryByName(formDto)) {
       // カテゴリー名重複チェックinactive
       formDto.setDuplicateStatus(DuplicateStatus.INACTIVE_DUPLICATE);

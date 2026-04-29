@@ -384,7 +384,8 @@ public class ManualPermissionService {
     public boolean canSaveDraftForCopy(
             User playUser,
             Category category,
-            String changeNote) {
+            String changeNote,
+            Manual originalManual) {
 
         // アクティブユーザー アクティブカテゴリー チェンジノート必須
         log.info("[{}][PERMISSION][START] rule={}");
@@ -395,6 +396,12 @@ public class ManualPermissionService {
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
+        }
+        log.info("[{}][PERMISSION][START] rule={}");
+        if (originalManual.getStatus() == ManualStatus.DRAFT) {
+            throw new InvalidStateException(
+                    "ステータスがDRAFTのマニュアルは複製できません。");
+
         }
         log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
@@ -410,7 +417,8 @@ public class ManualPermissionService {
             User playUser,
             Category category,
             String changeNote,
-            String title, String content) {
+            String title, String content,
+            Manual originalManual) {
 
         // アクティブユーザー アクティブカテゴリー チェンジノート必須 タイトル・コンテンツ必須
         log.info("[{}][PERMISSION][START] rule={}");
@@ -421,6 +429,12 @@ public class ManualPermissionService {
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
+        }
+        log.info("[{}][PERMISSION][START] rule={}");
+        if (originalManual.getStatus() == ManualStatus.DRAFT) {
+            throw new InvalidStateException(
+                    "ステータスがDRAFTのマニュアルは複製できません。");
+
         }
         log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {

@@ -116,10 +116,12 @@ public class ManualCommandService {
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
 
     User playUser = userService.getUserByPrincipal(principal);
+    Manual originalManual = query.findManualOrThrow(manualId);
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canSaveDraftForCopy(playUser,
         category,
-        formDto.getChangeNote())) {
+        formDto.getChangeNote(),
+        originalManual)) {
       throw new UnauthorizedException("判定エラー");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
@@ -148,7 +150,7 @@ public class ManualCommandService {
 
     Manual manual = new Manual();
     Category category = categoryService.getCategoryById(formDto.getCategoryId());
-
+    Manual originalManual = query.findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canSavePendingForCopy(
@@ -156,7 +158,8 @@ public class ManualCommandService {
         category,
         formDto.getChangeNote(),
         formDto.getTitle(),
-        formDto.getContent())) {
+        formDto.getContent(),
+        originalManual)) {
       throw new UnauthorizedException("判定エラー");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
@@ -259,7 +262,7 @@ public class ManualCommandService {
     User playUser = userService.getUserByPrincipal(principal);
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canPending(manual, playUser)) {
-      throw new UnauthorizedException("判定エラー");
+      throw new UnauthorizedException("このマニュアルは公開できません。");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
     manual.submitPENDING();
@@ -281,7 +284,7 @@ public class ManualCommandService {
     Category category = manual.getCategory();
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canApproveManual(manual, category, playUser)) {
-      throw new UnauthorizedException("判定エラー");
+      throw new UnauthorizedException("このマニュアルは承認できません。");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
     manual.approve();
@@ -311,7 +314,7 @@ public class ManualCommandService {
     User playUser = userService.getUserByPrincipal(principal);
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canRollbackManual(manual, playUser, requestDto.getChangeNote())) {
-      throw new UnauthorizedException("判定エラー");
+      throw new UnauthorizedException("このマニュアルは差し戻しできません。");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
     manual.markReadRolledback();
@@ -339,7 +342,7 @@ public class ManualCommandService {
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canArchiveManual(
         playUser, manual, category, actionRequestDto.getChangeNote())) {
-      throw new UnauthorizedException("判定エラー");
+      throw new UnauthorizedException("このマニュアルはアーカイブできません。");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
     manual.archive();
@@ -362,7 +365,7 @@ public class ManualCommandService {
     User playUser = userService.getUserByPrincipal(principal);
     log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canRestoreManual(manual, playUser, requestDto.getChangeNote())) {
-      throw new UnauthorizedException("判定エラー");
+      throw new UnauthorizedException("このマニュアルは復帰できません。");
     }
     log.info("[{}][PERMISSION][PASS] rule={}");
     manual.restoreToApproved();

@@ -77,6 +77,7 @@ public class ManualCommandController {
                 message.addFlashAttribute("message", "下書きを保存しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/create";
         }
@@ -112,6 +113,7 @@ public class ManualCommandController {
                 message.addFlashAttribute("message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/create";
         }
@@ -152,6 +154,7 @@ public class ManualCommandController {
                                 "message", "複製マニュアルを下書きに保存しました");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/actions/copy";
         }
@@ -191,6 +194,7 @@ public class ManualCommandController {
                                 "message", "複製マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/actions/copy";
         }
@@ -231,6 +235,7 @@ public class ManualCommandController {
                                 "message", "マニュアルを保存しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -271,6 +276,7 @@ public class ManualCommandController {
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -301,6 +307,7 @@ public class ManualCommandController {
                                 "message", "マニュアルを公開しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -341,6 +348,7 @@ public class ManualCommandController {
                                 "message", "マニュアルを承認しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -381,6 +389,7 @@ public class ManualCommandController {
                                 "message", "マニュアルを差し戻しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -420,6 +429,7 @@ public class ManualCommandController {
                                 "message", "マニュアルをアーカイブしました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
@@ -460,6 +470,7 @@ public class ManualCommandController {
                                 "message", "マニュアルをアーカイブから復帰しました。");
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
+                message.addFlashAttribute("myPageNeedsRefresh", true);
                 log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }

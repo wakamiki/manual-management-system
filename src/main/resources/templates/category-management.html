@@ -166,10 +166,13 @@
   </script>
   <script th:inline="javascript">
     const status = /*[[${formDto.duplicateStatus != null ? formDto.duplicateStatus.name() : ''}]]*/ '';
-    if (status === 'INACTIVE_DUPLICATE') {
-      const modal = new bootstrap.Modal(document.getElementById('duplicateModal'));
+    document.addEventListener("DOMContentLoaded", () => {
+      if (status !== 'INACTIVE_DUPLICATE') return;
+      const modalEl = document.getElementById('duplicateModal');
+      if (!modalEl) return;
+      const modal = new bootstrap.Modal(modalEl);
       modal.show();
-    }
+    });
 
     function confirmDuplicateSubmit() {
       const form = document.getElementById('categoryForm');

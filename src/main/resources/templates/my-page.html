@@ -183,7 +183,7 @@
                   <div>
                     <div class="dashboard-meta">
                       <span class="badge-status" th:classappend="' ' + ${manual.status.name().toLowerCase()}"
-                      th:text="${manual.statusLabel}">承認済</span>
+                        th:text="${manual.statusLabel}">承認済</span>
                       <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1001</small>
                       <small class="text-muted"
                         th:text="|更新日: ${#temporals.format(manual.updatedAt, 'yyyy-MM-dd')}|">更新日: 2026-04-05</small>
@@ -220,7 +220,7 @@
                   <div>
                     <div class="dashboard-meta">
                       <span class="badge-status" th:classappend="' ' + ${manual.status.name().toLowerCase()}"
-                      th:text="${manual.statusLabel}">申請中</span>
+                        th:text="${manual.statusLabel}">申請中</span>
                       <small class="text-muted" th:text="|マニュアルID: ${manual.manualId}|">マニュアルID: 1003</small>
                       <small class="text-muted" th:text="|申請者: ${manual.createdUserDto.displayName}|">申請者: 佐藤 次郎</small>
                       <small class="text-muted"
@@ -263,7 +263,21 @@
         setTimeout(() => alertEl.remove(), 400);
       }, 3000);
     });
+    window.addEventListener("storage", (event) => {
+      if (event.key !== "myPageNeedsRefresh") return;
+      localStorage.removeItem("myPageNeedsRefresh");
+      location.reload();
+    });
+
   </script>
+  <script>
+    const k = "myPageNeedsRefresh";
+    if (localStorage.getItem(k)) {
+      localStorage.removeItem(k);
+      location.reload();
+    }
+  </script>
+
 </body>
 
 </html>

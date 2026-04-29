@@ -77,11 +77,11 @@
       </div>
       <div class="card-footer d-flex flex-wrap gap-2">
         <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode != null and formDto.mode.name() == 'edit'}
-  ? @{/manuals/{manualId}/actions/save-draft(manualId=${formDto.manualId})}
+  ? @{/manuals/{manualId}/actions/save-draft-edit(manualId=${formDto.manualId})}
   : @{/manuals/{manualId}/actions/save-draft-copy(manualId=${formDto.manualId})}" th:disabled="${formDto.guest}">
           下書きに保存</button>
         <button type="submit" class="btn btn-outline-primary" th:formaction="${formDto.mode != null and formDto.mode.name() == 'edit'}
-  ? @{/manuals/{manualId}/actions/save-pending(manualId=${formDto.manualId})}
+  ? @{/manuals/{manualId}/actions/save-pending-edit(manualId=${formDto.manualId})}
   : @{/manuals/{manualId}/actions/save-pending-copy(manualId=${formDto.manualId})}" th:disabled="${formDto.guest}">
           マニュアル公開</button>
 
@@ -137,6 +137,9 @@
       updateTextCount(inputId, maxLength);
       input.addEventListener("input", () => updateTextCount(inputId, maxLength));
     });
+  </script>
+  <script th:if="${myPageNeedsRefresh}">
+    localStorage.setItem("myPageNeedsRefresh", Date.now());
   </script>
 </body>
 

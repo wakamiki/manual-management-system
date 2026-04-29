@@ -200,17 +200,24 @@
         note.value = '';
       });
 
-      const historyModalEl = document.getElementById('historyAddModal');
-      const historyModal = historyModalEl ? new bootstrap.Modal(historyModalEl) : null;
+      let historyModal = null;
+      function getHistoryModal() {
+        if (historyModal) return historyModal;
+        const el = document.getElementById('historyAddModal');
+        if (!el) return null;
+        historyModal = new bootstrap.Modal(el);
+        return historyModal;
+      }
 
       approveBtn?.addEventListener('click', () => {
-        if (!historyModal) return;
+        const modal = getHistoryModal();
+        if (!modal) return;
         form.action = approveBtn.dataset.url;
-        historyModal.show();
+        modal.show();
       });
 
       window.approveWithHistory = function () {
-        historyModal?.hide();
+        getHistoryModal()?.hide();
         label.textContent = '承認を実行';
         submitBtn.textContent = '承認を確定';
         note.placeholder = '更新履歴（任意）';
@@ -221,7 +228,7 @@
       };
 
       window.approveWithoutHistory = function () {
-        historyModal?.hide();
+        getHistoryModal()?.hide();
         form.querySelectorAll('input[name="changeNote"][type="hidden"]').forEach(el => el.remove());
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
@@ -233,6 +240,10 @@
     })();
 
   </script>
+  <script th:if="${myPageNeedsRefresh}">
+  localStorage.setItem("myPageNeedsRefresh", Date.now());
+</script>
+
 
   <!-- Modal -->
   <div class="modal fade" id="historyAddModal" tabindex="-1" aria-labelledby="historyAddModalLabel" aria-hidden="true">

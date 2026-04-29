@@ -32,8 +32,8 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="title" class="form-label">タイトル</label>
-          <input id="title" type="text" class="form-control" th:field="*{title}"
-            placeholder="タイトルを入力してください" maxlength="100">
+          <input id="title" type="text" class="form-control" th:field="*{title}" placeholder="タイトルを入力してください"
+            maxlength="100">
           <div class="text-count" data-for="title" data-max="100">0 / 100</div>
         </div>
         <div class="mb-3">
@@ -67,7 +67,7 @@
   <script th:if="${manualListNeedsRefresh}">
     localStorage.setItem("manualListNeedsRefresh", Date.now());
   </script>
-<script>
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
       const alertEl = document.getElementById("flashMessage");
       if (!alertEl) return;
@@ -111,6 +111,9 @@
       updateTextCount(inputId, maxLength);
       input.addEventListener("input", () => updateTextCount(inputId, maxLength));
     });
+  </script>
+  <script th:if="${myPageNeedsRefresh}">
+    localStorage.setItem("myPageNeedsRefresh", Date.now());
   </script>
 </body>
 
