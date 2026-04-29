@@ -45,12 +45,10 @@ public class CategoryController {
       Principal principal,
       @PageableDefault(size = 10) Pageable pageable,
       Model model) {
-    log.info("[{}][START] args={}");
     CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
     CategoryFormDto formDto = new CategoryFormDto();
     model.addAttribute("viewDto", viewDto);
     model.addAttribute("formDto", formDto);
-    log.info("[{}][END] result={}");
     return "category-management";
   }
 
@@ -62,14 +60,12 @@ public class CategoryController {
       RedirectAttributes message,
       @PageableDefault(size = 10) Pageable pageable,
       Model model) {
-    log.info("[{}][START] args={}");
     CategoryFormDto formDto = categoryService.toFormDto(categoryId);
     model.addAttribute("formDto", formDto);
     CategoryViewDto viewDto = categoryService.showCategoryUpdateMode(principal, categoryId, pageable);
     model.addAttribute("viewDto", viewDto);
     message.addFlashAttribute("message", "カテゴリーを取得しました。");
     message.addFlashAttribute("messageType", "success");
-    log.info("[{}][END] result={}");
     return "category-management";
   }
 
@@ -85,7 +81,6 @@ public class CategoryController {
       RedirectAttributes message,
       Model model,
       Pageable pageable) {
-    log.info("[{}][START] args={}");
     // @validエラー処理
     if (bindingResult.hasErrors()) {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
@@ -93,7 +88,6 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
-      log.info("[{}][END] result={}");
       return "category-management";
     }
 
@@ -101,13 +95,11 @@ public class CategoryController {
     // カテゴリー名重複チェック
     String url = handleDuplicateStatus(resultDto, principal, pageable, model);
     if (resultDto.getDuplicateStatus() != DuplicateStatus.NONE) {
-      log.info("[{}][END] result={}");
       return url;
     }
     // 通常処理
     message.addFlashAttribute("message", "新しいカテゴリーを作成しました。");
     message.addFlashAttribute("messageType", "success");
-    log.info("[{}][END] result={}");
     return "redirect:/categories";
   }
 
@@ -119,7 +111,6 @@ public class CategoryController {
       RedirectAttributes message,
       Model model,
       @PageableDefault(size = 10) Pageable pageable) {
-    log.info("[{}][START] args={}");
     // @validエラー処理
     if (bindingResult.hasErrors()) {
       CategoryViewDto viewDto = categoryService.showCategoryManagement(principal, pageable);
@@ -127,21 +118,18 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "必須項目が入力されていません。");
       model.addAttribute("messageType", "error");
-      log.info("[{}][END] result={}");
       return "category-management";
     }
     CategoryFormDto resultDto = categoryService.updateCategory(formDto, principal);
     // カテゴリー名重複チェック
     String url = handleDuplicateStatus(resultDto, principal, pageable, model);
     if (resultDto.getDuplicateStatus() != DuplicateStatus.NONE) {
-      log.info("[{}][END] result={}");
       return url;
     }
     // 通常処理
     message.addFlashAttribute(
         "message", "カテゴリーを更新しました。");
     message.addFlashAttribute("messageType", "success");
-    log.info("[{}][END] result={}");
     return "redirect:/categories";
   }
 
@@ -150,12 +138,10 @@ public class CategoryController {
       Principal principal,
       @PathVariable Long categoryId,
       RedirectAttributes message) {
-    log.info("[{}][START] args={}");
     categoryService.deactivateCategory(principal, categoryId);
     message.addFlashAttribute(
         "message", "選択カテゴリーを使用停止にしました。");
     message.addFlashAttribute("messageType", "success");
-    log.info("[{}][END] result={}");
     return "redirect:/categories";
   }
 
@@ -164,23 +150,19 @@ public class CategoryController {
       Principal principal,
       @PathVariable Long categoryId,
       RedirectAttributes message) {
-    log.info("[{}][START] args={}");
     categoryService.activateCategory(principal, categoryId);
     message.addFlashAttribute(
         "message", "選択カテゴリーを有効にしました。");
     message.addFlashAttribute("messageType", "success");
-    log.info("[{}][END] result={}");
     return "redirect:/categories";
   }
 
   public void getAllCategories() {
     // 停止中もすべて取得 adminのみ実行可
-    log.info("[{}][START] args={}");
   }
 
   public void getAllActiveCategories() {
     // adminのみ実行可
-    log.info("[{}][START] args={}");
   }
 
   // ===================================================
@@ -198,7 +180,6 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("message", "同名カテゴリの使用中カテゴリがあります。別の名前を使用してください。");
       model.addAttribute("messageType", "error");
-      log.info("[{}][END] result={}");
       return "category-management";
     }
     if (resultDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
@@ -207,10 +188,8 @@ public class CategoryController {
       model.addAttribute("viewDto", viewDto);
       model.addAttribute("duplicate", true);
       model.addAttribute("duplicateMessage", "入力されたカテゴリー名は既に存在しています。この名前で新規作成しますか？");
-      log.info("[{}][END] result={}");
       return "category-management";
     }
-    log.info("[{}][END] result={}");
     return "category-management";
   }
 

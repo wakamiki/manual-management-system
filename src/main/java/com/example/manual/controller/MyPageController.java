@@ -33,10 +33,8 @@ public class MyPageController {
   public String showMyPage(
       Principal principal,
       Model model) {
-    log.info("[{}][START] args={}");
     MyPageDto myPageDto = myPageService.showMyPage(principal);
     model.addAttribute("myPageDto", myPageDto);
-    log.info("[{}][END] result={}");
     return "my-page";
 
   }

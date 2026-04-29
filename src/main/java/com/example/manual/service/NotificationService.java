@@ -43,7 +43,6 @@ public class NotificationService {
     public void createSubmitNotifications(Principal principal, Manual manual) {
 
         User user = userService.getUserByPrincipal(principal);
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!canCreateSubmitNotifications(principal)) {
             throw new UnauthorizedException("判定エラー");
         }
@@ -56,9 +55,7 @@ public class NotificationService {
             notification.setManual(manual);
             notification.setType(NotificationType.PENDING_APPROVAL);
             notification.markCreatedNow();
-            log.info("[{}][{}][PERSIST][START] action={} id={}");
             notificationRepository.save(notification);
-            log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
     }
 
@@ -73,13 +70,8 @@ public class NotificationService {
         notification.setManual(manual);
         notification.setType(NotificationType.ROLLBACK);
         notification.markCreatedNow();
-        log.info("[{}][{}][PERSIST][START] action={} id={}");
         notificationRepository.save(notification);
-        log.info("[{}][{}][PERSIST][DONE] action={} id={}");
     }
-
-    // public void createApproveNotification(Manual manual){}
-    // 承認完了時に作成者へ通知を作成する。 余裕があれば実装
 
     // ========================================================
     // 通知削除
@@ -152,7 +144,6 @@ public class NotificationService {
                 NotificationType.PENDING_APPROVAL,
                 ManualStatus.PENDING,
                 playUser);
-        log.info("[{}][FETCH]");
         int notificationCount = Math.toIntExact(count);
         return notificationCount;
     }
@@ -163,7 +154,6 @@ public class NotificationService {
     private boolean isActiveUser(Principal principal) {
 
         User user = userService.getUserByPrincipal(principal);
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!user.isActive()) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -173,11 +163,9 @@ public class NotificationService {
     private boolean canCreateSubmitNotifications(Principal principal) {
 
         User user = userService.getUserByPrincipal(principal);
-        log.info("[{}][PERMISSION][START] rule={}");
         if (user.getRole() == UserRole.GUEST) {
             throw new InvalidStateException("権限が不足しています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActiveUser(principal)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }

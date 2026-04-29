@@ -45,7 +45,6 @@ public class ManualHistoryService {
     User changedByUser = userService.getUserByPrincipal(principal);
     history.setChangedByUser(changedByUser);
     history.setManual(manual);
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
     return historyRepository.save(history);
   }
 
@@ -84,7 +83,6 @@ public class ManualHistoryService {
       Long manualId) {
 
     List<ManualHistory> manualHistories = this.getManualIdHistory(manualId);
-    log.info("[{}][FETCH]");
     List<ManualDetailHistoryDto> historyDetailDtoList = new ArrayList<>();
     for (ManualHistory history : manualHistories) {
       ManualDetailHistoryDto historyDetailDto = new ManualDetailHistoryDto();

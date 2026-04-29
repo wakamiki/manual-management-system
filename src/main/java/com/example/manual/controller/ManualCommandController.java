@@ -54,13 +54,11 @@ public class ManualCommandController {
                         Principal principal,
                         RedirectAttributes message,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnDraftManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -70,7 +68,6 @@ public class ManualCommandController {
                         String url = returnDraftManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -78,7 +75,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/create";
         }
 
@@ -90,13 +86,11 @@ public class ManualCommandController {
                         Principal principal,
                         RedirectAttributes message,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnPendingManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -106,7 +100,6 @@ public class ManualCommandController {
                         String url = returnPendingManualCreateWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -114,7 +107,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/create";
         }
 
@@ -127,13 +119,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -146,7 +136,6 @@ public class ManualCommandController {
                         String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -155,7 +144,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/actions/copy";
         }
 
@@ -168,13 +156,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -187,7 +173,6 @@ public class ManualCommandController {
                         String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 message.addFlashAttribute(
@@ -195,7 +180,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/actions/copy";
         }
 
@@ -208,13 +192,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -227,7 +209,6 @@ public class ManualCommandController {
                         String url = returnDraftManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -236,7 +217,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -249,13 +229,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -268,7 +246,6 @@ public class ManualCommandController {
                         String url = returnPendingManualFormWithError(model, formDto, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -277,7 +254,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -292,14 +268,12 @@ public class ManualCommandController {
                         Principal principal,
                         RedirectAttributes message,
                         Model model) {
-                log.info("[{}][START] args={}");
                 try {
                         commandService.submitManual(manualId, principal);
                 } catch (UnauthorizedException | InvalidStateException | NotFoundException e) {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -308,7 +282,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -321,13 +294,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -340,7 +311,6 @@ public class ManualCommandController {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -349,7 +319,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -362,13 +331,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -381,7 +348,6 @@ public class ManualCommandController {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -390,7 +356,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -403,13 +368,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -421,7 +384,6 @@ public class ManualCommandController {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -430,7 +392,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -443,13 +404,11 @@ public class ManualCommandController {
                         RedirectAttributes message,
                         Principal principal,
                         Model model) {
-                log.info("[{}][START] args={}");
                 // @validエラー処理
                 if (bindingResult.hasErrors()) {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", "必須項目が入力されていません。");
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 既存処理
@@ -462,7 +421,6 @@ public class ManualCommandController {
                         String url = returnManualDetailWithError(model, manualId, principal);
                         model.addAttribute("message", e.getMessage());
                         model.addAttribute("messageType", "error");
-                        log.info("[{}][END] result={}");
                         return url;
                 }
                 // 成功処理
@@ -471,7 +429,6 @@ public class ManualCommandController {
                 message.addFlashAttribute("messageType", "success");
                 message.addFlashAttribute("manualListNeedsRefresh", true);
                 message.addFlashAttribute("myPageNeedsRefresh", true);
-                log.info("[{}][END] result={}");
                 return "redirect:/manuals/{manualId}/detail";
         }
 
@@ -486,7 +443,6 @@ public class ManualCommandController {
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
-                log.info("[{}][END] result={}");
                 return "manual-create";
         }
 
@@ -497,7 +453,6 @@ public class ManualCommandController {
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
-                log.info("[{}][END] result={}");
                 return "manual-create";
         }
 
@@ -509,7 +464,6 @@ public class ManualCommandController {
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
-                log.info("[{}][END] result={}");
                 return "manual-form";
         }
 
@@ -521,7 +475,6 @@ public class ManualCommandController {
                 model.addAttribute("formDto", formDto);
                 List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
                 model.addAttribute("categoryDto", categoryDto);
-                log.info("[{}][END] result={}");
                 return "manual-form";
         }
 
@@ -532,7 +485,6 @@ public class ManualCommandController {
                 ManualDetailDto detailDto = queryService.goToDetailPage(manualId, principal);
                 model.addAttribute("detailDto", detailDto);
 
-                log.info("[{}][END] result={}");
                 return "manual-detail";
         }
 

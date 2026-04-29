@@ -59,11 +59,9 @@ public class CategoryService {
       Principal principal, Pageable pageable) {
 
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!canShowCategoryManagement(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     Page<Category> categories = categoryRepository.findAllByOrderByDisplayOrderAsc(pageable);
     CategoryViewDto categoryDto = toCategoryViewDto(playUser, categories);
 
@@ -73,11 +71,9 @@ public class CategoryService {
   public CategoryViewDto showCategoryUpdateMode(
       Principal principal, Long categoryId, Pageable pageable) {
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!canShowCategoryUpdateMode(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     CategoryViewDto viewDto = showCategoryManagement(principal, pageable);
     viewDto.setMode(ViewMode.EDIT);
 
@@ -94,17 +90,13 @@ public class CategoryService {
       Principal principal) {
 
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!canCreateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     formDto = handleDuplicateOnCreate(formDto, principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getDuplicateStatus() == DuplicateStatus.ACTIVE_DUPLICATE) {
       return formDto;
     } else
-      log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
       return formDto;
     }
@@ -117,9 +109,9 @@ public class CategoryService {
     category.markCreatedNow();
     category.markUpdatedNow();
     category.markActive();
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
-    categoryRepository.save(category);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
+    Category savedCategory = categoryRepository.save(category);
+    log.debug("Category created: id={}, name={}, displayOrder={}",
+        savedCategory.getId(), savedCategory.getCategoryName(), savedCategory.getDisplayOrder());
     return formDto;
   }
 
@@ -129,17 +121,13 @@ public class CategoryService {
       Principal principal) {
 
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!canUpdateCategory(formDto, playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     formDto = handleDuplicateOnCreate(formDto, principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getDuplicateStatus() == DuplicateStatus.ACTIVE_DUPLICATE) {
       return formDto;
     } else
-      log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getDuplicateStatus() == DuplicateStatus.INACTIVE_DUPLICATE) {
       return formDto;
     }
@@ -148,53 +136,43 @@ public class CategoryService {
     Category category = findCategoryOrThrow(formDto.getId());
     int currentOrder = category.getDisplayOrder();
     int targetOrder = formDto.getDisplayOrder();
-    log.info("[{}][PERMISSION][START] rule={}");
     if (targetOrder < currentOrder) {
       shiftUpOrderNumbers(targetOrder, currentOrder - 1);
     } else if (targetOrder > currentOrder) {
       shiftDownOrderNumbers(currentOrder + 1, targetOrder);
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
 
     category.setCategoryName(formDto.getCategoryName());
     category.setDisplayOrder(targetOrder);
     category.markUpdatedNow();
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
-    categoryRepository.save(category);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
+    Category savedCategory = categoryRepository.save(category);
+    log.debug("Category updated: id={}, name={}, displayOrder={}",
+        savedCategory.getId(), savedCategory.getCategoryName(), savedCategory.getDisplayOrder());
     return formDto;
   }
 
   public void deactivateCategory(Principal principal, Long categoryId) {
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!isAdmin(principal)) {
       throw new UnauthorizedException("権限が不足しています。");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     Category category = getCategoryById(categoryId);
 
     category.markInactive();
     category.markUpdatedNow();
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
     categoryRepository.save(category);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
 
   }
 
   public void activateCategory(Principal principal, Long categoryId) {
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!isAdmin(principal)) {
       throw new UnauthorizedException("権限が不足しています。");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     Category category = getCategoryById(categoryId);
     category.markActive();
     category.markUpdatedNow();
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
     categoryRepository.save(category);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
 
   }
 
@@ -203,19 +181,15 @@ public class CategoryService {
   // ===============================================
 
   public Page<Category> getAllCategories(Pageable pageable) {
-    log.info("[{}][FETCH]");
     return categoryRepository.findAllByOrderByCategoryNameAsc(pageable);
   }
 
   public Category getCategoryById(Long categoryId) {
 
     Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-    log.info("[{}][FETCH]");
-    log.info("[{}][PERMISSION][START] rule={}");
     if (categoryOpt.isEmpty()) {
       throw new NotFoundException("指定されたカテゴリーは存在しません");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     return categoryOpt.get();
   }
 
@@ -223,7 +197,6 @@ public class CategoryService {
   public List<CategoryResponseDto> getActiveCategoryDtos() {
 
     List<Category> activeCategories = categoryRepository.findByIsActiveTrueOrderByDisplayOrderAsc();
-    log.info("[{}][FETCH]");
     List<CategoryResponseDto> activeCategoriesDto = new ArrayList<>();
     for (Category category : activeCategories) {
       CategoryResponseDto activeCategoryDto = new CategoryResponseDto();
@@ -238,7 +211,6 @@ public class CategoryService {
   public List<CategoryResponseDto> getInactiveCategoryDtos() {
 
     List<Category> inactiveCategories = categoryRepository.findByIsActiveFalseOrderByDisplayOrderAsc();
-    log.info("[{}][FETCH]");
     List<CategoryResponseDto> inactiveCategoriesDto = new ArrayList<>();
     for (Category category : inactiveCategories) {
       CategoryResponseDto inactiveCategoryDto = new CategoryResponseDto();
@@ -253,81 +225,61 @@ public class CategoryService {
   private void shiftDownOrderNumbers(Integer start, Integer endInclusive) {
     // new を挿入するために範囲をずらす
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (start == null) {
       return;
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     Integer end = endInclusive;
-    log.info("[{}][PERMISSION][START] rule={}");
     if (end == null) {
       Optional<Category> categoryOpt = categoryRepository.findTopByOrderByDisplayOrderDesc();
-      log.info("[{}][PERMISSION][START] rule={}");
       if (categoryOpt.isEmpty()) {
         throw new NotFoundException("カテゴリ最大値が取得できませんでした。");
       }
-      log.info("[{}][PERMISSION][PASS] rule={}");
       Integer categoryEnd = categoryOpt.get().getDisplayOrder();
       end = categoryEnd;
     }
-    log.info("[{}][PERMISSION][START] rule={}");
     if (end < start) {
       return;
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     List<Category> targets = categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
         start, end);
 
     for (Category target : targets) {
       target.setDisplayOrder(target.getDisplayOrder() - 1);
     }
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
     categoryRepository.saveAll(targets);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
   }
 
   // displayオーダー割り込み
   private void shiftUpOrderNumbers(Integer start, Integer end) {
     // new を挿入するために範囲をずらす
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (start == null) {
       return;
     }
-    log.info("[{}][PERMISSION][START] rule={}");
     if (end == null) {
       Optional<Category> categoryOpt = categoryRepository.findTopByOrderByDisplayOrderDesc();
-      log.info("[{}][PERMISSION][START] rule={}");
       if (categoryOpt.isEmpty()) {
         return;
       }
       end = categoryOpt.get().getDisplayOrder();
     }
-    log.info("[{}][PERMISSION][START] rule={}");
     if (end < start) {
       return;
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     List<Category> targets = categoryRepository.findByDisplayOrderBetweenOrderByDisplayOrderAsc(
         start, end);
 
     for (Category target : targets) {
       target.setDisplayOrder(target.getDisplayOrder() + 1);
     }
-    log.info("[{}][{}][PERSIST][START] action={} id={}");
     categoryRepository.saveAll(targets);
-    log.info("[{}][{}][PERSIST][DONE] action={} id={}");
   }
 
   public Category findInactiveCategoryByName(CategoryFormDto formDto) {
-    log.info("[{}][PERMISSION][START] rule={}");
-    log.info("[{}][RULE] check={}", formDto.getId());
     if (formDto.getId() == null) {
       // 新規作成時
       Optional<Category> categoryOpt = categoryRepository
           .findByCategoryNameAndIsActiveFalse(formDto.getCategoryName());
-      log.info("[{}][FETCH]");
-      log.info("[{}][PERMISSION][START] rule={}");
       if (categoryOpt.isEmpty()) {
         throw new InvalidStateException("取得カテゴリがありません。");
       }
@@ -336,8 +288,6 @@ public class CategoryService {
     // 変更時
     Optional<Category> categoryOpt = categoryRepository
         .findByCategoryNameAndIsActiveFalseAndIdNot(formDto.getCategoryName(), formDto.getId());
-    log.info("[{}][FETCH]");
-    log.info("[{}][PERMISSION][START] rule={}");
     if (categoryOpt.isEmpty()) {
       throw new InvalidStateException("取得カテゴリがありません。");
     }
@@ -385,7 +335,6 @@ public class CategoryService {
     User playUser = userService.getUserByPrincipal(principal);
     UserResponseDto userDto = userService.toCreatedUserDto(playUser);
     viewDto.setPlayUser(userDto);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.getId() == null) {
       viewDto.setMode(ViewMode.CREATE);
     } else {
@@ -420,7 +369,6 @@ public class CategoryService {
 
   // カテゴリー名重複チェック
   public boolean existsActiveCategoryByName(CategoryFormDto formDto) {
-    log.info("[{}][RULE] check={}", formDto.getId());
     if (formDto.getId() == null) {
       // 新規作成時
       return categoryRepository.existsByCategoryNameAndIsActiveTrue(formDto.getCategoryName());
@@ -430,7 +378,6 @@ public class CategoryService {
   }
 
   public boolean existsInactiveCategoryByName(CategoryFormDto formDto) {
-    log.info("[{}][RULE] check={}", formDto.getId());
     if (formDto.getId() == null) {
       // 新規作成時
       return categoryRepository.existsByCategoryNameAndIsActiveFalse(formDto.getCategoryName());
@@ -502,17 +449,13 @@ public class CategoryService {
   private Category findCategoryOrThrow(Long categoryId) {
 
     Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
-    log.info("[{}][FETCH]");
-    log.info("[{}][PERMISSION][START] rule={}");
     if (categoryOpt.isEmpty()) {
       throw new NotFoundException("カテゴリが見つかりません。");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     return categoryOpt.get();
   }
 
   public String getActiveLabel(boolean isActive) {
-    log.info("[{}][PERMISSION][START] rule={}");
     if (isActive) {
 
       return "使用中";
@@ -521,28 +464,33 @@ public class CategoryService {
   }
 
   private CategoryFormDto handleDuplicateOnCreate(CategoryFormDto formDto, Principal principal) {
-    log.info("[{}][PERMISSION][START] rule={}");
     if (formDto.isConfirmed()) {
       // カテゴリー名重複了承 チェック回避処理
       Category category = findInactiveCategoryByName(formDto);
+      log.debug("Duplicate confirmed: name={}, inactiveCategoryId={}",
+          formDto.getCategoryName(), category.getId());
       manualArchiveService.archiveManualsByInactiveDuplicateCategory(category, principal);
       formDto.setDuplicateStatus(DuplicateStatus.NONE);
       return formDto;
     }
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (existsActiveCategoryByName(formDto)) {
       // カテゴリー名重複チェックactive
       formDto.setDuplicateStatus(DuplicateStatus.ACTIVE_DUPLICATE);
+      log.debug("Duplicate detected (active): name={}, mode={}",
+          formDto.getCategoryName(), formDto.getId() == null ? "CREATE" : "UPDATE");
       return formDto;
     }
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (existsInactiveCategoryByName(formDto)) {
       // カテゴリー名重複チェックinactive
       formDto.setDuplicateStatus(DuplicateStatus.INACTIVE_DUPLICATE);
+      log.debug("Duplicate detected (inactive): name={}, mode={}",
+          formDto.getCategoryName(), formDto.getId() == null ? "CREATE" : "UPDATE");
       return formDto;
     }
+    log.debug("No duplicate detected: name={}, mode={}",
+        formDto.getCategoryName(), formDto.getId() == null ? "CREATE" : "UPDATE");
     return formDto;
   }
 }

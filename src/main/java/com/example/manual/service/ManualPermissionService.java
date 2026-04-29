@@ -32,11 +32,9 @@ public class ManualPermissionService {
     // ============================
 
     public boolean canRestore(User playUser, Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusArchived(manual)) {
             return false;
         }
@@ -44,11 +42,9 @@ public class ManualPermissionService {
     }
 
     public boolean canCopy(Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!manual.getCategory().isActive()) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual) &&
                 !isStatusApproved(manual) &&
                 !isStatusArchived(manual)) {
@@ -58,16 +54,13 @@ public class ManualPermissionService {
     }
 
     public boolean canApprove(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             return false;
         }
         // 作成者じゃない時のみOK
-        log.info("[{}][PERMISSION][START] rule={}");
         if (isOwner(manual.getCreatedByUser(), playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual)) {
             return false;
         }
@@ -75,15 +68,12 @@ public class ManualPermissionService {
     }
 
     public boolean canRollback(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (isOwner(manual.getCreatedByUser(), playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual)) {
             return false;
         }
@@ -91,11 +81,9 @@ public class ManualPermissionService {
     }
 
     public boolean PublishDtaftManual(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusDraft(manual)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             return false;
         }
@@ -103,11 +91,9 @@ public class ManualPermissionService {
     }
 
     public boolean canEditManual(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusDraft(manual) &&
                 !isStatusPending(manual)) {
             return false;
@@ -116,15 +102,12 @@ public class ManualPermissionService {
     }
 
     public boolean canArchive(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusApproved(manual) && !isStatusPending(manual) && !isStatusDraft(manual)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(manual.getTitle(), manual.getContent())) {
             return false;
         }
@@ -132,15 +115,12 @@ public class ManualPermissionService {
     }
 
     public boolean canPending(Manual manual, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusDraft(manual)) {
             return false;
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(manual.getTitle(), manual.getContent())) {
             return false;
         }
@@ -154,7 +134,6 @@ public class ManualPermissionService {
     public boolean canGoToDetailPage(User playUser) {
 
         // アクティブユーザー
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -164,7 +143,6 @@ public class ManualPermissionService {
     public boolean canGoToCopyPage(User playUser) {
 
         // アクティブユーザー
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -174,7 +152,6 @@ public class ManualPermissionService {
     public boolean canFindManualsBySearch(User playUser) {
 
         // アクティブユーザー
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -186,22 +163,18 @@ public class ManualPermissionService {
             Manual manual) {
 
         Category category = categoryService.getCategoryById(manual.getCategory().getId());
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "使用中カテゴリでのみ復帰が出来ます。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual) &&
                 !isStatusDraft(manual)) {
             throw new InvalidStateException(
                     "編集ができるのはステータス:DRAFT/PENDINGのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "編集ができるのは自分が作成したマニュアルだけです。");
@@ -211,7 +184,6 @@ public class ManualPermissionService {
 
     public boolean canGoToNewCreatePage(User playUser) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
@@ -224,21 +196,17 @@ public class ManualPermissionService {
             Category category,
             String changeNote) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusDraft(manual) &&
                 !isStatusPending(manual) &&
                 !isStatusApproved(manual)) {
             throw new InvalidStateException("マニュアルのステータスが条件を満たしていません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新期歴は必須です。");
         }
@@ -251,25 +219,20 @@ public class ManualPermissionService {
             Category category,
             User playUser) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual)) {
             throw new InvalidStateException(
                     "承認ができるのはステータス:PENDINGのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアルの承認をすることは出来ません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!category.isActive()) {
             throw new InvalidStateException(
                     "有効でないカテゴリーでは承認することが出来ません。");
@@ -282,25 +245,20 @@ public class ManualPermissionService {
             User playUser,
             String changeNote) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual)) {
             throw new InvalidStateException(
                     "差し戻しができるのはステータス:PENDINGのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアルを差し戻しすることは出来ません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新期歴は必須です。");
         }
@@ -312,25 +270,20 @@ public class ManualPermissionService {
             User playUser,
             String changeNote) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isApproverOrAdmin(playUser)) {
             throw new UnauthorizedException("権限が不足しています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusArchived(manual)) {
             throw new InvalidStateException(
                     "復帰ができるのはステータス:ARCHIVEDのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new InvalidStateException(
                     "使用中カテゴリでのみ復帰が出来ます。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新履歴は必須です。");
         }
@@ -342,11 +295,9 @@ public class ManualPermissionService {
             Manual manual,
             Category category) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "選択できるのは使用中カテゴリのみです。");
@@ -362,16 +313,13 @@ public class ManualPermissionService {
             Category category,
             ManualEditFormDto formDto) {
 
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "使用停止中のカテゴリーが選択されています。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(formDto.getTitle(), formDto.getContent())) {
             throw new InvalidStateException("必須項目が入力されていません。");
         }
@@ -388,22 +336,18 @@ public class ManualPermissionService {
             Manual originalManual) {
 
         // アクティブユーザー アクティブカテゴリー チェンジノート必須
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (originalManual.getStatus() == ManualStatus.DRAFT) {
             throw new InvalidStateException(
                     "ステータスがDRAFTのマニュアルは複製できません。");
 
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新履歴は必須です。");
         }
@@ -421,26 +365,21 @@ public class ManualPermissionService {
             Manual originalManual) {
 
         // アクティブユーザー アクティブカテゴリー チェンジノート必須 タイトル・コンテンツ必須
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (originalManual.getStatus() == ManualStatus.DRAFT) {
             throw new InvalidStateException(
                     "ステータスがDRAFTのマニュアルは複製できません。");
 
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isChangeNote(changeNote)) {
             throw new InvalidStateException("更新履歴は必須です。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(title, content)) {
             throw new InvalidStateException("タイトル・本文は必須です。");
         }
@@ -456,26 +395,21 @@ public class ManualPermissionService {
 
         // アクティブユーザー ステータスドラフト・ペンディングのみ 作成者のみ編集可 アクティブカテゴリ
         Category category = categoryService.getCategoryById(manual.getCategory().getId());
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual) && !isStatusDraft(manual)) {
             throw new InvalidStateException(
                     "編集ができるのはステータス:DRAFT/PENDINGのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアル以外を編集することはできません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isTitleAndContent(formDto.getTitle(), formDto.getContent())) {
             throw new InvalidStateException(
                     "タイトルと本文は必須項目です。");
@@ -492,21 +426,17 @@ public class ManualPermissionService {
 
         // アクティブユーザー ステータスドラフト・ペンディングのみ 作成者のみ編集可 アクティブカテゴリ
         Category category = categoryService.getCategoryById(manual.getCategory().getId());
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isActive(playUser)) {
             throw new UnauthorizedException("有効なユーザーではありません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isCategoryActivate(category)) {
             throw new InvalidStateException(
                     "停止中カテゴリにマニュアルは作成できません。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isStatusPending(manual) && !isStatusDraft(manual)) {
             throw new InvalidStateException(
                     "編集ができるのはステータス:DRAFT/PENDINGのマニュアルのみです。");
         }
-        log.info("[{}][PERMISSION][START] rule={}");
         if (!isOwner(manual.getCreatedByUser(), playUser)) {
             throw new InvalidStateException(
                     "自分が作成したマニュアル以外を編集することはできません。");
@@ -522,7 +452,6 @@ public class ManualPermissionService {
     // ============================
 
     private boolean isActive(User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (playUser.isActive()) {
             return true;
         }
@@ -530,7 +459,6 @@ public class ManualPermissionService {
     }
 
     private boolean isUserActive(User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (playUser.isActive() == true) {
             return true;
         }
@@ -538,7 +466,6 @@ public class ManualPermissionService {
     }
 
     private boolean isOwner(User createdUser, User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (Objects.equals(createdUser.getId(), playUser.getId())) {
             return true;
         }
@@ -546,7 +473,6 @@ public class ManualPermissionService {
     }
 
     private boolean isApproverOrAdmin(User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (playUser.getRole() == UserRole.ADMIN ||
                 playUser.getRole() == UserRole.APPROVER) {
             return true;
@@ -555,7 +481,6 @@ public class ManualPermissionService {
     }
 
     private boolean isStatusDraft(Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (manual.getStatus() == ManualStatus.DRAFT) {
             return true;
         }
@@ -563,7 +488,6 @@ public class ManualPermissionService {
     }
 
     private boolean isStatusPending(Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (manual.getStatus() == ManualStatus.PENDING) {
             return true;
         }
@@ -571,7 +495,6 @@ public class ManualPermissionService {
     }
 
     private boolean isStatusApproved(Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (manual.getStatus() == ManualStatus.APPROVED) {
             return true;
         }
@@ -579,7 +502,6 @@ public class ManualPermissionService {
     }
 
     private boolean isStatusArchived(Manual manual) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (manual.getStatus() == ManualStatus.ARCHIVED) {
             return true;
         }
@@ -587,7 +509,6 @@ public class ManualPermissionService {
     }
 
     private boolean isCategoryActivate(Category category) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (category.isActive()) {
             return true;
         }
@@ -595,7 +516,6 @@ public class ManualPermissionService {
     }
 
     private boolean isChangeNote(String changeNote) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (changeNote == null || changeNote.isBlank()) {
             return false;
         }
@@ -603,7 +523,6 @@ public class ManualPermissionService {
     }
 
     private boolean isTitleAndContent(String title, String content) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (title == null ||
                 content == null ||
                 title.isBlank() ||
@@ -614,7 +533,6 @@ public class ManualPermissionService {
     }
 
     public boolean isGuest(User playUser) {
-        log.info("[{}][PERMISSION][START] rule={}");
         if (playUser.getRole() == UserRole.GUEST) {
             return true;
         }

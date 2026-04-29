@@ -26,9 +26,7 @@ public class UserOperationHistoryService {
                 operationHistory.markCreateUser();
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーを新規作成しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         public void recordUpdateUser(
@@ -38,9 +36,7 @@ public class UserOperationHistoryService {
                 operationHistory.markUpdateUser();
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーを更新しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         public void recordDeactiveteUser(
@@ -50,9 +46,7 @@ public class UserOperationHistoryService {
                 operationHistory.markDeactiveteUser();
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーを停止しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         public void recordActivateUser(
@@ -62,9 +56,7 @@ public class UserOperationHistoryService {
                 operationHistory.markActivateUser();
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーを復帰しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         public void recordResetPassword(
@@ -74,9 +66,7 @@ public class UserOperationHistoryService {
                 operationHistory.markResetPassword();
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーパスワードを初期化しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         public void recordChangePassword(
@@ -87,9 +77,7 @@ public class UserOperationHistoryService {
 
                 operationHistory.setOperationDetail(
                                 "ID: " + targetUser.getId() + "のユーザーのパスワードを変更しました。");
-                log.info("[{}][{}][PERSIST][START] action={} id={}");
                 operationRepository.save(operationHistory);
-                log.info("[{}][{}][PERSIST][DONE] action={} id={}");
         }
 
         // =======================================

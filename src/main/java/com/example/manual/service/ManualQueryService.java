@@ -95,11 +95,9 @@ public class ManualQueryService {
   public List<CategoryResponseDto> goToNewCreatePage(Principal principal) {
 
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToNewCreatePage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     List<CategoryResponseDto> categoryDto = categoryService.getActiveCategoryDtos();
     return categoryDto;
   }
@@ -112,12 +110,10 @@ public class ManualQueryService {
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToEditPage(
         playUser, manual)) {
       throw new UnauthorizedException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     FormMode mode = FormMode.edit;
     return toManualFormInputDto(manual, playUser, mode);
   }
@@ -129,11 +125,9 @@ public class ManualQueryService {
 
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToCopyPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     FormMode mode = FormMode.copy;
     return toManualFormInputDto(manual, playUser, mode);
   }
@@ -145,11 +139,9 @@ public class ManualQueryService {
 
     Manual manual = findManualOrThrow(manualId);
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canGoToDetailPage(playUser)) {
       throw new UnauthorizedException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     ManualDetailDto baseDetailDto = toManualDetailDto(manual);
     ManualDetailDto detailDto = buildDetailPermissions(manual, playUser, baseDetailDto);
 
@@ -167,28 +159,23 @@ public class ManualQueryService {
       Pageable pageable) {
 
     User targetUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!permission.canFindManualsBySearch(targetUser)) {
       throw new UnauthorizedException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
 
     Specification<Manual> specification = (root, query, cb) -> cb.conjunction();
 
     Specification<Manual> keywordSpec = ManualSpecification.containsKeyword(condition.getKeyword());
-    log.info("[{}][PERMISSION][START] rule={}");
     if (keywordSpec != null) {
       specification = specification.and(keywordSpec);
     }
 
     Specification<Manual> categorySpec = ManualSpecification.hasCategoryIds(condition.getCategoryIds());
-    log.info("[{}][PERMISSION][START] rule={}");
     if (categorySpec != null) {
       specification = specification.and(categorySpec);
     }
 
     Specification<Manual> statusSpec = ManualSpecification.hasStatuses(condition.getStatuses());
-    log.info("[{}][PERMISSION][START] rule={}");
     if (statusSpec != null) {
       specification = specification.and(statusSpec);
     }
@@ -213,7 +200,6 @@ public class ManualQueryService {
 
     List<Manual> rollbackList = manualRepository.findByIsRolledbackTrueAndCreatedByUserOrderByUpdatedAtDesc(
         user);
-    log.info("[{}][FETCH]");
 
     return rollbackList;
   }
@@ -223,7 +209,6 @@ public class ManualQueryService {
 
     List<Manual> pendingManualList = manualRepository.findByCreatedByUserNotAndStatusOrderByUpdatedAtDesc(
         user, ManualStatus.PENDING);
-    log.info("[{}][FETCH]");
     return pendingManualList;
   }
 
@@ -233,7 +218,6 @@ public class ManualQueryService {
     User targetUser = userService.getUserByPrincipal(principal);
     Page<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
         targetUser, pageable);
-    log.info("[{}][FETCH]");
     return manualList;
   }
 
@@ -242,7 +226,6 @@ public class ManualQueryService {
     User targetUser = userService.getUserByPrincipal(principal);
     List<Manual> manualList = manualRepository.findByCreatedByUserOrderByCreatedAtDesc(
         targetUser);
-    log.info("[{}][FETCH]");
     return manualList;
   }
 
@@ -252,7 +235,6 @@ public class ManualQueryService {
     User targetUser = userService.getUserByPrincipal(principal);
     Page<Manual> manualList = manualRepository.findByCreatedByUserAndStatusOrderByUpdatedAtDesc(
         targetUser, ManualStatus.PENDING, pageable);
-    log.info("[{}][FETCH]");
     return manualList;
   }
 
@@ -263,7 +245,6 @@ public class ManualQueryService {
         LocalDateTime.now().minusDays(7),
         ManualStatus.DRAFT,
         pageable);
-    log.info("[{}][FETCH]");
     return manualList;
   }
 
@@ -273,7 +254,6 @@ public class ManualQueryService {
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUserAndStatus(
         targetUser, ManualStatus.PENDING);
-    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -284,7 +264,6 @@ public class ManualQueryService {
     Long count = manualRepository.countByUpdatedAtAfterAndStatusNot(
         LocalDateTime.now().minusDays(7),
         ManualStatus.DRAFT);
-    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -296,7 +275,6 @@ public class ManualQueryService {
     Long count = manualRepository.countByCreatedByUserNotAndStatus(
         targetUser,
         ManualStatus.PENDING);
-    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -307,7 +285,6 @@ public class ManualQueryService {
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByIsRolledbackTrueAndCreatedByUser(
         targetUser);
-    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -317,7 +294,6 @@ public class ManualQueryService {
 
     User targetUser = userService.getUserByPrincipal(principal);
     Long count = manualRepository.countByCreatedByUser(targetUser);
-    log.info("[{}][FETCH]");
     int targetCount = Math.toIntExact(count);
     return targetCount;
   }
@@ -334,7 +310,6 @@ public class ManualQueryService {
     int countCreatedPendingManual = countCreatedPendingManual(principal);
     // count 最近更新（７日間）
     int countRecentWeeklyManual = countRecentWeeklyManuals();
-    log.info("[{}][FETCH]");
 
     IndexSummaryDto summaryDto = new IndexSummaryDto();
     summaryDto.setCountUserCreatedManual(countUserCreatedManual);
@@ -353,8 +328,6 @@ public class ManualQueryService {
   public Manual findManualOrThrow(Long id) {
 
     Optional<Manual> manualOpt = manualRepository.findById(id);
-    log.info("[{}][FETCH]");
-    log.info("[{}][PERMISSION][START] rule={}");
     if (manualOpt.isEmpty()) {
       throw new RuntimeException("");
     }
@@ -369,7 +342,6 @@ public class ManualQueryService {
       FormMode mode) {
 
     ManualEditFormDto formDto = new ManualEditFormDto();
-    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.GUEST) {
       formDto.setGuest(true);
     }
@@ -380,11 +352,9 @@ public class ManualQueryService {
     formDto.setContent(manual.getContent());
     formDto.setTitle(manual.getTitle());
     formDto.setMode(mode);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (mode == FormMode.copy) {
       formDto.setModeLabel("複製");
     } else
-      log.info("[{}][PERMISSION][START] rule={}");
     if (mode == FormMode.edit) {
       formDto.setModeLabel("編集");
     }
@@ -395,7 +365,6 @@ public class ManualQueryService {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
-      log.info("[{}][PERMISSION][START] rule={}");
       if (permission.canEditManual(manual, playUser)) {
         responseDto.setCanEdit(true);
       }
@@ -421,7 +390,6 @@ public class ManualQueryService {
     List<ManualResponseDto> responseDtos = new ArrayList<>();
     for (Manual manual : manualList) {
       ManualResponseDto responseDto = new ManualResponseDto();
-      log.info("[{}][PERMISSION][START] rule={}");
       if (permission.canEditManual(manual, playUser)) {
         responseDto.setCanEdit(true);
       }
@@ -522,7 +490,6 @@ public class ManualQueryService {
     ManualStatus status[] = ManualStatus.values();
     for (ManualStatus manualStatus : status) {
       ManualResponseDto defaultStatus = new ManualResponseDto();
-      log.info("[{}][PERMISSION][START] rule={}");
       if (manualStatus == ManualStatus.DRAFT) {
       } else {
         defaultStatus.setStatus(manualStatus);

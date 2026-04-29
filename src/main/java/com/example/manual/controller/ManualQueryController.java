@@ -53,7 +53,6 @@ public class ManualQueryController {
             Principal principal,
             @PageableDefault(size = 10) Pageable pageable,
             Model model) {
-        log.info("[{}][START] args={}");
         // 検索チェックボックスStatus初期設定（アーカイブ以外全選択）
         condition.setStatuses(defaultStatusCheck(condition));
         ManualIndexDto listDto = queryService.showIndex(
@@ -61,11 +60,7 @@ public class ManualQueryController {
                 queryService.findManualsBySearch(
                         condition, principal, pageable),
                 condition);
-        log.info("listDto null? {}", listDto == null);
-        log.info("activeCategories null? {}", listDto != null ? listDto.getActiveCategories() == null : null);
         model.addAttribute("listDto", listDto);
-        log.info("listDto added to model");
-        log.info("[{}][END] result={}");
         return "index";
 
     }
@@ -79,11 +74,9 @@ public class ManualQueryController {
             Model model,
             RedirectAttributes message,
             @PageableDefault(size = 10) Pageable pageable) {
-        log.info("[{}][START] args={}");
         Page<Manual> manuals = queryService.findMyCreatedManualsPage(principal, pageable);
         ManualIndexDto listDto = queryService.showIndex(principal, manuals, condition);
         model.addAttribute("listDto", listDto);
-        log.info("[{}][END] result={}");
         return "index";
     }
 
@@ -96,11 +89,9 @@ public class ManualQueryController {
             Model model,
             RedirectAttributes message,
             @PageableDefault(size = 10) Pageable pageable) {
-        log.info("[{}][START] args={}");
         Page<Manual> manuals = queryService.findMyPendingManuals(principal, pageable);
         ManualIndexDto listDto = queryService.showIndex(principal, manuals, condition);
         model.addAttribute("listDto", listDto);
-        log.info("[{}][END] result={}");
         return "index";
     }
 
@@ -113,11 +104,9 @@ public class ManualQueryController {
             Model model,
             RedirectAttributes message,
             @PageableDefault(size = 10) Pageable pageable) {
-        log.info("[{}][START] args={}");
         Page<Manual> manuals = queryService.findRecentlyUpdatedManuals(pageable);
         ManualIndexDto listDto = queryService.showIndex(principal, manuals, condition);
         model.addAttribute("listDto", listDto);
-        log.info("[{}][END] result={}");
         return "index";
     }
 
@@ -131,23 +120,19 @@ public class ManualQueryController {
             @PathVariable Long manualId,
             Principal principal,
             Model model) {
-        log.info("[{}][START] args={}");
         ManualDetailDto detailDto = queryService.goToDetailPage(
                 manualId, principal);
         model.addAttribute("detailDto", detailDto);
-        log.info("[{}][END] result={}");
         return "manual-detail";
     }
 
     // 新規作成（新規タブ）
     @GetMapping("/create")
     public String goToNewCreatePage(Principal principal, Model model) {
-        log.info("[{}][START] args={}");
         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
         ManualEditFormDto formDto = new ManualEditFormDto();
         model.addAttribute("categoryDto", categoryDto);
         model.addAttribute("formDto", formDto);
-        log.info("[{}][END] result={}");
         return "manual-create";
     }
 
@@ -157,7 +142,6 @@ public class ManualQueryController {
             @PathVariable Long manualId,
             Principal principal,
             Model model) {
-        log.info("[{}][START] args={}");
         ManualEditFormDto formDto = queryService.goToCopyPage(
                 manualId, principal);
         String pendingSubmit = "/manuals/" + manualId + "/actions/save-pending-copy";
@@ -169,7 +153,6 @@ public class ManualQueryController {
         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
         model.addAttribute("categoryDto", categoryDto);
 
-        log.info("[{}][END] result={}");
         return "manual-form";
     }
 
@@ -179,7 +162,6 @@ public class ManualQueryController {
             @PathVariable Long manualId,
             Principal principal,
             Model model) {
-        log.info("[{}][START] args={}");
         ManualEditFormDto formDto = queryService.goToEditPage(
                 manualId, principal);
         String pendingSubmit = "/manuals/" + manualId + "/actions/save-pending-edit";
@@ -189,7 +171,6 @@ public class ManualQueryController {
         model.addAttribute("formDto", formDto);
         List<CategoryResponseDto> categoryDto = queryService.goToNewCreatePage(principal);
         model.addAttribute("categoryDto", categoryDto);
-        log.info("[{}][END] result={}");
         return "manual-form";
     }
 
@@ -200,17 +181,14 @@ public class ManualQueryController {
     // 検索チェックボックス初期設定
     private List<ManualStatus> defaultStatusCheck(ManualSearchConditionDto condition) {
         List<ManualStatus> statuses = condition.getStatuses();
-        log.info("[{}][START] args={}");
         if (statuses != null && !statuses.isEmpty()) {
             List<ManualStatus> targetStatuses = new ArrayList<>(statuses);
             targetStatuses.remove(ManualStatus.DRAFT);
-            log.info("[{}][END] result={}");
             return targetStatuses;
         }
         List<ManualStatus> defaultStatuses = new ArrayList<>();
         defaultStatuses.add(ManualStatus.PENDING);
         defaultStatuses.add(ManualStatus.APPROVED);
-        log.info("[{}][END] result={}");
         return defaultStatuses;
     }
 

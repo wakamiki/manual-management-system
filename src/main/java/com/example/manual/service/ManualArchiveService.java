@@ -38,9 +38,7 @@ public class ManualArchiveService {
         for (Manual manual : manuals) {
             manual.archive();
             manual.markUpdatedNow();
-            log.info("[{}][{}][PERSIST][START] action={} id={}");
             manualRepository.save(manual);
-            log.info("[{}][{}][PERSIST][DONE] action={} id={}");
             String changeNote = "同名カテゴリー追加のためARCHIVE化:更新履歴自動生成";
             historyService.createHistory(manual, changeNote, principal);
         }

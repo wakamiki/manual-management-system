@@ -44,11 +44,9 @@ public class MyPageService {
   public MyPageDto showMyPage(Principal principal) {
 
     User playUser = userService.getUserByPrincipal(principal);
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!canShowMyPage(playUser)) {
       throw new InvalidStateException("判定エラー");
     }
-    log.info("[{}][PERMISSION][PASS] rule={}");
     MyPageDto myPageDto = new MyPageDto();
 
     List<Manual> myCreatedManuals = query.findMyCreatedManuals(principal);
@@ -59,7 +57,6 @@ public class MyPageService {
     List<ManualResponseDto> rollbackDtos = query.buildIndexWithManualsPage(createdRollbackManuals, playUser);
     myPageDto.setRollbackManualList(rollbackDtos);
 
-    log.info("[{}][PERMISSION][START] rule={}");
     if (playUser.getRole() == UserRole.APPROVER || playUser.getRole() == UserRole.ADMIN) {
       List<Manual> pendingManuals = query.findPendingManuals(playUser);
       List<ManualResponseDto> pendingDtos = query.buildIndexWithManualsPage(pendingManuals, playUser);
@@ -81,7 +78,6 @@ public class MyPageService {
   public boolean canShowMyPage(User user) {
 
     // 有効アカウント
-    log.info("[{}][PERMISSION][START] rule={}");
     if (!user.isActive()) {
       throw new UnauthorizedException("このアカウントは有効ではありません。");
     }
