@@ -1,7 +1,7 @@
 ﻿# 06_test-specification.md
 
-Version: 01.03.21
-更新日: 2026-04-29
+Version: 01.10.00
+更新日: 2026-04-30
 
 ---
 

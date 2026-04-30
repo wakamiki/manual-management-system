@@ -1,7 +1,7 @@
 ﻿# 02_system-specification-and-detailed-design.md
 
-Version: 01.06.18
-更新日: 2026-04-23
+Version: 01.10.00
+更新日: 2026-04-30
 
 ---
 

@@ -94,7 +94,7 @@
             </div>
             <div class="admin-form-actions">
               <button type="submit" class="btn btn-primary admin-button-primry"
-                th:if="${formDto != null or 'CREATE'.equals(viewDto.mode.name())}" th:formaction="@{/users/create}"
+                th:if="${formDto != null and viewDto.mode != null and 'CREATE'.equals(viewDto.mode.name())}" th:formaction="@{/users/create}"
                 th:disabled="${viewDto.canGuest}">新規作成</button>
               <button type="submit" class="btn btn-outline-primary"
                 th:if="${formDto != null and 'EDIT'.equals(viewDto.mode.name())}"

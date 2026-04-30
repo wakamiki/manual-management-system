@@ -1,7 +1,7 @@
 ﻿# 01_project-overview-and-basic-design.md
 
-Version: 01.03.04
-更新日: 2026-04-17
+Version: 01.10.00
+更新日: 2026-04-30
 
 ---
 

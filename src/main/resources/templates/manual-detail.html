@@ -229,12 +229,7 @@
 
       window.approveWithoutHistory = function () {
         getHistoryModal()?.hide();
-        form.querySelectorAll('input[name="changeNote"][type="hidden"]').forEach(el => el.remove());
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = 'changeNote';
-        hidden.value = '';
-        form.appendChild(hidden);
+        note.value = '';
         form.submit();
       };
     })();

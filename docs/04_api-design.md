@@ -1,6 +1,6 @@
 ﻿# 04_api-design.md
 
-Version: 01.03.23
+Version: 01.10.00
 更新日: 2026-04-30
 
 ---
