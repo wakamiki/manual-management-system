@@ -36,7 +36,8 @@ public class SecurityConfig {
                                                                 "/login",
                                                                 "/css/**",
                                                                 "/js/**",
-                                                                "/login/guest")
+                                                                "/login/guest",
+                                                                "/health")
                                                 .permitAll()
                                                 .anyRequest()
                                                 .authenticated())

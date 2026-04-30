@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "manualHistories")
+@Table(name = "manual_histories")
 public class ManualHistory {
 
   public ManualHistory() {
@@ -33,13 +33,15 @@ public class ManualHistory {
   @JoinColumn(name = "change_user_id")
   private User changedByUser;
 
-  //#region getter
+  // #region getter
   public Long getId() {
     return this.id;
   }
+
   public Manual getManual() {
     return this.manual;
   }
+
   public String getChangeNote() {
     return this.changeNote;
   }
@@ -48,13 +50,13 @@ public class ManualHistory {
     return this.changedAt;
   }
 
-  public User getChangedByUser(){
+  public User getChangedByUser() {
 
-    return  this.changedByUser;
+    return this.changedByUser;
   }
 
-  //#endregion
-  //#region setter
+  // #endregion
+  // #region setter
   public void setManual(Manual manual) {
     this.manual = manual;
   }
@@ -63,7 +65,7 @@ public class ManualHistory {
     this.changeNote = changeNote;
   }
 
-  public void setChangedByUser(User changedByUser){
+  public void setChangedByUser(User changedByUser) {
 
     this.changedByUser = changedByUser;
   }
@@ -71,5 +73,5 @@ public class ManualHistory {
   public void markChangedNow() {
     this.changedAt = LocalDateTime.now();
   }
-  //#endregion
+  // #endregion
 }

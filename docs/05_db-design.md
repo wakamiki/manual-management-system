@@ -33,12 +33,12 @@ Version: 01.03.05
 ```text
 categories               1 --- N manuals
 users                    1 --- N manuals
-manuals                  1 --- N manualHistories
-users                    1 --- N manualHistories
+manuals                  1 --- N manual_histories
+users                    1 --- N manual_histories
 users                    1 --- N user_operation_histories (target)
 users                    1 --- N user_operation_histories (operatedBy)
-users                    1 --- N Notifications (target)
-manuals                  1 --- N Notifications
+users                    1 --- N notifications (target)
+manuals                  1 --- N notifications
 ```
 
 ---
@@ -47,9 +47,9 @@ manuals                  1 --- N Notifications
 - categories
 - users
 - manuals
-- manualHistories
+- manual_histories
 - user_operation_histories
-- Notifications
+- notifications
 
 ---
 
@@ -105,7 +105,7 @@ manuals                  1 --- N Notifications
 
 ---
 
-## 7. manualHistories
+## 7. manual_histories
 
 | カラム名 | 型 | 制約 | 説明 |
 | --- | --- | --- | --- |
@@ -130,7 +130,7 @@ manuals                  1 --- N Notifications
 
 ---
 
-## 9. Notifications
+## 9. notifications
 
 | カラム名 | 型 | 制約 | 説明 |
 | --- | --- | --- | --- |
@@ -143,4 +143,4 @@ manuals                  1 --- N Notifications
 
 ### 9-1. 実装準拠メモ
 - 現在のEntityには `is_read` は未実装
-- テーブル名は `Notifications`（先頭大文字）を使用
+- テーブル名は `notifications` を使用

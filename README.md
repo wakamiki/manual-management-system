@@ -1,7 +1,7 @@
 ﻿# Manual Management System
 
-Version: 01.09.17
-更新日: 2026-04-29
+Version: 01.09.18
+更新日: 2026-04-30
 
 ## 概要
 日々更新される業務マニュアルを、現場で継続的に管理することを想定したポートフォリオ用システムです。
@@ -40,6 +40,16 @@ Version: 01.09.17
 - 接続先: `jdbc:h2:file:./data/testdb`
 - H2コンソール: `/h2-console`
 - Spring Security 導入済み
+
+## 本番環境（Render）
+- 本番DBは Render PostgreSQL を使用
+- アプリとDBは同一リージョン配置を推奨
+- 本番DB構築は手動SQL実行で管理（`ddl-auto=update` 任せにしない）
+- マイグレーションSQL:
+  - `docs/db-migration/V1__create_tables.sql`
+  - `docs/db-migration/V2__seed_initial_data.sql`
+- 実行手順:
+  - `docs/db-migration/README.md`
 
 ## セキュリティ構成
 - Spring Security を導入
@@ -134,6 +144,8 @@ Version: 01.09.17
     - エンドポイント一覧、DTO方針、例外/認可のAPI設計。
   - `docs/05_db-design.md`
     - テーブル定義、カラム制約、エンティティとの対応。
+  - `docs/db-migration/README.md`
+    - 本番DB初期構築（V1/V2）手順。
   - `docs/06_test-specification.md`
     - テスト観点・ケース定義・実施基準。
   - `docs/06_test-result.md`
@@ -183,6 +195,7 @@ Version: 01.09.17
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.09.18 | 2026-04-30 | 本番環境（Render PostgreSQL）運用方針とDBマイグレーション導線を追記 |
 | 01.09.17 | 2026-04-29 | ポートフォリオ資料導線（スライド/PDF予定）を追記 |
 | 01.09.16 | 2026-04-27 | Postman直POSTテスト運用とテスト反映方針を追記 |
 | 01.09.15 | 2026-04-27 | 環境変数一覧追加 |

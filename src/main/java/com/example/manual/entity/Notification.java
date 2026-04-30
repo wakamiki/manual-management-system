@@ -13,8 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 @Entity
-@Table(name = "Notifications")
+@Table(name = "notifications")
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,44 +34,51 @@ public class Notification {
 
     private LocalDateTime createdAt;
 
-    //getter
-    public Long getId(){
+    // getter
+    public Long getId() {
         return this.id;
     }
-    public User getTargetUser(){
+
+    public User getTargetUser() {
         return this.targetUser;
     }
-    public Manual getManual(){
+
+    public Manual getManual() {
         return this.manual;
     }
-    public NotificationType getType(){
+
+    public NotificationType getType() {
         return this.type;
     }
-    public String getMessage(){
+
+    public String getMessage() {
         return this.message;
     }
 
-    public LocalDateTime getCreatedAt(){
+    public LocalDateTime getCreatedAt() {
         return this.createdAt;
     }
 
-    //setter
+    // setter
 
-    public void setTargetUser(User targetUser){
+    public void setTargetUser(User targetUser) {
         this.targetUser = targetUser;
     }
-    public void setManual(Manual manual){
-        this.manual=manual;
-    }
-    public void setType(NotificationType type){
-        this.type=type;
-    }
-    public void setMessage(String message){
-        this.message=message;
-    }
-    public void markCreatedNow(){
-        this.createdAt = LocalDateTime.now();
+
+    public void setManual(Manual manual) {
+        this.manual = manual;
     }
 
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void markCreatedNow() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }
