@@ -1,6 +1,6 @@
 # DB Migration Guide (Render PostgreSQL)
 
-Version: 01.10.00  
+Version: 01.10.01  
 更新日: 2026-04-30
 
 ---
@@ -59,3 +59,12 @@ ORDER BY display_order;
 - `V1` は初回構築向け。既存環境で再実行すると制約追加で失敗する可能性がある。
 - 認証情報（DB URL / Password）はdocsに平文で残さない。
 - 初期管理者の平文パスワードは保存せず、必要時に再発行する。
+---
+
+## Production Apply Note (2026-04-30)
+- Applied to Render PostgreSQL (manual_management_prod)
+- Applied SQL files:
+  - `V1__create_tables.sql`
+  - `V2__seed_initial_data.sql`
+- Web URL:
+  - `https://manual-management-system-1.onrender.com`

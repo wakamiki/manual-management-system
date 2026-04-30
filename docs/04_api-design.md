@@ -1,7 +1,18 @@
 ﻿# 04_api-design.md
 
-Version: 01.10.00
+Version: 01.10.01
 更新日: 2026-04-30
+
+---
+
+## 0. 実行環境URL
+- ローカル: `http://localhost:8081`
+- 本番（Render）: `https://manual-management-system-1.onrender.com`
+
+### 0-1. 運用確認エンドポイント
+- GET `/health`
+  - 稼働確認用（200 / `OK`）
+  - 認証不要
 
 ---
 

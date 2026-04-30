@@ -1,6 +1,6 @@
 ﻿# Manual Management System
 
-Version: 01.10.00
+Version: 01.10.01
 更新日: 2026-04-30
 
 ## 概要
@@ -42,6 +42,7 @@ Version: 01.10.00
 - Spring Security 導入済み
 
 ## 本番環境（Render）
+- 公開URL: `https://manual-management-system-1.onrender.com`
 - 本番DBは Render PostgreSQL を使用
 - アプリとDBは同一リージョン配置を推奨
 - 本番DB構築は手動SQL実行で管理（`ddl-auto=update` 任せにしない）
@@ -120,11 +121,11 @@ Version: 01.10.00
 
 | 変数名 | 用途 | ローカル | 本番 |
 | --- | --- | --- | --- |
-| SPRING_PROFILES_ACTIVE | 実行プロファイル | local | prod |
-| PORT | Render起動ポート | 8080 | Renderが設定 |
-| DATABASE_URL | PostgreSQL接続URL | 不要 | 必須 |
-| DATABASE_USERNAME | DBユーザー名 | 不要 | 必須 |
-| DATABASE_PASSWORD | DBパスワード | 不要 | 必須 |
+| PORT | サーバ起動ポート（`server.port`） | 8081（省略時） | Renderが設定 |
+| SPRING_DATASOURCE_URL | DB接続URL（JDBC形式） | `jdbc:h2:file:./data/testdb`（省略時） | 必須 |
+| SPRING_DATASOURCE_DRIVER_CLASS_NAME | JDBCドライバ | `org.h2.Driver`（省略時） | `org.postgresql.Driver` |
+| SPRING_DATASOURCE_USERNAME | DBユーザー名 | `sa`（省略時） | 必須 |
+| SPRING_DATASOURCE_PASSWORD | DBパスワード | 空（省略時） | 必須 |
 | GUEST_LOGIN_ID | ゲストログインID | 任意 | 必須 |
 | GUEST_LOGIN_PASSWORD | ゲストログインPW | 任意 | 必須 |
 
@@ -152,6 +153,10 @@ Version: 01.10.00
     - 実施済みテスト結果、判定、補足メモ。
 
 ## 現在の開発状況
+- 本番公開
+  - Render へデプロイ済み
+  - 公開URL: `https://manual-management-system-1.onrender.com`
+  - Render PostgreSQL 接続で稼働中
 - 実装済み（主要機能）
   - 認証/認可（Spring Security、ロール別制御、GUEST閲覧専用）
   - マニュアル機能（作成/編集/複製/申請/承認/差し戻し/アーカイブ/復帰）
@@ -163,9 +168,9 @@ Version: 01.10.00
   - UIメッセージ導線（成功/失敗フラッシュ、資格情報通知）
   - テスト運用整備（`06_test-specification.md` / `06_test-result.md`）
 - 継続中
-  - DTO/Validationの追加整備（入力制約の見直し）
-  - ドキュメントと実装の最終整合確認
   - ポートフォリオ提出用資料（全体説明スライド、操作説明PDF）作成
+  - 公開環境の性能観測（Render要因/アプリ要因の切り分け）
+  - 運用向け最終ドキュメント整備（デモ手順・操作ガイド）
 
 ## テスト運用メモ（現行）
 - 直POST系は `Login_ユーザー` → `Get_CSRF` → 対象POST の順で実行
@@ -195,6 +200,7 @@ Version: 01.10.00
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.10.01 | 2026-04-30 | 公開URL追記、環境変数一覧を実装準拠へ修正、開発状況を本番公開後状態へ更新 |
 | 01.10.00 | 2026-04-30 | Render本番デプロイ成功に伴い本番運用状態へ更新 |
 | 01.09.18 | 2026-04-30 | 本番環境（Render PostgreSQL）運用方針とDBマイグレーション導線を追記 |
 | 01.09.17 | 2026-04-29 | ポートフォリオ資料導線（スライド/PDF予定）を追記 |

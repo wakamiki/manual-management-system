@@ -1,6 +1,6 @@
 ﻿# 01_project-overview-and-basic-design.md
 
-Version: 01.10.00
+Version: 01.10.01
 更新日: 2026-04-30
 
 ---
@@ -109,3 +109,11 @@ Manual Management System
 - 詳細仕様は `docs/02_system-specification-and-detailed-design.md` を参照
 - 画面仕様は `docs/03_screen-design.md` を参照
 - API 設計は `docs/04_api-design.md` を参照
+
+---
+
+## 8. 本番公開情報（2026-04-30）
+- 公開URL: `https://manual-management-system-1.onrender.com`
+- 本番アプリ基盤: Render Web Service
+- 本番DB: Render PostgreSQL
+- 本番DB構築: `docs/db-migration/V1__create_tables.sql` と `V2__seed_initial_data.sql` を手動適用
