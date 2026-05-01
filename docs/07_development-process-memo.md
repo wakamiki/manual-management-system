@@ -1,7 +1,32 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.10.00  
-更新日: 2026-04-30
+Version: 01.10.02  
+更新日: 2026-05-01
+
+---
+
+## 2026-05-01（セキュリティ強化）
+
+### 作業概要
+本番公開後のセキュリティ面を見直し、H2コンソール露出リスクの抑止とHTTPレスポンスヘッダ強化を実施した。
+
+### 実施内容
+- `application-local.yml` / `application-prod.yml` を追加し、環境別設定を分離
+  - `local`: H2コンソール有効
+  - `prod`: H2コンソール無効
+- `SecurityConfig` を修正
+  - `h2-console` の公開許可設定を除去
+  - セキュリティヘッダを追加
+    - `X-Content-Type-Options`
+    - `Referrer-Policy`
+    - `Permissions-Policy`
+    - `Strict-Transport-Security`
+    - `Content-Security-Policy`
+- SQLインジェクション観点の全件棚卸しを実施し、危険な生SQL実装がないことを確認
+
+### 学び・改善点
+- 本番運用を想定した設定は `application.yml` 直書きではなく profile 分離で管理する方が安全
+- セキュリティヘッダは「段階導入 + 画面動作確認」で進めると破壊的変更を避けやすい
 
 ---
 

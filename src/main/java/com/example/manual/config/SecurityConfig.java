@@ -9,12 +9,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-        // 部品系Bean
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
@@ -25,14 +26,12 @@ public class SecurityConfig {
                 return config.getAuthenticationManager();
         }
 
-        // 設定系Bean
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoginSuccessHandler successHandler)
                         throws Exception {
                 http
-                                // ログインなしで許可
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/h2-console/**",
+                                                .requestMatchers(
                                                                 "/login",
                                                                 "/css/**",
                                                                 "/js/**",
@@ -41,25 +40,32 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .anyRequest()
                                                 .authenticated())
-                                // ログイン遷移設定
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .successHandler(successHandler)
                                                 .failureUrl("/login?error")
                                                 .permitAll())
-                                // ログアウト設定
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/login?logout")
                                                 .invalidateHttpSession(true)
                                                 .deleteCookies("JSESSIONID")
                                                 .permitAll())
-                                // H2コンソールはCSRF対象外
-                                .csrf(csrf -> csrf
-                                                .ignoringRequestMatchers("/h2-console/**"))
-                                // H2コンソール表示用に frame を許可
                                 .headers(headers -> headers
-                                                .frameOptions(frame -> frame.sameOrigin()));
+                                                .frameOptions(frame -> frame.sameOrigin())
+                                                .contentTypeOptions(c -> {
+                                                })
+                                                .referrerPolicy(r -> r
+                                                                .policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                                                .addHeaderWriter(new StaticHeadersWriter("Permissions-Policy",
+                                                                "geolocation=(), camera=(), microphone=()"))
+                                                .addHeaderWriter(new StaticHeadersWriter("Strict-Transport-Security",
+                                                                "max-age=31536000"))
+                                                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                                                "default-src 'self'; "
+                                                                                + "style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; "
+                                                                                + "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
+                                                                                + "img-src 'self' data:; font-src 'self' data:; object-src 'none'; frame-ancestors 'self'")));
 
                 return http.build();
         }

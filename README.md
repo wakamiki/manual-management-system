@@ -1,7 +1,7 @@
 ﻿# Manual Management System
 
-Version: 01.10.01
-更新日: 2026-04-30
+Version: 01.10.02
+更新日: 2026-05-01
 
 ## 概要
 日々更新される業務マニュアルを、現場で継続的に管理することを想定したポートフォリオ用システムです。
@@ -54,7 +54,16 @@ Version: 01.10.01
 
 ## セキュリティ構成
 - Spring Security を導入
-- 開発時は H2 コンソールアクセスを許可
+- `local` / `prod` のプロファイル分離を導入
+  - `local`: H2 コンソール有効
+  - `prod`: H2 コンソール無効
+- `SecurityConfig` で `h2-console` の公開許可を廃止
+- セキュリティヘッダを追加
+  - `X-Content-Type-Options: nosniff`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy`
+  - `Strict-Transport-Security`
+  - `Content-Security-Policy`
 - `users` テーブルベースのログイン認証へ移行済み
 
 ## ゲスト閲覧機能
@@ -200,6 +209,7 @@ Version: 01.10.01
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.10.02 | 2026-05-01 | H2公開抑止（profile分離）とセキュリティヘッダ追加を反映 |
 | 01.10.01 | 2026-04-30 | 公開URL追記、環境変数一覧を実装準拠へ修正、開発状況を本番公開後状態へ更新 |
 | 01.10.00 | 2026-04-30 | Render本番デプロイ成功に伴い本番運用状態へ更新 |
 | 01.09.18 | 2026-04-30 | 本番環境（Render PostgreSQL）運用方針とDBマイグレーション導線を追記 |
