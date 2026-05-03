@@ -65,7 +65,7 @@
           <form th:object="${formDto}" th:action="@{/users/create}" method="post">
             <div class="mb-3" th:if="${'EDIT'.equals(viewDto.mode.name())}">
               <label for="id" class="form-label">id</label>
-              <input id="id" type="hidden" class="form-control" th:if="${'EDIT'.equals(viewDto.mode.name())}"
+              <input id="id" type="text" class="form-control" th:if="${'EDIT'.equals(viewDto.mode.name())}"
                 th:field="*{id}" readonly>
             </div>
             <div class="mb-3">

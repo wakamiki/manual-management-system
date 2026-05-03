@@ -1,7 +1,31 @@
 ﻿# 07_development-process-memo.md
 
-Version: 01.10.02  
-更新日: 2026-05-01
+Version: 01.10.03  
+更新日: 2026-05-03
+
+---
+
+## 2026-05-03（公開後UI表示崩れ修正）
+
+### 作業概要
+公開環境で確認された表示崩れを修正し、セキュリティヘッダ導入後に発生したアイコン表示不具合を解消した。
+
+### 実施内容
+- ユーザー更新モードで `id` が表示されない不具合を修正
+  - `type="hidden"` から `type="text" readonly` へ変更
+- MyPageの管理アイコン領域で、権限外時に空枠のみ表示される不具合を修正
+  - 表示条件（`th:if`）をアイコンラッパー要素側へ移動
+- セキュリティヘッダ追加後に発生したBootstrap Icons非表示を修正
+  - CSPの `style-src` / `font-src` に `https://cdn.jsdelivr.net` を追加
+
+### 影響範囲
+- `src/main/resources/templates/user-management.html`
+- `src/main/resources/templates/my-page.html`
+- `src/main/java/com/example/manual/config/SecurityConfig.java`
+
+### 学び・改善点
+- 表示制御条件は子要素ではなく、レイアウト枠要素に付与する方が崩れを防ぎやすい
+- CSP導入時は外部CSS/フォント/CDNの依存先を一覧化してから適用すると再調整工数を減らせる
 
 ---
 

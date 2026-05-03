@@ -63,9 +63,9 @@ public class SecurityConfig {
                                                                 "max-age=31536000"))
                                                 .contentSecurityPolicy(csp -> csp.policyDirectives(
                                                                 "default-src 'self'; "
-                                                                                + "style-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; "
+                                                                                + "style-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline'; "
                                                                                 + "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
-                                                                                + "img-src 'self' data:; font-src 'self' data:; object-src 'none'; frame-ancestors 'self'")));
+                                                                                + "img-src 'self' data:; font-src 'self' data: https://cdn.jsdelivr.net; object-src 'none'; frame-ancestors 'self'")));
 
                 return http.build();
         }

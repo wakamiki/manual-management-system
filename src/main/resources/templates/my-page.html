@@ -50,17 +50,17 @@
           </div>
 
           <div class="overview-icon">
-            <div class="home-icon-preview">
+            <div class="home-icon-preview"
+              th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}">
               <a target="_blank" rel="noopener noreferrer" type="button" class="home-icon-button" aria-label="ユーザー"
-                th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}"
                 th:href="@{/users}">
                 <i class="bi bi-person-fill-gear home-icon-shape" aria-hidden="true"></i>
               </a>
             </div>
 
-            <div class="home-icon-preview">
+            <div class="home-icon-preview"
+              th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}">
               <a target="_blank" rel="noopener noreferrer" type="button" class="home-icon-button" aria-label="カテゴリー"
-                th:if="${myPageDto.userDto.userRole.name()=='ADMIN' or myPageDto.userDto.userRole.name()=='GUEST'}"
                 th:href="@{/categories}">
                 <i class="bi bi-diagram-3-fill home-icon-shape" aria-hidden="true"></i>
               </a>
