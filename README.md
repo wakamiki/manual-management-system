@@ -1,11 +1,36 @@
 ﻿# Manual Management System
 
-Version: 01.10.03
-更新日: 2026-05-03
+Version: 01.10.04
+更新日: 2026-05-06
 
 ## 概要
 日々更新される業務マニュアルを、現場で継続的に管理することを想定したポートフォリオ用システムです。
 マニュアルの作成、更新、承認、履歴管理、カテゴリ管理、通知確認を通じて、業務システム開発の設計力・保守性・説明力を示すことを目的としています。
+
+## 資料一覧
+- システム概要スライド
+  - `docs/portfolio/01_system-overview.pdf`
+- 操作説明スライド
+  - `docs/portfolio/02_operation-guide.pdf`
+- ポートフォリオ資料の読み方
+  - `docs/portfolio/README.md`
+- 仕様・設計ドキュメント
+  - `docs/01_project-overview-and-basic-design.md`
+    - プロジェクトの目的、全体方針、基本設計の概要。
+  - `docs/02_system-specification-and-detailed-design.md`
+    - 業務仕様、権限/状態遷移、詳細設計の基準。
+  - `docs/03_screen-design.md`
+    - 画面一覧、画面遷移、各画面の表示・操作要件。
+  - `docs/04_api-design.md`
+    - エンドポイント一覧、DTO方針、例外/認可のAPI設計。
+  - `docs/05_db-design.md`
+    - テーブル定義、カラム制約、エンティティとの対応。
+  - `docs/06_test-specification.md`
+    - テスト観点・ケース定義・実施基準。
+  - `docs/06_test-result.md`
+    - 実施済みテスト結果、判定、補足メモ。
+  - `docs/08_security-check.md`
+    - 認証/認可、CSRF、SQLインジェクション、本番設定の確認記録。
 
 ## 主な機能
 - マニュアル一覧表示
@@ -48,9 +73,7 @@ Version: 01.10.03
 - 本番DB構築は手動SQL実行で管理（`ddl-auto=update` 任せにしない）
 - マイグレーションSQL:
   - `docs/db-migration/V1__create_tables.sql`
-  - `docs/db-migration/V2__seed_initial_data.sql`
-- 実行手順:
-  - `docs/db-migration/README.md`
+  - 初期データSQLは機密情報を含むため非公開管理
 
 ## セキュリティ構成
 - Spring Security を導入
@@ -138,29 +161,6 @@ Version: 01.10.03
 | GUEST_LOGIN_ID | ゲストログインID | 任意 | 必須 |
 | GUEST_LOGIN_PASSWORD | ゲストログインPW | 任意 | 必須 |
 
-## ポートフォリオ資料導線
-- 最初に見てほしい全体説明スライド（追加予定）
-  - `docs/portfolio/01_overview-slide.pdf`
-- 操作説明PDF（追加予定）
-  - `docs/portfolio/02_operation-guide.pdf`
-- 仕様・設計ドキュメント
-  - `docs/01_project-overview-and-basic-design.md`
-    - プロジェクトの目的、全体方針、基本設計の概要。
-  - `docs/02_system-specification-and-detailed-design.md`
-    - 業務仕様、権限/状態遷移、詳細設計の基準。
-  - `docs/03_screen-design.md`
-    - 画面一覧、画面遷移、各画面の表示・操作要件。
-  - `docs/04_api-design.md`
-    - エンドポイント一覧、DTO方針、例外/認可のAPI設計。
-  - `docs/05_db-design.md`
-    - テーブル定義、カラム制約、エンティティとの対応。
-  - `docs/db-migration/README.md`
-    - 本番DB初期構築（V1/V2）手順。
-  - `docs/06_test-specification.md`
-    - テスト観点・ケース定義・実施基準。
-  - `docs/06_test-result.md`
-    - 実施済みテスト結果、判定、補足メモ。
-
 ## 現在の開発状況
 - 本番公開
   - Render へデプロイ済み
@@ -211,6 +211,7 @@ Version: 01.10.03
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.10.04 | 2026-05-06 | 提出資料導線、リリース記録、セキュリティ確認資料を追加 |
 | 01.10.03 | 2026-05-03 | 公開後UI崩れ修正とCSP調整（Bootstrap Icons表示不具合対応）を反映 |
 | 01.10.02 | 2026-05-01 | H2公開抑止（profile分離）とセキュリティヘッダ追加を反映 |
 | 01.10.01 | 2026-04-30 | 公開URL追記、環境変数一覧を実装準拠へ修正、開発状況を本番公開後状態へ更新 |

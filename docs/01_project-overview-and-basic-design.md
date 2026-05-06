@@ -116,4 +116,4 @@ Manual Management System
 - 公開URL: `https://manual-management-system-1.onrender.com`
 - 本番アプリ基盤: Render Web Service
 - 本番DB: Render PostgreSQL
-- 本番DB構築: `docs/db-migration/V1__create_tables.sql` と `V2__seed_initial_data.sql` を手動適用
+- 本番DB構築: `docs/db-migration/V1__create_tables.sql` を手動適用し、初期データSQLは機密情報として別管理

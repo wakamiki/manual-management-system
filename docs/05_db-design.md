@@ -149,7 +149,6 @@ manuals                  1 --- N notifications
 ## 本番運用差分メモ（2026-04-30）
 - 開発環境DB: H2（`jdbc:h2:file:./data/testdb`）
 - 本番環境DB: PostgreSQL（Render）
-- 本番では手動マイグレーションSQLを適用してテーブル/初期データを構築する
+- 本番では手動マイグレーションSQLを適用してテーブルを構築し、初期データSQLは機密情報として別管理する
   - `docs/db-migration/V1__create_tables.sql`
-  - `docs/db-migration/V2__seed_initial_data.sql`
 - 公開URL: `https://manual-management-system-1.onrender.com`
