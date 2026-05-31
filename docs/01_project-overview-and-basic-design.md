@@ -115,5 +115,6 @@ Manual Management System
 ## 8. 本番公開情報（2026-04-30）
 - 公開URL: `https://manual-management-system-1.onrender.com`
 - 本番アプリ基盤: Render Web Service
-- 本番DB: Render PostgreSQL
+- 本番DB: Neon PostgreSQL
+- 将来構成: Northflank Web Service + Neon PostgreSQL
 - 本番DB構築: `docs/db-migration/V1__create_tables.sql` を手動適用し、初期データSQLは機密情報として別管理

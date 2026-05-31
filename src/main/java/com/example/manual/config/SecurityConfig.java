@@ -2,6 +2,7 @@ package com.example.manual.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,19 +28,23 @@ public class SecurityConfig {
         }
 
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoginSuccessHandler successHandler)
+        public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomLoginSuccessHandler successHandler,
+                        @Value("${spring.h2.console.enabled:false}") boolean h2ConsoleEnabled)
                         throws Exception {
                 http
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
+                                .authorizeHttpRequests(auth -> {
+                                        auth.requestMatchers(
                                                                 "/login",
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/login/guest",
                                                                 "/health")
-                                                .permitAll()
-                                                .anyRequest()
-                                                .authenticated())
+                                                        .permitAll();
+                                        if (h2ConsoleEnabled) {
+                                                auth.requestMatchers("/h2-console/**").permitAll();
+                                        }
+                                        auth.anyRequest().authenticated();
+                                })
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .successHandler(successHandler)
@@ -66,6 +71,9 @@ public class SecurityConfig {
                                                                                 + "style-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline'; "
                                                                                 + "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
                                                                                 + "img-src 'self' data:; font-src 'self' data: https://cdn.jsdelivr.net; object-src 'none'; frame-ancestors 'self'")));
+                if (h2ConsoleEnabled) {
+                        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+                }
 
                 return http.build();
         }

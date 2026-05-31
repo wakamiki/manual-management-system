@@ -1,7 +1,7 @@
 ﻿# Manual Management System
 
-Version: 01.10.04
-更新日: 2026-05-06
+Version: 01.10.05
+更新日: 2026-05-31
 
 ## 概要
 日々更新される業務マニュアルを、現場で継続的に管理することを想定したポートフォリオ用システムです。
@@ -66,11 +66,13 @@ Version: 01.10.04
 - H2コンソール: `/h2-console`
 - Spring Security 導入済み
 
-## 本番環境（Render）
+## 本番環境
 - 公開URL: `https://manual-management-system-1.onrender.com`
-- 本番DBは Render PostgreSQL を使用
-- アプリとDBは同一リージョン配置を推奨
+- 現行公開アプリ基盤は Render Web Service を使用
+- 本番DBは Neon PostgreSQL を使用
+- Render版アプリ、将来のNorthflank版アプリはいずれも同じNeon DBへ接続する方針
 - 本番DB構築は手動SQL実行で管理（`ddl-auto=update` 任せにしない）
+- 本番では `ddl-auto=validate` を使用し、起動時にスキーマ整合のみ確認する
 - マイグレーションSQL:
   - `docs/db-migration/V1__create_tables.sql`
   - 初期データSQLは機密情報を含むため非公開管理
@@ -153,7 +155,8 @@ Version: 01.10.04
 
 | 変数名 | 用途 | ローカル | 本番 |
 | --- | --- | --- | --- |
-| PORT | サーバ起動ポート（`server.port`） | 8081（省略時） | Renderが設定 |
+| SPRING_PROFILES_ACTIVE | 実行プロファイル | 未指定またはlocal | `prod` |
+| PORT | サーバ起動ポート（`server.port`） | 8081（省略時） | 実行基盤が設定 |
 | SPRING_DATASOURCE_URL | DB接続URL（JDBC形式） | `jdbc:h2:file:./data/testdb`（省略時） | 必須 |
 | SPRING_DATASOURCE_DRIVER_CLASS_NAME | JDBCドライバ | `org.h2.Driver`（省略時） | `org.postgresql.Driver` |
 | SPRING_DATASOURCE_USERNAME | DBユーザー名 | `sa`（省略時） | 必須 |
@@ -165,7 +168,7 @@ Version: 01.10.04
 - 本番公開
   - Render へデプロイ済み
   - 公開URL: `https://manual-management-system-1.onrender.com`
-  - Render PostgreSQL 接続で稼働中
+  - Neon PostgreSQL 接続へ移行
 - 実装済み（主要機能）
   - 認証/認可（Spring Security、ロール別制御、GUEST閲覧専用）
   - マニュアル機能（作成/編集/複製/申請/承認/差し戻し/アーカイブ/復帰）
@@ -180,7 +183,8 @@ Version: 01.10.04
   - テスト運用整備（`06_test-specification.md` / `06_test-result.md`）
 - 継続中
   - ポートフォリオ提出用資料（全体説明スライド、操作説明PDF）作成
-  - 公開環境の性能観測（Render要因/アプリ要因の切り分け）
+  - Northflank + Neon 構成への移行検討
+  - 公開環境の性能観測（実行基盤要因/アプリ要因の切り分け）
   - 運用向け最終ドキュメント整備（デモ手順・操作ガイド）
 
 ## テスト運用メモ（現行）
@@ -211,6 +215,7 @@ Version: 01.10.04
 ## 更新履歴
 | Version | Date | 内容 |
 | --- | --- | --- |
+| 01.10.05 | 2026-05-31 | 本番DBをNeon PostgreSQLへ移行するための環境変数/prod設定方針を反映 |
 | 01.10.04 | 2026-05-06 | 提出資料導線、リリース記録、セキュリティ確認資料を追加 |
 | 01.10.03 | 2026-05-03 | 公開後UI崩れ修正とCSP調整（Bootstrap Icons表示不具合対応）を反映 |
 | 01.10.02 | 2026-05-01 | H2公開抑止（profile分離）とセキュリティヘッダ追加を反映 |
