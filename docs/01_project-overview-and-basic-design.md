@@ -1,7 +1,7 @@
 ﻿# 01_project-overview-and-basic-design.md
 
-Version: 01.10.01
-更新日: 2026-04-30
+Version: 01.10.02
+更新日: 2026-05-31
 
 ---
 
@@ -93,14 +93,17 @@ Manual Management System
 - Spring Security
 - Thymeleaf
 - Bootstrap
-- H2 Database
+- H2 Database（ローカル開発DB）
+- PostgreSQL / Neon PostgreSQL（本番DB）
+- Render Web Service（本番公開環境）
 - Git / GitHub
 
 ### 6-1. 開発環境補足
 - 開発DBは H2 file DB を使用
 - 接続先: `jdbc:h2:file:./data/testdb`
 - H2コンソール: `/h2-console`
-- 本番移行候補: PostgreSQL
+- 本番DBは Neon PostgreSQL を使用
+- 本番DB接続情報は環境変数で管理
 - SecurityConfig を導入し、開発時の H2 コンソールアクセスを許可
 
 ---
@@ -112,9 +115,11 @@ Manual Management System
 
 ---
 
-## 8. 本番公開情報（2026-04-30）
+## 8. 本番公開情報（2026-05-31）
 - 公開URL: `https://manual-management-system-1.onrender.com`
 - 本番アプリ基盤: Render Web Service
 - 本番DB: Neon PostgreSQL
-- 将来構成: Northflank Web Service + Neon PostgreSQL
+- DB接続情報: 環境変数で管理し、URL/ユーザー名/パスワードはコードや公開docsへ直書きしない
 - 本番DB構築: `docs/db-migration/V1__create_tables.sql` を手動適用し、初期データSQLは機密情報として別管理
+- 本番JPA設定: `ddl-auto=validate` とし、起動時はスキーマ整合のみ確認する
+- Northflank は検証したが、無料枠では CPU/メモリ不足により Spring Boot の起動・ログインが遅いため正式構成には含めない

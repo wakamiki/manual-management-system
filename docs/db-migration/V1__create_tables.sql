@@ -1,6 +1,3 @@
--- Manual Management System
--- V1: create tables for PostgreSQL (manual execution)
-
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS categories (

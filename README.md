@@ -57,7 +57,8 @@ Version: 01.10.05
 - Spring Data JPA
 - Thymeleaf
 - Bootstrap
-- H2 Database
+- H2 Database（ローカル開発）
+- Neon PostgreSQL（本番DB）
 - Git / GitHub
 
 ## 開発環境
@@ -70,7 +71,10 @@ Version: 01.10.05
 - 公開URL: `https://manual-management-system-1.onrender.com`
 - 現行公開アプリ基盤は Render Web Service を使用
 - 本番DBは Neon PostgreSQL を使用
-- Render版アプリ、将来のNorthflank版アプリはいずれも同じNeon DBへ接続する方針
+- 本番公開環境では、Render上のSpring Bootアプリケーションから外部PostgreSQL（Neon）へ接続する
+- Render PostgreSQL から Neon PostgreSQL へ移行済み
+- Render Free のため、初回アクセス時は起動に時間がかかる場合がある
+- Northflank は検証したが、無料枠では Spring Boot の起動・ログインが遅いため正式採用しない
 - 本番DB構築は手動SQL実行で管理（`ddl-auto=update` 任せにしない）
 - 本番では `ddl-auto=validate` を使用し、起動時にスキーマ整合のみ確認する
 - マイグレーションSQL:
@@ -168,7 +172,8 @@ Version: 01.10.05
 - 本番公開
   - Render へデプロイ済み
   - 公開URL: `https://manual-management-system-1.onrender.com`
-  - Neon PostgreSQL 接続へ移行
+  - Render PostgreSQL から Neon PostgreSQL 接続へ移行済み
+  - Render + Neon 構成を正式運用構成とする
 - 実装済み（主要機能）
   - 認証/認可（Spring Security、ロール別制御、GUEST閲覧専用）
   - マニュアル機能（作成/編集/複製/申請/承認/差し戻し/アーカイブ/復帰）
@@ -183,7 +188,7 @@ Version: 01.10.05
   - テスト運用整備（`06_test-specification.md` / `06_test-result.md`）
 - 継続中
   - ポートフォリオ提出用資料（全体説明スライド、操作説明PDF）作成
-  - Northflank + Neon 構成への移行検討
+  - Northflank は検証済みだが正式採用は見送り
   - 公開環境の性能観測（実行基盤要因/アプリ要因の切り分け）
   - 運用向け最終ドキュメント整備（デモ手順・操作ガイド）
 

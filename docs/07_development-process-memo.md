@@ -1660,5 +1660,35 @@ Render に本番DBを作成し、Webサービスの公開まで完了した。
 ---
 
 
+## 2026-05-31
+
+### 作業概要
+Render PostgreSQL の無料DB期限切れに伴い、本番DBを Neon PostgreSQL へ移行した。  
+アプリ本体は既存の Render 公開URLを維持し、正式な本番構成を Render + Neon として整理した。
+
+### 実施内容
+- Neon PostgreSQL を本番DBとして採用
+- 本番DBへ schema SQL / seed SQL を手動投入
+- Render の環境変数を Neon 接続用に変更
+- Render 上の Spring Boot アプリから Neon DB へ接続できることを確認
+- ログイン成功を確認
+- 初期データ表示を確認
+- 新規作成などのDB更新系操作が Neon DB に反映されることを確認
+- 本番JPA設定は `ddl-auto=validate` とし、スキーマ自動更新を行わない方針に整理
+- DB接続URL、ユーザー名、パスワードはコードや公開docsへ記載しない方針を再確認
+
+### Northflank検証メモ
+- Northflank + Neon 構成も検証した
+- 無料枠では CPU / メモリが不足気味で、Spring Boot の起動やログインが遅かった
+- 既に Render 版URLを提出済みであることも踏まえ、正式採用は見送り
+- 最終的な正式公開構成は Render + Neon とする
+
+### 学び
+- アプリ公開基盤とDB基盤は分離して運用できる
+- DB接続情報を環境変数化しておくと、Render PostgreSQL から Neon PostgreSQL への移行時にコード変更を抑えられる
+- 本番DBでは `ddl-auto=update` に頼らず、schema SQL と `validate` で管理する方が安全
+
+---
+
 
 
